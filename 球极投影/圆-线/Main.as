@@ -27,7 +27,7 @@
 				var p1:Point = new Point(0, r);
 				var cos:Number = Math.cos(ang);
 				var sin:Number = Math.sin(ang);
-				var p2:Point = new Point(cos, sin); 
+				var p2:Point = new Point(r*cos, r*sin); 
 				var gra:Graphics = shape.graphics;
 				var x0:Number = r * Math.tan(Math.PI/4+ang/2);
 				gra.clear();
@@ -41,7 +41,8 @@
 				gra.lineTo(p2.x, p2.y);
 				gra.lineStyle(1, 0x0000ff);
 				gra.moveTo(p1.x, p1.y);
-				gra.lineTo(x0*2-p1.x, -p1.y);
+				gra.lineTo(x0, 0);
+				gra.lineTo(p2.x, p2.y);
 				gra.lineStyle(1, 0xff00ff);
 				gra.drawCircle(p2.x, p2.y, 3);
 				gra.drawCircle(p1.x, p1.y, 3);
