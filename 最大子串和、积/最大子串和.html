@@ -1,0 +1,49 @@
+<pre id = 'a'></pre>
+<pre id = "b"></pre>
+<div id = 'r'></div>
+<button onclick='show()'>刷新</button>
+<script type="text/javascript">
+
+	var ta = document.getElementById("a"); 
+	var tb = document.getElementById("b");
+	var fr = document.getElementById("r");
+
+	var n = 10;
+	var ma = 10;
+	var mi = -10;
+	show();
+
+	function show(){
+		var a = randomA(n, ma, mi);
+		var res = findMaxProduct(a);
+		ta.innerHTML = "a:\t"+res[0].join('\t');
+		tb.innerHTML = "b:\t"+res[1].join('\t');
+		fr.innerHTML = "max:\t"+res[2];
+	}
+
+	/**
+	 * 生成一个长度是n，值在[min,max]范围内的整数数组。
+	 */
+	function randomA(n, max, min){
+		var a = [];
+		for(var i = 0; i < n; i++){
+			a[i] = min + Math.floor(Math.random() * (max - min + 1));
+		}
+		return a;
+	} 
+
+	/**
+	 * 求最大子串和。
+	 */
+	function findMaxProduct(a){
+		var b = [];
+		var max = a[0];
+		var len = a.length;
+		b[0] = a[0];
+		for(var k = 1; k < len; k++){
+			b[k] = Math.max(b[k-1] + a[k], a[k]);
+			max = Math.max(b[k], max);
+		}
+		return [a,b,max];
+	}
+</script>
