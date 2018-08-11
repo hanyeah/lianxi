@@ -1,0 +1,64 @@
+<canvas id = "canvas" width="256" height="256" style="width:256px;height:256px;"></canvas>
+
+<script type="text/javascript" src = "Vector3.js"></script>
+<script type="text/javascript" src = "Ray3.js"></script>
+<script type="text/javascript" src = "IntersectResult.js"></script>
+<script type="text/javascript" src = "Sphere.js"></script>
+<script type="text/javascript" src = "PerspectiveCamera.js"></script>
+<script type="text/javascript" src = "Color.js"></script>
+<script type="text/javascript" src = "CheckerMaterial.js"></script>
+<script type="text/javascript" src = "PhongMaterial.js"></script>
+
+<script type="text/javascript">
+
+	var canvas = document.getElementById("canvas");
+	var w = 256;
+	var h = 256;
+
+	var sphere = new Sphere(new Vector3(0, 10, -10), 10);
+	sphere.material = new CheckerMaterial(3);
+	sphere.material = new PhongMaterial(Color.red, Color.white, 16);
+	var camera = new PerspectiveCamera(new Vector3(0, 10, 10), new Vector3(0, 0, -1), new Vector3(0, 1, 0), 90);
+	var maxDepth = 20;
+	//
+	setInterval(function(){
+		loop();
+	},20);
+	function loop(){
+		rayTrace(canvas, sphere, camera, maxDepth);
+	}
+
+	
+	//
+
+	function rayTrace(canvas, scene, camera, maxDepth){
+
+		var ctx = canvas.getContext("2d");
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.fillRect(0, 0, w, h);
+		var imgData = ctx.getImageData(0,0,w,h);
+		var pixels = imgData.data;
+
+		scene.initialize();
+		camera.initialize();
+
+		var i = 0;
+		for(var y=0;y<h;y++){
+			var sy = 1 - y / h;
+			for(var x=0;x<w;x++){
+				var sx = x/w;
+				var ray = camera.generateRay(sx, sy);
+				var result = scene.intersect(ray);
+				if(result.geometry){
+					var color = result.geometry.material.sample(ray, result.position, result.normal);
+					pixels[i  ] = color.r * 255;
+					pixels[i+1] = color.g * 255;
+					pixels[i+2] = color.b * 255;
+					pixels[i+3] = 255;
+				}
+				i += 4;
+			}
+		}
+		ctx.putImageData(imgData, 0, 0);
+	}
+</script>

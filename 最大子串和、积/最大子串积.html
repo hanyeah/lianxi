@@ -1,12 +1,9 @@
-
 <pre id = 'a'></pre>
-<pre id = "b"></pre>
 <div id = 'r'></div>
 <button onclick='show()'>刷新</button>
 <script type="text/javascript">
-	// https://blog.csdn.net/qq_41021816/article/details/80411643
-	var ta = document.getElementById("a"); 
-	var tb = document.getElementById("b");
+	// https://blog.csdn.net/puqutogether/article/details/41862163
+	var ta = document.getElementById("a");
 	var fr = document.getElementById("r");
 
 	var n = 10;
@@ -16,10 +13,9 @@
 
 	function show(){
 		var a = randomA(n, ma, mi);
-		var res = findMaxProduct(a);
-		ta.innerHTML = "a:\t"+res[0].join('\t');
-		tb.innerHTML = "b:\t"+res[1].join('\t');
-		fr.innerHTML = "max:\t"+res[2];
+		var max = findMaxProduct(a);
+		ta.innerHTML = "a:\t"+a.join('\t');
+		fr.innerHTML = "max:\t"+max;
 	}
 
 	/**
@@ -34,17 +30,18 @@
 	} 
 
 	/**
-	 * 求最大子串和。
+	 * 求最大子串。
 	 */
 	function findMaxProduct(a){
-		var b = [];
 		var max = a[0];
+		var min = a[0];
+		var maxProduct = a[0];
 		var len = a.length;
-		b[0] = a[0];
 		for(var k = 1; k < len; k++){
-			b[k] = Math.max(b[k-1] + a[k], a[k]);
-			max = Math.max(b[k], max);
+			max = Math.max(max*a[k], min*a[k], a[k]);
+			min = Math.max(max*a[k], min*a[k], a[k]);
+			maxProduct = Math.max(max, min);
 		}
-		return [a,b,max];
+		return maxProduct;
 	}
 </script>

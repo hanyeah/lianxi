@@ -1,0 +1,27 @@
+
+<pre id = 'a'></pre>
+<div id = 'r'></div>
+<script type="text/javascript">
+	// https://www.cnblogs.com/wangzaizhen/p/5161762.html
+	var ta = document.getElementById("a"); 
+	var fr = document.getElementById("r");
+
+	var a = [2,4,3,2,3,5,5];
+	var res = findOnceNum(a);
+	ta.innerHTML = "a:\t"+a.join('\t');
+	fr.innerHTML = "once:\t"+res;
+
+	
+	/**
+	 * 数组中唯一出现1次的数。
+	 */
+	function findOnceNum(a){
+		var ret = 0;
+		var len = a.length;
+		for(var i = 0; i < len; i++){
+			ret = ret^a[i];
+		}
+		return ret;
+	}
+
+</script>

@@ -1,0 +1,48 @@
+
+<pre id = 'a'></pre>
+<div id = 'r'></div>
+<script type="text/javascript">
+	// https://www.cnblogs.com/wangzaizhen/p/5161762.html
+	var ta = document.getElementById("a"); 
+	var fr = document.getElementById("r");
+
+	var a = [2,4,3,2,3,5,5,7];
+	var res = findOnceNums(a);
+	ta.innerHTML = "a:\t"+a.join('\t');
+	fr.innerHTML = "once:\t"+res.join('\t');
+
+	function isTrueBit(num, index){
+		return (num>>index) & 0x01;
+	}
+	
+	/**
+	 * 数组中两个出现1次的数。
+	 */
+	function findOnceNums(arr){
+		var xor = 0;
+		var len = arr.length;
+		for(var i = 0; i < len; i++){
+			xor = xor^arr[i];
+		}
+		//
+		var index = 0;
+		while(index < 32){
+			if(isTrueBit(xor, index)){
+				break;
+			}
+			index++;
+		}
+		//
+		var a = 0;
+		var b = 0;
+		for(var i = 0; i < len; i++){
+			if(isTrueBit(arr[i])){
+				a = a^arr[i];
+			} else {
+				b = b^arr[i];
+			}
+		}
+		return [a, b];
+	}
+
+</script>

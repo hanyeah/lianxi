@@ -1,0 +1,67 @@
+<canvas id = "canvas" width="256" height="256" style="width:256px;height:256px;"></canvas>
+
+<script type="text/javascript" src = "Vector3.js"></script>
+<script type="text/javascript" src = "Ray3.js"></script>
+<script type="text/javascript" src = "IntersectResult.js"></script>
+<script type="text/javascript" src = "Sphere.js"></script>
+<script type="text/javascript" src = "PerspectiveCamera.js"></script>
+
+<script type="text/javascript">
+
+	var canvas = document.getElementById("canvas");
+	var w = 256;
+	var h = 256;
+
+	var sphere = new Sphere(new Vector3(0, 10, -10), 10);
+	var camera = new PerspectiveCamera(new Vector3(0, 10, 10), new Vector3(0, 0, -1), new Vector3(0, 1, 0), 90);
+	var maxDepth = 20;
+	//
+	var speed = 0.1;
+	setInterval(function(){
+		//loop();
+	},20);
+	function loop(){
+		if(sphere.center.z < -15){
+			speed = 0.1;
+		} else if(sphere.center.z > -5){
+			speed = -0.1;
+		}
+
+		sphere.center.z += speed;
+
+		renderDepth(canvas, sphere, camera, maxDepth);
+	}
+
+	renderNormal(canvas, sphere, camera, maxDepth);
+	//
+
+	function renderNormal(canvas, scene, camera, maxDepth){
+
+		var ctx = canvas.getContext("2d");
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.fillRect(0, 0, w, h);
+		var imgData = ctx.getImageData(0,0,w,h);
+		var pixels = imgData.data;
+
+		scene.initialize();
+		camera.initialize();
+
+		var i = 0;
+		for(var y=0;y<h;y++){
+			var sy = 1 - y / h;
+			for(var x=0;x<w;x++){
+				var sx = x/w;
+				var ray = camera.generateRay(sx, sy);
+				var result = scene.intersect(ray);
+				if(result.geometry){
+					pixels[i  ] = (result.normal.x + 1)*128;
+					pixels[i+1] = (result.normal.y + 1)*128;
+					pixels[i+2] = (result.normal.z + 1)*128;
+					pixels[i+3] = 255;
+				}
+				i += 4;
+			}
+		}
+		ctx.putImageData(imgData, 0, 0);
+	}
+</script>
