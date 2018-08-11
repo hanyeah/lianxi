@@ -13,6 +13,7 @@
 
 	function show(){
 		var a = randomA(n, ma, mi);
+		var a = [-2.5, 4, 0, 3, 0.5, 8, -1];
 		var max = findMaxProduct(a);
 		ta.innerHTML = "a:\t"+a.join('\t');
 		fr.innerHTML = "max:\t"+max;
@@ -38,9 +39,10 @@
 		var maxProduct = a[0];
 		var len = a.length;
 		for(var k = 1; k < len; k++){
-			max = Math.max(max*a[k], min*a[k], a[k]);
-			min = Math.max(max*a[k], min*a[k], a[k]);
-			maxProduct = Math.max(max, min);
+			var a0 = Math.max(max*a[k], min*a[k], a[k]);
+			var b0 = Math.min(max*a[k], min*a[k], a[k]);
+			max = a0;min = b0;
+			maxProduct = Math.max(max, maxProduct);
 		}
 		return maxProduct;
 	}
