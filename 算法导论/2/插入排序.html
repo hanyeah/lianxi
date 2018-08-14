@@ -1,0 +1,173 @@
+<script type="text/javascript">
+	// 测试
+	var a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+	a.sort(function(a, b){return Math.random()>0.5;});
+
+	var s0 = '<pre>' + a.join('\t') + '</pre>';
+	inselectionSort(a); // 排序
+	var s1 = '<pre>' + a.join('\t') + '</pre>';
+	document.write(s0 + s1);
+	//
+	/**
+	 * 插入排序
+	 * (无论在什么时候，左手中的牌都是排好序的)
+	 * @param  {Array} a 要排序的数组
+	 */
+	function inselectionSort(a){
+		var len = a.length;
+		for(var j = 0; j < len; j++){
+			var key = a[j];// 取出牌
+			var i = j - 1;
+			while(i >= 0 && a[i] > key){// 左边有牌，并且左边的牌比取出的牌大
+				a[i + 1] = a[i];// 左边的牌右移一位，流出一个空位
+				i--;// 继续往左边走
+			}
+			a[i+1] = key;//把取出的牌放到最后的空位上。
+		}
+	}
+</script>
+
+<script type="text/javascript">
+	var a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+	a.sort(function(a, b){return Math.random()>0.5;});
+
+	var records = inselectionSortRecord(a.concat());
+	//console.log(records);
+
+	var divCon = document.createElement('div');
+	document.body.appendChild(divCon);
+	
+	divCon.style.position = 'relative';
+	var tArr = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+	var cardArr = [];
+	for(var i = 0 ;i < 13; i++){
+		var card = new Card(50, 80, '#cccccc');
+		divCon.appendChild(card.dom);
+		card.setPosition(60 * i, 0);
+		card.setText(tArr[a[i]-1]);
+		cardArr[i] = card;
+	}
+	var arrow = new Card(10, 10, '#cc0000');
+	divCon.appendChild(arrow.dom);
+	arrow.setPosition(60 * (0.5 + 0) - 5, -15);
+
+	var bigDiv = new Card(40, 20, '#ffffff');
+	divCon.appendChild(bigDiv.dom);
+	bigDiv.setText('大于');
+	bigDiv.show(false);
+	bigDiv.setFontSize(18);
+	bigDiv.setPosition(60 * (0.5 + 0) - 20, 90);
+
+	var pt = 0;
+	var pickCard;
+	var ind = 0;
+	var i = 0;
+	setTimeout(doStep, 1000);
+	function doStep(){
+		var step = records[pt++];
+		bigDiv.show(false);
+		switch(step){
+			case 'pick':
+				pick();
+			break;
+			case 'big':
+				bigger();
+			break;
+			case 'move':
+				move();
+			break;
+			case 'put':
+				put();
+				i++;
+				ind = i;
+				arrow.setPosition(60 * (0.5 + ind)-5, -15);
+			break;
+		}
+		if(pt < records.length){
+			setTimeout(doStep, 1000);
+		}
+	}
+
+	function pick(){
+		pickCard = cardArr[ind];
+		cardArr[ind] = null;
+		moveTo(pickCard, ind * 60, 120);
+	}
+
+	function bigger(){
+		console.log('大于');
+		bigDiv.setPosition(60 * (0.5 + ind - 1) - 20, 90);
+		bigDiv.show(true);
+	}
+
+	function move(){
+		moveTo(cardArr[ind-1], ind * 60, 0);
+		cardArr[ind] = cardArr[ind-1];
+		cardArr[ind-1] = null;
+		ind--;
+	}
+
+	function put(){
+		moveTo(pickCard, ind * 60, 0);
+		cardArr[ind] = pickCard;
+	}
+
+	function moveTo(card, x, y){
+		card.setPosition(x, y);
+	}
+
+	function Card(w, h, bgCo){
+		var div = document.createElement('div');
+		div.style.position = 'absolute';
+		div.style.width = w + 'px';
+		div.style.height = h + 'px';
+		div.style.background = bgCo;
+		div.style.fontSize = '30px';
+		div.style.left = '0px';
+		div.style.top = '0px';
+		div.style.border = 'solid 1px #000000';
+		div.style.lineHeight = h + 'px';
+		div.style.textAlign = 'center';
+		this.dom = div;
+
+		this.setPosition = function(x, y){
+			div.style.left = x + 'px';
+			div.style.top = y + 'px';
+		}
+
+		this.setText = function(txt){
+			div.innerHTML = '' + txt;
+		}
+
+		this.show = function(flag){
+			div.style.display = flag?'block':'none';
+		}
+
+		this.setFontSize = function(value){
+			div.style.fontSize = value+ 'px';
+		}
+	}
+	/**
+	 * 插入排序
+	 * (无论在什么时候，左手中的牌都是排好序的)
+	 * @param  {Array} a 要排序的数组
+	 */
+	function inselectionSortRecord(a){
+		var record = [];
+		var len = a.length;
+		for(var j = 0; j < len; j++){
+			var key = a[j];// 取出牌
+			record.push('pick');
+			var i = j - 1;
+			while(i >= 0 && a[i] > key){// 左边有牌，并且左边的牌比取出的牌大
+				record.push('big');
+				record.push('move');
+				a[i + 1] = a[i];// 左边的牌右移一位，流出一个空位
+				i--;// 继续往左边走
+			}
+			record.push('put');
+			a[i+1] = key;//把取出的牌放到最后的空位上。
+		}
+		return record;
+	}
+</script>
