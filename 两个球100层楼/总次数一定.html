@@ -1,0 +1,27 @@
+<script type="text/javascript">
+	function f(m, n){
+		if(m==1){
+			return n;
+		}
+		if(n==1){
+			return 1;
+		}
+		return f(m, n-1) + f(m-1,n-1) + 1;
+	}
+	var m = 0;
+	var sum = 0;
+	var n = 0;
+	var arr = [];
+	for(var i = 14; i > 0; i--){
+		m += i;
+		for(var j = 1; j < i; j++){
+			if(m - i + j <= 100){
+				n++;
+				sum += (14-i+1) + j;
+			}
+		}
+		console.log(i,m);
+	}
+	console.log(f(2, 14));
+	console.log(n, sum, sum/n);
+</script>

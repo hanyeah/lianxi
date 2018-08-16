@@ -1,0 +1,35 @@
+<script type="text/javascript">
+	//https://www.cnblogs.com/tracyhan/p/5490775.html
+	
+	// 测试
+	var queue = new Queue();
+	var n = 0;
+	for(var i = 0; i < 20; i++ ){
+		if(Math.random() > 0.2){
+			queue.push(n);
+			console.log("插入一个值：",n);
+			n++;
+		} else {
+			console.log("取出一个值：",queue.pop());
+		}
+	}
+
+	//两个栈实现一个队列
+	function Queue(){
+		var stack1 = [];
+		var stack2 = [];
+
+		this.push = function(data){
+			stack1.push(data);
+		}
+
+		this.pop = function(){
+			if(stack2.length == 0){
+				for(var i = stack1.length; i > 0; i--){
+					stack2.push(stack1.pop());
+				}
+			}
+			return stack2.pop();
+		}
+	}
+</script>

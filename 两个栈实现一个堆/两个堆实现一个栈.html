@@ -1,0 +1,88 @@
+<script type="text/javascript">
+	//https://www.cnblogs.com/tracyhan/p/5490775.html
+	
+	// 测试
+	// var queue = new Queue();
+	// var n = 0;
+	// for(var i = 0; i < 20; i++ ){
+	// 	if(Math.random() > 0.2){
+	// 		queue.push(n);
+	// 		console.log("插入一个值：",n);
+	// 		n++;
+	// 	} else {
+	// 		console.log("取出一个值：",queue.pop());
+	// 	}
+	// }
+
+	// 测试
+	var stack = new Stack();
+	var n = 0;
+	for(var i = 0; i < 20; i++ ){
+		if(Math.random() > 0.2){
+			stack.push(n);
+			console.log("插入一个值：",n);
+			n++;
+		} else {
+			console.log("取出一个值：",stack.pop());
+		}
+	}
+
+
+
+	function Stack(){
+		var queue1 = new Queue();
+		var queue2 = new Queue();
+		var n = 0;
+
+		this.push = function(data){
+			queue1.push(data);
+			n++;
+		}
+
+		this.pop = function(){
+			var size = queue1.size();
+			for(var i = size; i > 0; i--){
+				queue2.push(queue1.pop());
+				if(i > 1){
+					queue1.push(queue2.pop());
+				}
+			}
+			if(n > 0){
+				n--;
+			}
+			return queue2.pop();
+		}
+
+		this.size = function(){
+			return n;
+		}
+	}
+
+	//两个栈实现一个队列
+	function Queue(){
+		var stack1 = [];
+		var stack2 = [];
+		var n = 0;
+
+		this.push = function(data){
+			stack1.push(data);
+			n++;
+		}
+
+		this.pop = function(){
+			if(stack2.length == 0){
+				for(var i = stack1.length; i > 0; i--){
+					stack2.push(stack1.pop());
+				}
+			}
+			if(n > 0){
+				n--;
+			}
+			return stack2.pop();
+		}
+
+		this.size = function(){
+			return n;
+		}
+	} 
+</script>
