@@ -1,0 +1,66 @@
+<script>
+	var a = [2, 3, 8, 6, 1];
+	var p = reversePairs(a);
+	console.log(p);
+	var p = [];
+	mergeReversePairs(a, 0, a.length, p);
+	console.log('数组：', a.join(','));
+	console.log('逆序对个数：', p.length);
+	console.log('逆序对：', p);
+
+	function reversePairs(a){
+		var r = [];
+		var len = a.length;
+		for(var i = 0; i < len - 1; i++){
+			for(var j = i + 1; j < len; j++){
+				if(a[i] > a[j]){
+					//r.push([i, j]);
+					r.push([a[i],a[j]]);
+				}
+			}
+		}
+		return r;
+	}
+
+	function mergeReversePairs(a, p, r, b){
+		if(p < r - 1){
+			var q = Math.floor((p + r) / 2);
+			mergeReversePairs(a, p, q, b);
+			mergeReversePairs(a, q, r, b);
+			merge(a, p, q, r, b);
+		}
+		return b;
+	}
+
+	function merge(a, p, q, r, b){
+		var n1 = q - p;
+		var n2 = r - q;
+		var L = [];
+		var R = [];
+		for(var i = 0; i < n1; i++){
+			L[i] = a[p + i];
+		}
+		for(var j = 0; j < n2; j++){
+			R[j] = a[q + j];
+		}
+		L[n1] = Infinity;
+		R[n2] = Infinity;
+		var i = 0;
+		var j = 0;
+		for(var k = p; k < r; k++){
+			if(L[i] < R[j]){
+				a[k] = L[i];
+				i++;
+			}
+			else {
+				a[k] = R[j];
+				if(i < n1){
+					for(var m = i; m < n1; m++){
+						b.push([L[m],R[j]]);
+					}
+				}
+				j++;
+			}
+		}
+	}
+</script>

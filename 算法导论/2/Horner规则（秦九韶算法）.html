@@ -1,0 +1,17 @@
+﻿<script>
+	var a = [1, 2, 3, 4, 5];
+	var x = 8;
+	console.log('多项式：','a0 + x * (a1 + x * (a2 + x * (a3 + x * a4)))');
+	console.log('系数：', a.join(','));
+	console.log('x:', x);
+	console.log('结果：',horner(a, x));
+	
+	function horner(a, x){
+		var y = 0;
+		for(var i = a.length - 1; i >= 0; i--){
+			y = a[i] + x * y;
+		}
+		return y;
+	}
+
+</script>
