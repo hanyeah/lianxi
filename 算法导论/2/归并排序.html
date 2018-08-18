@@ -1,0 +1,44 @@
+<script>
+	var a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+	a.sort(function(){return Math.random()>0.5;});
+
+	console.log(a.join("\t"));
+	mergeSort(a, 0, a.length);
+	console.log(a.join("\t"));
+
+	function mergeSort(a, p, r){
+		if(p < r - 1){
+			var q = Math.floor((p+r)/2);
+			mergeSort(a, p, q);
+			mergeSort(a, q, r);
+			merge(a, p, q, r);
+		}
+	}
+
+	function merge(a, p, q, r){
+		var n1 = q - p;
+		var n2 = r - q;
+		var L = [];
+		var R = [];
+		for(var i = 0; i < n1; i++){
+			L[i] = a[p + i];
+		}
+		for(var j = 0; j < n2; j++){
+			R[j] = a[q + j];
+		}
+		L[n1] = Infinity;
+		R[n2] = Infinity;
+		var i = 0;
+		var j = 0;
+		for(var k = p; k < r; k++){
+			if(L[i] < R[j]){
+				a[k] = L[i];
+				i++;
+			}
+			else {
+				a[k] = R[j];
+				j++;
+			}
+		}
+	}
+</script>

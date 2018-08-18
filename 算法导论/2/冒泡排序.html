@@ -1,25 +1,21 @@
 <script>
-
 	var a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 	a.sort(function(){return Math.random()>0.5;});
 
 	console.log(a.join("\t"));
-	selectionSort(a);
+	bubbleSort(a);
 	console.log(a.join("\t"));
 
-	function selectionSort(a){
+	function bubbleSort(a){
 		var len = a.length;
 		for(var i = 0; i < len - 1; i++){
-			var mi = i;
-			var m = a[i];
-			for(var j = i + 1; j < len; j++){
-				if(a[j] < m){
-					m = a[j];
-					mi = j;
+			for(var j = len - 1; j > i; j--){
+				if(a[j] < a[i]){
+					var k = a[i];
+					a[i] = a[j];
+					a[j] = k;
 				}
 			}
-			a[mi] = a[i];
-			a[i] = m;
 		}
 	}
 </script>
