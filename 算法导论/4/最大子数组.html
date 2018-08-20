@@ -1,0 +1,49 @@
+<script>
+	var a = [13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7];
+	var b = findMaximumSubArray(a, 0, a.length-1);
+	console.log('数组：',a.join(','));
+	console.log('结果',b.join(','));
+	console.log('最大子数组：',a.slice(b[0], b[1]+1).join(','));
+
+	function findMaxCrossingSubArray(a, low, mid, high){
+		var leftSum = -Infinity;
+		var sum = 0;
+		var maxLeft = mid;
+		for(var i = mid; i >= low; i--){
+			sum = sum + a[i];
+			if(sum > leftSum){
+				leftSum = sum;
+				maxLeft = i;
+			}
+		}
+		var rightSum = -Infinity;
+		sum = 0;
+		var maxRight = mid;
+		for(var j = mid + 1; j <= high; j++){
+			sum = sum + a[j];
+			if(sum > rightSum){
+				rightSum = sum;
+				maxRight = j;
+			}
+		}
+		return [maxLeft, maxRight, leftSum + rightSum];
+	}
+
+	function findMaximumSubArray(a, low, high){
+		if(high == low){
+			return [low, high, a[low]];
+		} else {
+			var mid = Math.floor((low + high) / 2);
+			var left = findMaximumSubArray(a, low, mid);
+			var right = findMaximumSubArray(a, mid + 1, high);
+			var cross = findMaxCrossingSubArray(a, low, mid, high);
+			if(left[2] >= right[2] && left[2] >= cross[2]){
+				return left;
+			} else if(right[2] >= left[2] && right[2] >= cross[2]){
+				return right;
+			} else {
+				return cross;
+			}
+		}
+	}
+</script>
