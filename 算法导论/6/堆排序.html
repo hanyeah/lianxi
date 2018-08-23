@@ -5,8 +5,18 @@
 	a.heapSize = a.length;
 
 	console.log(a.join('\t'));
-	buildMaxHeap(a);
+	//buildMaxHeap(a);
+	heapSort(a);
 	console.log(a.join('\t'));
+
+	function heapSort(a){
+		buildMaxHeap(a);
+		for(var i = a.length-1; i>0;i--){
+			exchange(a, 0, i);
+			a.heapSize--;
+			maxHeapify(a, 0);
+		}
+	}
 
 	function buildMaxHeap(a){
 		a.heapSize = a.length;
