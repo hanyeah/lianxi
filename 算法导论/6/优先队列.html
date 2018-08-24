@@ -1,0 +1,58 @@
+<script type="text/javascript" src = "最大堆.js"></script>
+<script type="text/javascript">
+	var a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+	a.sort(function(){return Math.random()>0.5});
+	a.heapSize = a.length;
+
+	console.log("数组a:",a.join('\t'));
+	var b = [];
+	b.heapSize = 0;
+	for(var i = 0;i<a.length;i++){
+		maxHeapInsert(b, a[i]);
+		console.log(b.join('\t'));
+	}
+	console.log("优先队列b:",b.join('\t'));
+	while(b.heapSize){
+		console.log("  heapMaximum(b):",heapMaximum(b));
+		var max = heapExtractMax(b);
+		console.log("  heapExtractMax(b):",max);
+	}
+
+	function heapMaximum(a){
+		return a[0];
+	}
+
+	function heapExtractMax(a){
+		if(a.heapSize<0){
+			throw(new Error('heap underflow'));
+		}
+		max = a[0];
+		a[0] = a[a.heapSize - 1];
+		a.heapSize--;
+		maxHeapify(a, 0);
+		return max;
+	}
+
+	function heapIncreaseKey(a, i, key){
+		if(key < a[i]){
+			throw(new Error('new key is smaller then current key'));
+		}
+		a[i] = key;
+		var pi;
+		while(i>0){
+			pi = parent(i);
+			if(a[pi] < a[i]){
+				exchange(a, i, pi);
+				i = pi;
+			} else {
+				break;
+			}
+		}
+	}
+
+	function maxHeapInsert(a, key){
+		a[a.heapSize] = -Infinity;
+		a.heapSize++;
+		heapIncreaseKey(a, a.heapSize - 1, key);
+	}
+</script>

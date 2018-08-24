@@ -19,7 +19,6 @@
 	}
 
 	function buildMaxHeap(a){
-		a.heapSize = a.length;
 		for(var i = a.length>>1; i>=0;i--){
 			maxHeapify(a, i);
 		}
@@ -56,7 +55,7 @@
 	}
 
 	function parent(i){
-		return (i+1)>>1;
+		return (i-1)>>1;
 	}
 
 	/*function left(i){
