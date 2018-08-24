@@ -1,36 +1,36 @@
 function heapSort(a){
-	buildMaxHeap(a);
+	buildMinHeap(a);
 	for(var i = a.length-1; i>0;i--){
 		exchange(a, 0, i);
 		a.heapSize--;
-		maxHeapify(a, 0);
+		minHeapify(a, 0);
 	}
 }
 
-function heapMaximum(a){
+function heapMinimum(a){
 	return a[0];
 }
 
-function heapExtractMax(a){
+function heapExtractMin(a){
 	if(a.heapSize<0){
 		throw(new Error('heap underflow'));
 	}
-	max = a[0];
+	min = a[0];
 	a[0] = a[a.heapSize - 1];
 	a.heapSize--;
-	maxHeapify(a, 0);
-	return max;
+	minHeapify(a, 0);
+	return min;
 }
 
 function heapIncreaseKey(a, i, key){
-	if(key < a[i]){
-		throw(new Error('new key is smaller then current key'));
+	if(key > a[i]){
+		throw(new Error('new key is bigger then current key'));
 	}
 	a[i] = key;
 	var pi;
 	while(i>0){
 		pi = parent(i);
-		if(a[pi] < a[i]){
+		if(a[pi] > a[i]){
 			exchange(a, i, pi);
 			i = pi;
 		} else {
@@ -39,54 +39,54 @@ function heapIncreaseKey(a, i, key){
 	}
 }
 
-function maxHeapInsert(a, key){
-	a[a.heapSize] = -Infinity;
+function minHeapInsert(a, key){
+	a[a.heapSize] = Infinity;
 	a.heapSize++;
 	heapIncreaseKey(a, a.heapSize - 1, key);
 }
 
-function buildMaxHeap(a){
+function buildMinHeap(a){
 	for(var i = a.length>>1; i>=0;i--){
-		maxHeapify(a, i);
+		minHeapify(a, i);
 	}
 }
 
-function buildMaxHeap2(a){
+function buildMinHeap2(a){
 	a.heapSize = 1;
 	for(var i = 1; i < a.length; i++){
-		maxHeapInsert(a, a[i]);
+		minHeapInsert(a, a[i]);
 	}
 }
 
 function heapDelete(a, i){
 	a.heapSize--;
 	a[i] = a[a.heapSize];
-	maxHeapify(a, i);
+	minHeapify(a, i);
 	a[a.heapSize] = null;
 }
 
-function maxHeapify(a, i){
+function minHeapify(a, i){
 	var l = left(i);
 	var r = right(i);
-	var largest;
-	if(l<a.heapSize && a[l]>a[i]){
-		largest = l;
+	var least;
+	if(l<a.heapSize && a[l]<a[i]){
+		least = l;
 	} else {
-		largest = i;
+		least = i;
 	}
-	if(r<a.heapSize && a[r]>a[largest]){
-		largest = r;
+	if(r<a.heapSize && a[r]<a[least]){
+		least = r;
 	}
-	if(largest!=i){
-		exchange(a,i,largest);
-		maxHeapify(a,largest);
+	if(least!=i){
+		exchange(a,i,least);
+		minHeapify(a,least);
 	}
 }
 
-function exchange(a,i,largest){
+function exchange(a,i,least){
 	var temp = a[i];
-	a[i] = a[largest];
-	a[largest] = temp;
+	a[i] = a[least];
+	a[least] = temp;
 }
 
 function left(i){
