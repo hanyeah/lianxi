@@ -1,0 +1,129 @@
+<script type="text/javascript">
+	// https://wenku.baidu.com/view/15c7aad103d276a20029bd64783e0912a3167c14?from=singlemessage&isappinstalled=0
+	var a = [9, 6, 3, 2, 4, 8, 5, 14, 12];
+	console.log(a.join("\t"));
+
+	youngSort(a);
+	console.log(a.join("\t"));
+
+	/*var m = initYoung(4, 4);
+	for(var i = 0; i < a.length; i ++){
+		youngInsert(m, a[i]);
+	}
+	console.log(a);
+	console.log(m);*/
+
+	function youngSort(a){
+		var len = a.length;
+		var n = Math.ceil(Math.sqrt(len));
+		var m = initYoung(n, n);
+		for(var i = 0; i < a.length; i ++){
+			youngInsert(m, a[i]);
+		}
+		for(var i = 0; i < a.length; i++){
+			a[i] = youngExtractMin(m);
+		}
+	}
+
+	function youngExtractMin(m){
+		if(m[0][0] == Infinity){
+			throw(new Error("young underflow"));
+		}
+		var min = m[0][0];
+		youngDelete(m, 0, 0);
+		return min;
+	}
+
+	function youngFind(m, key){
+		var i = 0;
+		var j = m.size.y - 1;
+		while(i < a.size.x && j >= 0){
+			if(a[i][j] > key){
+				j--;
+			} else if(a[i][j] < key){
+				i++;
+			} else {
+				return {x: i, y: j};
+			}
+		}
+		return null;
+	}
+
+	function youngIsFull(m){
+		return m[m.size.x - 1][m.size.y - 1] < Infinity;
+	}
+
+	function youngInsert(m, key){
+		if(youngIsFull(m)){
+			throw(new Error("young matrix is full"));
+		}
+		var i = m.size.x - 1;
+		var j = m.size.y - 1;
+		decreaseKey(m, i, j, key);
+	}
+
+	function decreaseKey(m, i, j, key){
+		if(m[i][j] < key){
+			throw(new Error("Invalid key"));
+		}
+		m[i][j] = key;
+		var largestI = i;
+		var largestJ = j;
+		if(i > 0 && m[i - 1][j] > m[i][j]){
+			largestI = i - 1;
+			largestJ = j;
+		}
+		if(j > 0 && m[i][j - 1] > m[largestI][largestJ]){
+			largestI = i;
+			largestJ = j - 1;
+		}
+		if(largestI != i || largestJ != j){
+			exchange(m, i, j, largestI, largestJ);
+			decreaseKey(m, largestI, largestJ, key);
+		}
+	}
+
+	function youngDelete(m, i, j){
+		m[i][j] = Infinity;
+		youngify(m, i, j);
+	} 
+
+	function youngify(m, i, j){
+		var minI = i;
+		var minJ = j;
+		if(i < m.size.x - 1 && m[i + 1][j] < m[i][j]){
+			minI = i + 1;
+			minJ = j;
+		} 
+		if(j < m.size.y - 1 && m[i][j + 1] < m[minI][minJ]){
+			minI = i;
+			minJ = j + 1;
+			
+		}
+		if(i != minI || j != minJ){
+			exchange(m,i,j,minI,minJ);
+			youngify(m, minI,minJ);
+		}
+	}
+
+	function minYoung(m){
+		return m[0][0];
+	}
+
+	function initYoung(m, n){
+		var arr = [];
+		for(var i = 0; i < m; i++){
+			arr[i] = [];
+			for(var j = 0; j < n; j++){
+				arr[i][j] = Infinity;
+			}
+		}
+		arr.size = {x : m, y: n};
+		return arr;
+	}
+	function exchange(m,i0,j0,i1,j1){
+		var temp = m[i0][j0];
+		m[i0][j0] = m[i1][j1];
+		m[i1][j1] = temp;
+	}
+</script>
