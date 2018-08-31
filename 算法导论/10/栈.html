@@ -1,0 +1,32 @@
+<script type="text/javascript">
+	var s = [];
+	s.top = 0;
+	console.log(stackEmpty(s));
+	for(var i = 0; i < 10; i++){
+		push(s, i);
+		console.log("push:",i);
+	}
+	while(!stackEmpty(s)){
+		console.log("pop:",pop(s));
+	}
+
+	function stackEmpty(s){
+		if(s.top==0){
+			return true;
+		}
+		return false;
+	}
+
+	function push(s, x){
+		s[s.top] = x;
+		s.top++;
+	}
+
+	function pop(s){
+		if(stackEmpty(s)){
+			throw(new Error("underflow"));
+		}
+		s.top--;
+		return s[s.top];
+	}
+</script>

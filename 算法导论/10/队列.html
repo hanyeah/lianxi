@@ -1,0 +1,58 @@
+<script type="text/javascript">
+	var q = new Array(10);
+	q.head = 0;
+	q.tail = 0;
+	var n = 0;
+	while(!queFull(q)){
+		n++;
+		enQueue(q, n);
+		console.log("入队：",n);
+	}
+	console.log(q);
+	while(!queEmpty(q)){
+		console.log("出队：",deQueue(q));
+	}
+	console.log(q);
+
+	function enQueue(q, x){
+		if(queFull(q)){
+			throw(new Error("que is full"));
+		}
+		q[q.tail] = x;
+		if(q.tail == q.length - 1){
+			q.tail = 0;
+		} else {
+			q.tail++;
+		}
+	}
+
+	function deQueue(q){
+		if(queEmpty(q)){
+			throw(new Error("que is empty"));
+		}
+		var x = q[q.head];
+		if(q.head == q.length - 1){
+			q.head = 0;
+		}
+		else {
+			q.head = q.head + 1;
+		}
+		return x;
+	}
+
+	function queFull(q){
+		if(q.head == (q.tail + 1) % q.length){
+			return true;
+		}
+		return false;
+	}
+
+	function queEmpty(q){
+		if(q.head == q.tail){
+			return true;
+		}
+		return false;
+	}
+
+	
+</script>
