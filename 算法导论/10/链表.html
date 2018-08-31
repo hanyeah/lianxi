@@ -1,0 +1,64 @@
+<script type="text/javascript">
+	var l = {};
+	l.head= null;
+
+	for(var i = 0; i < 10; i++){
+		listInsert(l, {key:i});
+	}
+	console.log(l);
+	console.log(listSearch(l, 2));
+	
+
+	function listSearch(l, k){
+		var x = l.head;
+		while(x&&x.key!=k){
+			x = x.next;
+		}
+		return x;
+	}
+
+	function listInsert(l, x){
+		x.next = l.head;
+		if(l.head){
+			l.head.prev = x;
+		}
+		l.head = x;
+		x.prev = null;
+	}
+
+	function listDelete(l, x){
+		if(x.prev){
+			x.prev.next = x.next;
+		} else {
+			l.head = x.next;
+		}
+		if(x.next){
+			x.next.prev = x.prev;
+		}
+	}
+
+	//
+	function listSearch0(l, k){
+		var x = l.nil.next;
+		while(x!=l.nil &&x.key!=k){
+			x = x.next;
+		}
+		return x;
+	}
+
+	function listInsert0(l, x){
+		x.next = l.nil.next;
+		l.nil.next.prev = x;
+		l.nil.next = x;
+		x.prev = l.nil;
+	}
+
+	function listDelete0(l, x){
+		x.prev.next = x.next;
+		x.next.prev = x.prev;
+	}
+
+</script>
+
+
+
