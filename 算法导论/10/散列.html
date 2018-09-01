@@ -1,0 +1,70 @@
+﻿<script type="text/javascript">
+	function hashInsert(t, x){
+		var hk = h(x.key);
+		t[hk] = x;
+	}
+
+	function hashSearch(t, k){
+		var hk = h(k);
+		return t[hk];
+	}
+
+	function hashDelete(t, x){
+		var hk = h(x.key);
+		t[hk] = null;
+	}
+
+	function chainHashInsert(t, x){
+		var hk = h(x.key);
+		t[hk] = t[hk] || [];
+		t[hk].push(x);
+	}
+
+	function chainHashSearch(t, k){
+		var hk = h(k);
+		var a = t[hk];
+		for(var i = 0; i < a.length;i++){
+			if(a[i].key == k){
+				return a[i];
+			}
+		}
+		return null;
+	}
+
+	function chainHashDelete(t, x){
+		var hk = h(k);
+		var a = t[hk];
+		for(var i = 0; i < a.length;i++){
+			if(a[i].key == k){
+				a.splice(i, 1);
+				break;
+			}
+		}
+	}
+
+	var t = new Array(100);
+	for(var i = 0; i < 10; i ++){
+		var x = {key: Math.random()};
+		chainHashInsert(t, x);
+		console.log("插入：",x);
+	}
+	console.log(t);
+
+	function h(k){
+		return Math.floor(k*1000) % 100;
+	}
+
+	function h(k){
+		return Math.floor(100*(k*618%1));
+	}
+
+	/*function h(k){
+		return Math.floor(k*100);
+	}*/
+</script>
+
+
+
+
+
+
