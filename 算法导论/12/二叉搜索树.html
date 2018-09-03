@@ -1,4 +1,20 @@
-<script type="text/javascript">
+﻿<script type="text/javascript">
+	var t = {};
+	for(var i = 0; i < 10; i++){
+		var k = Math.floor(Math.random()*20);
+		treeInsert(t, {key:k});
+		console.log("插入：", k);
+	}
+	treeInsert(t, {key:10});
+	console.log(t);
+	console.log("中序遍历：");
+	inOrderTreeWalk(t.root);
+	var a = treeSearch(t.root, 10);
+	treeDelete(t, a);
+	console.log("中序遍历：");
+	inOrderTreeWalk(t.root);
+
+
 	function inOrderTreeWalk(x){
 		if(x){
 			inOrderTreeWalk(x.left);
