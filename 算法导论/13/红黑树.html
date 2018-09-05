@@ -1,0 +1,141 @@
+﻿<script type="text/javascript">
+
+	var t = {};
+	t.nil = {};
+	t.root = t.nil;
+	for(var i = 0; i < 10; i++){
+		var k = Math.floor(Math.random()*20);
+		rbInsert(t, {key: k});
+		console.log("中序遍历：");
+		inOrderTreeWalk(t.root);
+	}
+	console.log(t);
+	console.log("中序遍历：");
+	inOrderTreeWalk(t.root);
+
+	function inOrderTreeWalk(x){
+		if(x){
+			inOrderTreeWalk(x.left);
+			console.log(x.key);
+			inOrderTreeWalk(x.right);
+		}
+	}
+
+	function preOrderTreeWalk(x){
+		if(x){
+			console.log(x.key);
+			preOrderTreeWalk(x.left);
+			preOrderTreeWalk(x.right);
+		}
+	}
+
+	function postOrderTreeWalk(x){
+		if(x){
+			postOrderTreeWalk(x.left);
+			postOrderTreeWalk(x.right);
+			console.log(x.key);
+		}
+	}
+
+	function leftRotate(t, x){
+		var y = x.right;
+		x.right = y.left;
+		if(y.left!=t.nil){
+			y.left.parent = x;
+		}
+		y.parent = x.parent;
+		if(x.parent == t.nil){
+			t.root = y;
+		} else if(x == x.parent.left){
+			x.parent.left = y;
+		} else {
+			x.parent.right = y;
+		}
+		y.left = x;
+		x.parent = y;
+	}
+
+	function rightRotate(t, y){
+		var x = y.left;
+		y.left = x.right;
+		if(x.right!=t.nil){
+			x.right.parent = y;
+		}
+		x.parent = y.parent;
+		if(y.parent == t.nil){
+			t.root = x;
+		} else if(y == y.parent.left){
+			y.parent.left = x;
+		} else {
+			y.parent.right = x;
+		}
+		x.right = y;
+		y.parent = x;
+	}
+
+	function rbInsert(t, z){
+		var y = t.nil;
+		var x = t.root;
+		while(x!=t.nil){
+			y = x;
+			if(z.key < x.key){
+				x = x.left;
+			} else {
+				x = x.right;
+			}
+		}
+		z.parent = y;
+		if(y == t.nil){
+			t.root = z;
+		} else if(z.key < y.key){
+			y.left = z;
+		} else {
+			y.right = z;
+		}
+		z.left = t.nil;
+		z.right = t.nil;
+		z.color = 'red';
+		rbInsertFixUp(t, z);
+	}
+
+	function rbInsertFixUp(t, z){
+		while(z.parent.color=='red'){
+			if(z.parent == z.parent.parent.left){
+				var y = z.parent.parent.right;
+				if(y.color=='red'){
+					z.parent.color = 'black';
+					y.color = 'black';
+					z.parent.parent.color = 'red';
+					z = z.parent.parent;
+				} else if(z = z.parent.right){
+					z = z.parent;
+					leftRotate(t, z);
+				}
+				z.parent.color = 'black';
+				z.parent.parent.color = 'red';
+				rightRotate(t, z.parent.parent);
+			} else {
+				var y = z.parent.parent.left;
+				if(y.color = 'red'){
+					z.parent.coor = 'black';
+					y.color = 'black';
+					z.parent.parent.color = 'red';
+					z = z.parent.parent;
+				} else if(z = z.parent.left){
+					z = z.parent;
+					rightRotate(t, z);
+				}
+				z.parent.color = 'black';
+				z.parent.parent.color = 'red';
+				leftRotate(t, z.parent.parent);
+			}
+		}
+		t.root.color = 'black';
+	}
+</script>
+
+
+
+
+
+
