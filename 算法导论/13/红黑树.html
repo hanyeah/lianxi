@@ -3,18 +3,21 @@
 	var t = {};
 	t.nil = {};
 	t.root = t.nil;
-	for(var i = 0; i < 10; i++){
-		var k = Math.floor(Math.random()*20);
+	var a = [];
+	console.log(a);
+	var n = 10;
+	for(var i = 0; i < n; i++){
+		var k = Math.floor(Math.random()*n);
+		a.push(k);
+		console.log('插入：',k);
 		rbInsert(t, {key: k});
-		console.log("中序遍历：");
-		inOrderTreeWalk(t.root);
 	}
 	console.log(t);
 	console.log("中序遍历：");
 	inOrderTreeWalk(t.root);
 
 	function inOrderTreeWalk(x){
-		if(x){
+		if(x != t.nil){
 			inOrderTreeWalk(x.left);
 			console.log(x.key);
 			inOrderTreeWalk(x.right);
@@ -22,7 +25,7 @@
 	}
 
 	function preOrderTreeWalk(x){
-		if(x){
+		if(x != t.nil){
 			console.log(x.key);
 			preOrderTreeWalk(x.left);
 			preOrderTreeWalk(x.right);
@@ -30,7 +33,7 @@
 	}
 
 	function postOrderTreeWalk(x){
-		if(x){
+		if(x != t.nil){
 			postOrderTreeWalk(x.left);
 			postOrderTreeWalk(x.right);
 			console.log(x.key);
@@ -107,27 +110,31 @@
 					y.color = 'black';
 					z.parent.parent.color = 'red';
 					z = z.parent.parent;
-				} else if(z = z.parent.right){
-					z = z.parent;
-					leftRotate(t, z);
+				} else{
+					if(z == z.parent.right){
+						z = z.parent;
+						leftRotate(t, z);
+					}
+					z.parent.color = 'black';
+					z.parent.parent.color = 'red';
+					rightRotate(t, z.parent.parent);
 				}
-				z.parent.color = 'black';
-				z.parent.parent.color = 'red';
-				rightRotate(t, z.parent.parent);
 			} else {
 				var y = z.parent.parent.left;
 				if(y.color = 'red'){
-					z.parent.coor = 'black';
+					z.parent.color = 'black';
 					y.color = 'black';
 					z.parent.parent.color = 'red';
 					z = z.parent.parent;
-				} else if(z = z.parent.left){
-					z = z.parent;
-					rightRotate(t, z);
+				} else {
+					if(z == z.parent.left){
+						z = z.parent;
+						rightRotate(t, z);
+					}
+					z.parent.color = 'black';
+					z.parent.parent.color = 'red';
+					leftRotate(t, z.parent.parent);
 				}
-				z.parent.color = 'black';
-				z.parent.parent.color = 'red';
-				leftRotate(t, z.parent.parent);
 			}
 		}
 		t.root.color = 'black';
