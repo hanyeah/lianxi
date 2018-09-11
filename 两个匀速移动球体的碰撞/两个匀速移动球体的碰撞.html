@@ -1,0 +1,103 @@
+<canvas id = 'canvas' width='600' height='300' style='width:600px;height:300px;'></canvas>
+<script type="text/javascript">
+	var ball01 = {
+		c: {
+			x: 50,
+			y: 50
+		},
+		r: 20,
+		v:{
+			x: 3,
+			y: 0
+		}
+	};
+	var ball02 = {
+		c: {
+			x: 500,
+			y: 50
+		},
+		r: 30,
+		v:{
+			x: -4,
+			y: 0
+		}
+	}
+
+	var result = calcCollision(ball01, ball02);
+	console.log(result);
+	document.write(`碰撞时间：${result[0]}, 碰撞分离时间：${result[1]}`);
+
+	function calcCollision(ball01, ball02){
+		var v = sub(ball01.v, ball02.v);
+		var c = sub(ball01.c, ball02.c);
+		var r = ball01.r + ball02.r;
+		//
+		var a = dot(v, v);
+		var b = 2 * dot(v, c);
+		var c = dot(c,c) - r * r;
+		if(c == 0){
+			return 0;
+		}
+		if(a == 0){
+			return Infinity;
+		}
+		var delta = b * b - 4 * a * c;
+		if(delta < 0){
+			return -1;
+		}
+		var sqrtDelta = Math.sqrt(delta);
+		var t1 = (-b + sqrtDelta) / (2 * a);
+		var t2 = (-b - sqrtDelta) / (2 * a);
+		return [t2, t1];
+	}
+
+	function dot(v1, v2){
+		return v1.x * v2.x + v1.y * v2.y;
+	}
+
+	function sub(v1, v2){
+		return {
+			x: v1.x - v2.x,
+			y: v1.y - v2.y
+		}
+	}
+
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var w = parseInt(canvas.attributes.width.value);
+	var h = parseInt(canvas.attributes.height.value);
+	var t0 = 0;
+
+	requestAnimationFrame(loop);
+	function loop(){
+		var sca = 1;
+		t0 += sca;
+		updatePosition(ball01, sca);
+		updatePosition(ball02, sca);
+		ctx.clearRect(0,0,w,h);
+		renderBall(ball01);
+		renderBall(ball02);
+		ctx.fillText(t0+'',10,10);
+		if(!checkCollision(ball01, ball02)){
+			requestAnimationFrame(loop);
+		}
+	}
+
+	function updatePosition(ball, sca){
+		ball.c.x += ball.v.x * sca;
+		ball.c.y += ball.v.y * sca;
+	}
+
+	function renderBall(ball){
+		ctx.beginPath();
+		ctx.arc(ball.c.x, ball.c.y, ball.r, 0, 2 * Math.PI);
+		ctx.stroke();
+	}
+
+	function checkCollision(ball01, ball02){
+		var dx = ball01.c.x - ball02.c.x;
+		var dy = ball01.c.y - ball02.c.y;
+		var r = ball01.r + ball02.r;
+		return dx * dx + dy * dy < r * r;
+	}
+</script>
