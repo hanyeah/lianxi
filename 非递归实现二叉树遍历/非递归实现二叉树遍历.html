@@ -1,0 +1,216 @@
+﻿<script type="text/javascript">
+	var t = {};
+	for(var i = 0; i < 10; i++){
+		var k = Math.floor(Math.random()*20);
+		treeInsert(t, {key:k});
+		console.log("插入：", k);
+	}
+	treeInsert(t, {key:10});
+	console.log(t);
+
+	console.log = function(...arg){
+		for(var i = 0; i < arg.length; i++){
+			document.write(arg[i],'<br/>');
+		}
+	}
+
+	console.log("前序遍历：");
+	preOrderTreeWalk(t.root);
+	console.log("非递归前序遍历：");
+	nonRecursivePreOrderTreeWalk(t.root);
+
+	console.log("中序遍历：");
+	inOrderTreeWalk(t.root);
+	console.log("非递归中序遍历：");
+	nonRecursiveInOrderTreeWalk(t.root);
+
+	console.log("后序遍历：");
+	postOrderTreeWalk(t.root);
+	console.log("非递归后序遍历：");
+	nonRecursivePostOrderTreeWalk(t.root);
+
+
+	/**
+	 * 中序遍历
+	 * @param
+	 * @return
+	 */
+	function inOrderTreeWalk(x){
+		if(x){
+			inOrderTreeWalk(x.left);
+			console.log(x.key);
+			inOrderTreeWalk(x.right);
+		}
+	}
+	/**
+	 * 非递归中序遍历
+	 * @param
+	 * @return
+	 */
+	function nonRecursiveInOrderTreeWalk(x){
+		var stack = [x];
+		var next = 'left';
+		var n = 1;
+		while(n > 0){
+			x = stack[n - 1];
+			if(x){
+				if(next=='left'){
+					stack.push('log');
+					stack.push(x.left);
+					// next = 'left';
+					n += 2;
+					continue;
+				}
+				if(next=='log'){
+					console.log(x.key);
+					next = 'right';
+				}
+				if(next == 'right'){
+					stack.push('end');
+					stack.push(x.right);
+					next = 'left';
+					n += 2;
+					continue;
+				}
+			}
+			stack.pop();
+			next = stack.pop();
+			n -= 2;
+		}
+	}
+
+	/**
+	 * 前序遍历
+	 * @param 
+	 * @return
+	 */
+	function preOrderTreeWalk(x){
+		if(x){
+			console.log(x.key);
+			preOrderTreeWalk(x.left);
+			preOrderTreeWalk(x.right);
+		}
+	}
+
+	/**
+	 * 非递归前序遍历
+	 * @param
+	 * @return
+	 */
+	function nonRecursivePreOrderTreeWalk(x){
+		var stack = [x];
+		var next = 'log';
+		var n = 1;
+		while(n > 0){
+			x = stack[n - 1];
+			if(x){
+				if(next == 'log'){
+					console.log(x.key);
+					next = 'left';
+				}
+				if(next=='left'){
+					stack.push('right');
+					stack.push(x.left);
+					next = 'log';
+					n += 2;
+					continue;
+				}
+				if(next=='right'){
+					stack.push('end');
+					stack.push(x.right);
+					next = 'log';
+					n += 2;
+					continue;
+				}
+			}
+			stack.pop();
+			next = stack.pop();
+			n -= 2;
+		}
+	}
+
+	/**
+	 * 后序遍历
+	 * @param
+	 * @return
+	 */
+	function postOrderTreeWalk(x){
+		if(x){
+			postOrderTreeWalk(x.left);
+			postOrderTreeWalk(x.right);
+			console.log(x.key);
+		}
+	}
+	/**
+	 * 非递归后序遍历
+	 * @param
+	 * @return
+	 */
+	function nonRecursivePostOrderTreeWalk(x){
+		var stack = [x];
+		var next = 'left';
+		var n = 1;
+		while(n > 0){
+			x = stack[n - 1];
+			if(x){
+				if(next=='left'){
+					stack.push('right');
+					stack.push(x.left);
+					// next = 'left';
+					n += 2;
+					continue;
+				}
+				if(next=='right'){
+					stack.push('log');
+					stack.push(x.right);
+					next = 'left';
+					n += 2;
+					continue;
+				}
+				if(next == 'log'){
+					console.log(x.key);
+				}
+			}
+			stack.pop();
+			next = stack.pop();
+			n -= 2;
+		}
+	}
+
+	/**
+	 * 插入
+	 * @param
+	 * @param
+	 * @return
+	 */
+	function treeInsert(t, z){
+		var y = null;
+		var x = t.root;
+		while(x){
+			y = x;
+			if(z.key < x.key){
+				x = x.left;
+			}
+			else {
+				x= x.right;
+			}
+		}
+		z.parent = y;
+		if(!y){
+			t.root = z;
+		}
+		else if(z.key < y.key){
+			y.left = z;
+		} else {
+			y.right = z;
+		}
+	}
+
+	
+</script>
+
+
+
+
+
+
