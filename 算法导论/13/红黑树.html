@@ -139,6 +139,94 @@
 		}
 		t.root.color = 'black';
 	}
+
+	function rbTransplant(t, u, z){
+		if(u.p==t.nil){
+			t.root = v;
+		} else if(u==u.parent.left){
+			u.parent.left = v;
+		} else {
+			u.parent.right = v;
+		}
+		v.p = u.p;
+	}
+
+	function treeMinimum(x){
+		while(x.left){
+			x = x.left;
+		}
+		return x;
+	}
+
+	function treeMaximum(x){
+		while(x.right){
+			x = x.right;
+		}
+		return x;
+	}
+
+	function rbDelete(t, x){
+		var y = z;
+		y.originalColor = y.color;
+		if(z.left == t.nil){
+			x = z.right;
+			rbTransplant(t, z, z.right);
+		} else if(z.right == t.nil){
+			x = z.left;
+			rbTransplant(t, z, z.left);
+		} else {
+			y = treeMinimum(z.right);
+			y.originalColor = y.color;
+			x = y.right;
+			if(y.parent == z){
+				x.parent = y;
+			} else {
+				rbTransplant(t, y, y.right);
+				y.right = z.right;
+				y.right.parent = y;
+			}
+			rbTransplant(t, z, y);
+			y.left = z.left;
+			y.left.parent = y;
+			y.color = z.color;
+		}
+		if(y.originalColor == 'black'){
+			rbDeleteFixUp(t, x);
+		}
+	}
+
+	function rbDeleteFixUp(t, x){
+		while(x!=t.root && x.color=='black'){
+			if(x == x.parent.left){
+				var w = x.parent.right;
+				if(w.color=='red'){
+					w.color = 'black';
+					x.parent.color = 'red';
+					leftRotate(t, x.parent);
+					w = x.parent.right;
+				}
+				if(w.left.color == 'black' && w.right.color == 'black'){
+					w.color = 'red';
+					x = x.parent;
+				} else{
+					if(w.right.color == 'black'){
+						w.left.color = 'black';
+						w.color = 'red';
+						rightRotate(t, w);
+						w = x.parent.right;
+					}
+					w.color = x.parent.color;
+					x.parent.color = 'black';
+					w.right.color = 'black';
+					leftRotate(t, x.parent);
+					x = t.root;
+				}
+			} else {
+
+			}
+		}
+		x.color = 'black';
+	}
 </script>
 
 
