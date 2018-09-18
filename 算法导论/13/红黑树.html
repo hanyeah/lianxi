@@ -1,20 +1,111 @@
-﻿<script type="text/javascript">
+﻿<canvas id = "canvas" width="1000" height="600" style="width:1000px;height:600px;"></canvas>
+<script>
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	function drawTree(t){
+		ctx.clearRect(0,0,1000,600);
+		drawNode(t.root, 30, 30);
+	}
 
+	function drawNode(node, x, y){
+		if(!node.key){
+			return {x: x, w: 30};
+		}
+		var o1 = drawNode(node.left, x, y + 30);
+		var o2 = drawNode(node.right, o1.x + o1.w / 2, y + 30);
+		var x = (o1.x + o2.x) / 2;
+		ctx.strokeStyle=node.color=='black'?"#000000":"#ff0000";
+		ctx.beginPath();
+		ctx.arc(x,y,10,0,2*Math.PI);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+		ctx.lineTo(o1.x, y+30);
+		ctx.moveTo(x, y);
+		ctx.lineTo(o2.x, y+30);
+		ctx.stroke();
+		ctx.strokeText(node.key+"",x,y);
+		return {x: x, w: o1.w+o2.w};
+	}
+</script>
+<script>
 	var t = {};
-	t.nil = {};
+	t.nil = {color:'black'};
 	t.root = t.nil;
 	var a = [];
 	console.log(a);
-	var n = 10;
+	var n = 20;
 	for(var i = 0; i < n; i++){
-		var k = Math.floor(Math.random()*n);
+		var k = 1 + Math.floor(Math.random()*n);
 		a.push(k);
+		// console.log('插入：',k);
+		// rbInsert(t, {key: k});
+	}
+
+	// drawTree(t);
+	// console.log(t);
+	// console.log("中序遍历：");
+	// inOrderTreeWalk(t.root);
+	// 删除测试
+	/*while(a.length){
+		var o = treeSearch(t.root, a.pop());
+		rbDelete(t, o);
+		console.log("中序遍历：");
+		inOrderTreeWalk(t.root);
+	}*/
+
+	// 插入
+	var i = 0;
+	var delay = 1000;
+	setTimeout(charu, delay);
+	function charu(){
+		var k = a[i];
 		console.log('插入：',k);
 		rbInsert(t, {key: k});
+		drawTree(t);
+		i++;
+		if(i<n){
+			setTimeout(charu, delay);
+		} else {
+			i=0;
+			console.log("中序遍历：");
+			inOrderTreeWalk(t.root);
+			setTimeout(shanchu, delay);
+		}
 	}
-	console.log(t);
-	console.log("中序遍历：");
-	inOrderTreeWalk(t.root);
+
+	function shanchu(){
+		var o = treeSearch(t.root, a[i]);
+		rbDelete(t, o);
+		drawTree(t);
+		i++;
+		if(i<n){
+			setTimeout(shanchu, delay);
+		}
+	}
+
+	/*
+	// 找BUG
+	a = [6, 3, 1, 8, 4, 8, 9, 3, 9, 6];
+	test();
+	function test(){
+		t = {};
+		t.nil={color:'black'};
+		t.root = t.nil;
+		var n = 0;
+		let loop = ()=>{
+				rbInsert(t,{key:a[n]});
+				n++;
+				if(n<a.length){
+					setTimeout(loop, 3000);
+				};
+				drawTree(t);
+			};
+		setTimeout(loop, 3000);
+	}*/
+	
+</script>
+<script type="text/javascript">
 
 	function inOrderTreeWalk(x){
 		if(x != t.nil){
@@ -38,6 +129,16 @@
 			postOrderTreeWalk(x.right);
 			console.log(x.key);
 		}
+	}
+
+	function treeSearch(x, k){
+		if(!x || x.key == k){
+			return x;
+		}
+		if(k < x.key){
+			return treeSearch(x.left, k);
+		}
+		return treeSearch(x.right, k);
 	}
 
 	function leftRotate(t, x){
@@ -121,7 +222,7 @@
 				}
 			} else {
 				var y = z.parent.parent.left;
-				if(y.color = 'red'){
+				if(y.color == 'red'){
 					z.parent.color = 'black';
 					y.color = 'black';
 					z.parent.parent.color = 'red';
@@ -140,32 +241,32 @@
 		t.root.color = 'black';
 	}
 
-	function rbTransplant(t, u, z){
-		if(u.p==t.nil){
+	function rbTransplant(t, u, v){
+		if(u.parent==t.nil){
 			t.root = v;
 		} else if(u==u.parent.left){
 			u.parent.left = v;
 		} else {
 			u.parent.right = v;
 		}
-		v.p = u.p;
+		v.parent = u.parent;
 	}
 
 	function treeMinimum(x){
-		while(x.left){
+		while(x.left != t.nil){
 			x = x.left;
 		}
 		return x;
 	}
 
 	function treeMaximum(x){
-		while(x.right){
+		while(x.right != t.nil){
 			x = x.right;
 		}
 		return x;
 	}
 
-	function rbDelete(t, x){
+	function rbDelete(t, z){
 		var y = z;
 		y.originalColor = y.color;
 		if(z.left == t.nil){
@@ -204,7 +305,7 @@
 					x.parent.color = 'red';
 					leftRotate(t, x.parent);
 					w = x.parent.right;
-				}
+				}if(!w.right||!w.left)debugger
 				if(w.left.color == 'black' && w.right.color == 'black'){
 					w.color = 'red';
 					x = x.parent;
@@ -222,7 +323,29 @@
 					x = t.root;
 				}
 			} else {
-
+				var w = x.parent.left;
+				if(w.color=='red'){
+					w.color = 'black';
+					x.parent.color = 'red';
+					rightRotate(t, x.parent);
+					w = x.parent.left;
+				}if(!w.right||!w.left)debugger
+				if(w.right.color == 'black' && w.left.color == 'black'){
+					w.color = 'red';
+					x = x.parent;
+				} else{
+					if(w.left.color == 'black'){
+						w.right.color = 'black';
+						w.color = 'red';
+						leftRotate(t, w);
+						w = x.parent.left;
+					}
+					w.color = x.parent.color;
+					x.parent.color = 'black';
+					w.left.color = 'black';
+					rightRotate(t, x.parent);
+					x = t.root;
+				}
 			}
 		}
 		x.color = 'black';
