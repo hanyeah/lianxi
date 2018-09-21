@@ -1,0 +1,47 @@
+<canvas id = 'canvas' width = '1000' height = '600' style = 'width:1000px;height:600px;'></canvas>
+<script type="text/javascript">
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var arr = [
+		{x: 100, y: 100}
+		, {x: 200, y: 220}
+		, {x: 300, y: 300}
+	];
+
+	var ab = nihe(arr);
+
+	for(var i = 0; i < arr.length; i++){
+		var o = arr[i];
+		var w = 10;
+		ctx.strokeStyle="#ff0000";
+		ctx.strokeRect(o.x - w / 2, o.y - w / 2, w, w);
+	}
+	ctx.strokeStyle="#00ff00";
+	ctx.beginPath();
+	ctx.moveTo(0, getY(0));
+	ctx.lineTo(1000, getY(1000));
+	ctx.stroke();
+
+	function getY(x){
+		return ab.a * x + ab.b;
+	}
+
+	function nihe(arr) {
+		// https://blog.csdn.net/ouyangying123/article/details/53996403
+		let len = arr.length;
+		let xy = 0;
+		let x2 = 0;
+		let nx = 0;
+		let ny = 0;
+		for (let i = 0; i < len; i++) {
+		  let o = arr[i];
+		  xy += o.x * o.y;
+		  nx += o.x;
+		  ny += o.y;
+		  x2 += o.x * o.x;
+		}
+		let a = (xy - nx * ny / len) / (x2 - nx * nx / len);
+		let b = (ny - a * nx) / len;
+		return {a: a, b: b};
+	}
+</script>
