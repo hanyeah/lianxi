@@ -44,4 +44,25 @@
 		let b = (ny - a * nx) / len;
 		return {a: a, b: b};
 	}
+
+nihe2(arr);
+	function nihe2(arr){
+		let a = 0;
+		let b = 0;
+		let c = 0;
+		let d = 0;
+		let e = 0;
+		let f = 0;
+		let len = arr.length;
+		for(let i = 0; i < len; i++){
+			let o = arr[i];
+			a += o.x * o.x;
+			b += o.x;
+			c += o.x;
+			d += 1;
+			e += o.x * o.y;
+			f += o.y;
+		}
+		
+	}
 </script>
