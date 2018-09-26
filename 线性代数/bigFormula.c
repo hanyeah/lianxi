@@ -3,6 +3,7 @@
 #include <math.h>
 #define GET(a,n,i,j) *((int*)a + n*i + j)
 
+// n的阶乘
 int factorial(int n){
 	int a = 1;
 	while(n > 1){
@@ -11,6 +12,7 @@ int factorial(int n){
 	return a;
 }
 
+// 交换两个整数
 void swap(int *a, int *b){
 	int temp;
 	temp = *a;
@@ -18,6 +20,9 @@ void swap(int *a, int *b){
 	*b = temp;
 }
 
+// 全排列(包括逆序数的奇偶)
+// 参考：https://www.jianshu.com/p/d4aaee236c8d
+//       https://www.cnblogs.com/xianzhedeyu/p/3822946.html
 void perm(int *r, int *t, int *a, int k, int n, int d){
 	if(k < n){
 		for(int i = k; i < n; i++){
@@ -66,6 +71,7 @@ void trace(int *b, int n){
 	printf("\n");
 }
 
+// 求行列式的值
 int delt(int **a, int t, int *r, int n){
 	int d = 0;
 	int i = 0;
@@ -80,63 +86,6 @@ int delt(int **a, int t, int *r, int n){
 		i += n + 1;
 	}
 	return d;
-}
-
-void test01(){
-	const int n = 4;
-	int t = 0;
-	int *r = (int *)malloc(factorial(n+1)*sizeof(int));
-	int a[n][n] = {{1,1,0,0},{1,1,1,0},{0,1,1,1},{0,0,1,1}};
-	int b[n] = {0,1,2,3};
-	perm(r, &t, b, 0, n, 1);
-	
-	printf("A = \n");
-	trace((int **)a, n, n);
-	
-	// trace(r, t, n+1);
-	
-	int d = 0;
-	d = delt((int **)a, t, r, n);
-	printf("delt(A) = %d\n", d);
-	free(r);
-}
-
-void test03(){
-	const int n = 3;
-	int t = 0;
-	int *r = (int *)malloc(factorial(n+1)*sizeof(int));
-	int a[n][n] = {{1,1,0},{1,1,1},{0,1,1}};
-	int b[n] = {0,1,2};
-	perm(r, &t,b, 0, n, 1);
-	
-	printf("A = \n");
-	trace((int **)a, n, n);
-	
-	// trace(r, t, n+1);
-	
-	int d = 0;
-	d = delt((int **)a, t, r, n);
-	printf("delt(A) = %d\n", d);
-	free(r);
-}
-
-void test02(){
-	const int n = 5;
-	int t = 0;
-	int *r = (int *)malloc(factorial(n+1)*sizeof(int));
-	int a[n][n] = {{1,1,0,0,0},{1,1,1,0,0},{0,1,1,1,0},{0,0,1,1,1},{0,0,0,1,1}};
-	int b[n] = {0,1,2,3,4};
-	perm(r, &t, b, 0, n, 1);
-	
-	printf("A = \n");
-	trace((int **)a, n, n);
-	
-	//trace(r, t, n+1);
-	
-	int d = 0;
-	d = delt((int **)a, t, r, n);
-	printf("delt(A) = %d\n", d);
-	free(r);
 }
 
 void test(int n){
@@ -167,16 +116,9 @@ void test(int n){
 	free(r);
 }
 
-void addadd(int *a){
-	*a = *a + 1;
-}
 int main(){
-	test01();
-	test02();
-	test03();
 	for(int i = 1; i <= 6; i++){
 		test(i);
 	}
-	
 	return 0;
 }
