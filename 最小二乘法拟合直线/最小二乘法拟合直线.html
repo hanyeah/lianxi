@@ -9,6 +9,7 @@
 	];
 
 	var ab = nihe(arr);
+	console.log(ab);
 
 	for(var i = 0; i < arr.length; i++){
 		var o = arr[i];
@@ -21,6 +22,9 @@
 	ctx.moveTo(0, getY(0));
 	ctx.lineTo(1000, getY(1000));
 	ctx.stroke();
+
+	var ab = nihe2(arr);
+	console.log(ab);
 
 	function getY(x){
 		return ab.a * x + ab.b;
@@ -45,8 +49,19 @@
 		return {a: a, b: b};
 	}
 
-nihe2(arr);
 	function nihe2(arr){
+		// ax + b = y
+		// 求a，b
+		// |x1 , 1|       |y1|
+		// |x2 , 1|*|a| = |y2|
+		// |x3 , 1| |b|   |y3|
+		// ...
+		// |xn , 1|       |yn|
+		// 
+		// 上边数组用Ax = b表示，A、b已知，求x。
+		// 大多数时候无解。
+		// 左乘A'(A的转置)，A'Ax = A'b，可使方程有解。
+		// 
 		let a = 0;
 		let b = 0;
 		let c = 0;
@@ -63,6 +78,8 @@ nihe2(arr);
 			e += o.x * o.y;
 			f += o.y;
 		}
-		
+		let y = (f * a - e * c) / (d * a - b * c);//(f - e * c / a) / (d - b * c / a);
+		let x = (e - b * y) / a;
+		return {a: x, b: y};
 	}
 </script>
