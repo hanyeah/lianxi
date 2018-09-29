@@ -15,7 +15,7 @@ void trace(int **a, int m, int n){
 }
 
 int cofactor(int **a, int n, int i, int j);
-int rank(int **a, int n);
+int det(int **a, int n);
 
 // 代数余子式
 int cofactor(int **a, int n, int i, int j){
@@ -33,12 +33,12 @@ int cofactor(int **a, int n, int i, int j){
 			c[ic][jc] = GET(a, n, ii, jj);
 		}
 	}
-	int r = rank((int **)c, n1);
+	int r = det((int **)c, n1);
 	return si * r;
 }
 
-// 秩
-int rank(int **a, int n){
+// 行列式值
+int det(int **a, int n){
 	if(n == 1){
 		return GET(a, n, 0, 0);
 	}
@@ -56,10 +56,10 @@ int rank(int **a, int n){
 void test01(){
 	int n = 4;
 	int a[4][4] = {{1,1,0,0},{1,1,1,0},{0,1,1,1},{0,0,1,1}};
-	int r = rank((int **)a, n);
+	int r = det((int **)a, n);
 	printf("A = \n");
 	trace((int **)a, n, n);
-	printf("Rank(A) = %d", r);
+	printf("det(A) = %d", r);
 }
 
 void test(int n){
@@ -73,10 +73,10 @@ void test(int n){
 			}
 		}
 	}
-	int r = rank((int **)a, n);
+	int r = det((int **)a, n);
 	printf("A = \n");
 	trace((int **)a, n, n);
-	printf("Rank(A) = %d\n", r);
+	printf("det(A) = %d\n", r);
 }
 
 int main(){
