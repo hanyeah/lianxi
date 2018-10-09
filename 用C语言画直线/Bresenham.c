@@ -10,6 +10,7 @@ unsigned char img[W * H * 3];
 
 // https://zhuanlan.zhihu.com/p/30553006
 // https://zh.wikipedia.org/wiki/%E5%B8%83%E9%9B%B7%E6%A3%AE%E6%BC%A2%E5%A7%86%E7%9B%B4%E7%B7%9A%E6%BC%94%E7%AE%97%E6%B3%95
+// https://blog.csdn.net/qq_26093511/article/details/73695096
 
 void setPixel(int x, int y){
 	unsigned char* p = img + (y * W + x) * 3;
