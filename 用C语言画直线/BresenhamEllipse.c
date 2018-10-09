@@ -8,6 +8,8 @@
 #define H 512
 unsigned char img[W * H * 3];
 
+// https://www.cnblogs.com/yym2013/category/707569.html
+// https://blog.csdn.net/orbit/article/details/7496008
 void setPixel(int x, int y){
 	if(x >= 0 && x < W && y >=0 && y < H){
 		unsigned char* p = img + (y * W + x) * 3;
