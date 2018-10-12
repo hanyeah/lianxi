@@ -32,9 +32,9 @@ void bresenhamCircle(int x0, int y0, int r){
 		setPixel(x0 + y, y0 - x);
 		
 		if(d < 0){
-			d = d + 2 * x + 3;
+			d = d + 2 * x + 1;// +3
 		} else {
-			d = d + 2 * (x - y) + 5;
+			d = d + 2 * (x - y) + 1;// +5
 			y--;
 		}
 		x++;

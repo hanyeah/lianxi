@@ -72,7 +72,7 @@ int main(){
 	int start = 0;
 	int end = len - 1;
 	SubAryData data = findMaxSubArray(ary, start, end);
-	printf("最大数组从第%d到%d个\n",data.startIndex, data.endIndex);
+	printf("最大数组从第%d到第%d个\n",data.startIndex, data.endIndex);
 	for(int i = data.startIndex; i <= data.endIndex; i++){
 		printf("%d ",ary[i]);
 	}
