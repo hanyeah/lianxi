@@ -1,0 +1,53 @@
+<canvas id = "canvas" width="256" height="256" style="width:256px;height:256px;background:#cccccc;"></canvas>
+<div id = "tf"></div>
+<button onclick="reset()">重置</button>
+<script type="text/javascript">
+	var w = 256;
+	var h = 256;
+	var tf = document.getElementById("tf");
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	var imgData = ctx.getImageData(0, 0, w, h);
+	var pixels = imgData.data;
+	var n1 = 0;
+	var n2 = 0;
+	var N = 10;
+	var delay = 0;
+
+	function reset(){
+		ctx.clearRect(0, 0, w, h);
+		n1 = 0;
+		n2 = 0;
+		imgData = ctx.getImageData(0, 0, w, h);
+		pixels = imgData.data;
+	}
+
+	function addPoint(){
+		n2++;
+		var x = Math.random();
+		var y = Math.random();
+		var i = Math.floor(x * w);
+		var j = Math.floor(y * h);
+		var ind = (j * w + i) * 4;
+		
+		pixels[ind + 3] = 0xff;
+		x -= 0.5;
+		y -= 0.5;
+		if(x * x + y * y < 0.25){
+			n1++;
+			pixels[ind + 2] = 0xff;
+		} else {
+			pixels[ind] = 0xff;
+		}
+	}
+	function refresh(){
+		var i = 0;
+		while(i < N){
+			addPoint();
+			i++;
+		}
+		ctx.putImageData(imgData, 0, 0);
+		tf.innerHTML = "PI = " + (n1 * 4 / n2);
+	}
+	setInterval(refresh, delay);
+</script>

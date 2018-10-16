@@ -1,0 +1,255 @@
+<html>
+	<script type="text/javascript">
+
+var COUNTING = 1;
+function getUID(){
+	return COUNTING++;
+}
+// -------------------------顶点-------------------------------
+/**
+ * 顶点
+ */
+function Node(){
+	// 相邻的顶点
+	this.nodes = [];
+	// 边，一个顶点可以对应多个边
+	this.edges = [];
+	this.UID = getUID();
+}
+
+// 度。无向图，出度==入度
+Node.prototype.degree = function(){
+	return this.nodes.length;
+}
+
+// 添加一个边
+Node.prototype.addEdge = function(node, edge) {
+	var ind = this.nodes.indexOf(node);
+	if(ind === -1){
+		ind = this.nodes.length;
+	}
+	this.nodes[ind] = node;
+	this.edges[ind] = this.edges[ind] || [];
+	this.edges[ind].push(edge);
+}
+
+// 删除邻接点
+Node.prototype.deleteNode = function(node){
+	var ind = this.nodes.indexOf(node);
+	if(ind !== -1){
+		this.nodes.splice(i, 1);
+		this.edges.splice(i, 1);
+	}
+}
+
+// 删除边
+Node.prototype.deleteEdge = function(edge){
+	for(var i = this.edges.length - 1; i >= 0; i--){
+		var a = this.edges[i];
+		var ind = a.indexOf(edge);
+		if (ind !== -1) {
+			a.splice(ind, 1);
+			if(a.length === 0){
+				this.nodes.splice(i, 1);
+				this.edges.splice(i, 1);
+			}
+			break;
+		}
+	}
+}
+
+// 销毁
+Node.prototype.destroy = function() {
+	for(var i = this.edges.length - 1; i >= 0; i--){
+		var a = this.edges[i];
+		for(var j = a.length - 1; j >= 0; j--){
+			a[j].destroy();
+		}
+	}
+	for(var i = this.nodes.length - 1; i >= 0; i--){
+		this.nodes[i].deleteNode(this);
+	}
+	this.nodes.length = 0;
+	this.edges.length = 0;
+}
+
+Node.prototype.forEachEdge = function(callBack){
+	for(var i = this.edges.length - 1; i >= 0; i--){
+		var a = this.edges[i];
+		for(var j = a.length - 1; j >= 0; j--){
+			callBack(a[j], i, j);
+		}
+	}
+}
+
+// 深度优先搜索
+Node.prototype.DFS = function(a, o){
+	for(var i = 0; i < this.nodes.length; i++){
+		var node = this.nodes[i];
+		if(!o[node.UID]){
+			o[node.UID] = true;
+			a.push(node);
+			node.DFS(a, o);
+		}
+	}
+}
+
+// -------------------------边---------------------------------------
+
+function Edge(node1, node2, weight){
+	this.node1 = node1;
+	this.node2 = node2;
+	this.weight = weight;
+	this.UID = getUID();
+}
+
+Edge.prototype.destroy = function(){
+	this.node1 = null;
+	this.node2 = null;
+	this.weight = NaN;
+}
+
+// -------------------------图---------------------------------------
+
+function Graph(){
+	this.nodes = [];
+}
+
+Graph.prototype.insertNode = function(node){
+	this.nodes.push(node);
+}
+
+Graph.prototype.deleteNode = function(node){
+	var index = this.nodes.indexOf(node);
+	if(index != -1){
+		this.nodes.splice(index, 1);
+		node.destroy();
+	}
+}
+
+Graph.prototype.insertEdge = function(node1, node2, weight){
+	var edge = new Edge(node1, node2, weight);
+	node1.addEdge(node2, edge);
+	node2.addEdge(node1, edge);
+}
+
+	</script>
+<canvas id = "canvas" width = "1000" height = "600" style = "width:1000px;height:600px;background:#cccccc;"></canvas>
+<script type="text/javascript">
+// -------------------------测试---------------------------------------
+var graph = new Graph();
+var node1 = new Node();
+var node2 = new Node();
+var node3 = new Node();
+var node4 = new Node();
+var node5 = new Node();
+graph.insertNode(node1);
+graph.insertNode(node2);
+graph.insertNode(node3);
+graph.insertNode(node4);
+graph.insertNode(node5);
+
+graph.insertEdge(node1, node2, 10);
+graph.insertEdge(node1, node3, 20);
+graph.insertEdge(node1, node5, 30);
+graph.insertEdge(node2, node3, 40);
+graph.insertEdge(node2, node4, 50);
+graph.insertEdge(node3, node5, 60);
+graph.insertEdge(node4, node5, 70);
+graph.insertEdge(node4, node5, 80);
+console.log(graph);
+
+function CNode(){
+	this.x = 0;
+	this.y = 0;
+	this.r = 10;
+	this.text = "";
+}
+
+CNode.prototype.refresh = function(){
+	ctx.beginPath();
+	ctx.fillStyle="#0000ff";
+	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+	ctx.stroke();
+	ctx.fillStyle="green";
+	ctx.fill();
+	ctx.strokeText(this.text, this.x, this.y);
+}
+
+function CEdge(node1, node2, id, weight){
+	var sx = node1.x;
+	var sy = node1.y;
+	var ex = node2.x;
+	var ey = node2.y;
+	id = parseInt((id + 1) / 2) * (id % 2 == 0 ? 1 : -1);
+	var cx = (sx + ex) / 2 + (ey - sy) * (id) * 0.4;
+	var cy = (sy + ey) / 2 - (ex - sx) * (id) * 0.4;
+	var a = Bessel(sx, sy, cx, cy, ex, ey);
+
+	ctx.beginPath();
+	for(var i = 0; i < a.length; i+=2){
+		var x = a[i];
+		var y = a[i+1];
+		if(i===0){
+			ctx.moveTo(x,y);
+		} else {
+			ctx.lineTo(x,y);
+		}
+		if(i == 50){
+			ctx.strokeText(weight+"", x, y);
+		}
+	}
+	ctx.stroke();
+}
+
+function Bessel(x0, y0, x1, y1, x2, y2){
+	var a = [];
+	for(var i = 0; i <= 100; i++){
+		var t = i * 0.01;
+		var x01 = (1 - t) * x0 + t * x1;
+		var y01 = (1 - t) * y0 + t * y1;
+		var x12 = (1 - t) * x1 + t * x2;
+		var y12 = (1 - t) * y1 + t * y2;
+		var x02 = (1 - t) * x01 + t * x12;
+		var y02 = (1 - t) * y01 + t * y12;
+		a.push(x02, y02);
+	}
+	return a;
+}
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+var a = [];
+node1.DFS(a, {});
+console.log(a);
+
+var cnodeArr = [];
+for(var i = 0; i< a.length; i++){
+	var node = a[i];
+	var cnode = new CNode();
+	var ang = i * 60 * Math.PI / 180;
+	cnode.x = 400 + 200 * Math.cos(ang);
+	cnode. y = 200 + 100 * Math.sin(ang);
+	cnode.text = (i + 1) + "";
+	node.view = cnode;
+	cnodeArr.push(cnode);
+}
+
+var o = {};
+for(var i = 0; i < a.length; i++){
+	a[i].forEachEdge(function(edge, i, j){
+		if(!o[edge.UID]){
+			o[edge.UID] = true;
+			// console.log(i,j,edge);
+			CEdge(edge.node1.view, edge.node2.view, j, edge.weight);
+		}
+	});
+}
+
+cnodeArr.forEach(function(cnode){
+	cnode.refresh();
+});
+
+</script>
+</html>
