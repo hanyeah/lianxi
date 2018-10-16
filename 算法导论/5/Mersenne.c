@@ -83,8 +83,8 @@ uint32_t ExtractU32()
 
 int main(){
 	Initialize(1234);
-	for(int i = 0; i < 10; i++){
-		printf("%u ",ExtractU32());
+	for(int i = 0; i < 100; i++){
+		printf("%u\n",ExtractU32());
 	}
 	printf("\n");
 	return 0;

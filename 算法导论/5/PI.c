@@ -39,7 +39,7 @@ void test02(){
 		unsigned long long x = rand();
 		unsigned long long y = rand();
 		unsigned long long dis = x * x + y * y;
-		if(dis < r2){
+		if(dis <= r2){
 			s1++;
 		}
 		if(s2 % 100000 == 0){
@@ -50,7 +50,7 @@ void test02(){
 }
 
 int main(){
-	test01();
-	//test02();
+	//test01();
+	test02();
 	return 0;
 }
