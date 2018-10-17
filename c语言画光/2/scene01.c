@@ -9,8 +9,15 @@
 #define MAX_STEP 10
 #define MAX_DISTANCE 2.0f
 #define EPSILON 1e-6f
-//https://zhuanlan.zhihu.com/p/30745861
+//https://zhuanlan.zhihu.com/p/30748318
 unsigned char img[W*H*3];
+typedef struct {
+	float sd, emissive;
+} Result;
+
+Result unionOp(Result a, Result b){
+	return a.sd < b.sd ? a : b;
+}
 
 float circleSDF(float x, float y, float cx, float cy, float r){
 	float ux = x - cx;
@@ -18,14 +25,21 @@ float circleSDF(float x, float y, float cx, float cy, float r){
 	return sqrtf(ux * ux + uy * uy) - r;
 }
 
+Result scene(float x, float y){
+	Result r1 = {circleSDF(x, y, 0.3f, 0.3f, 0.1f), 2.0f};
+	Result r2 = {circleSDF(x, y, 0.3f, 0.7f, 0.05f), 0.8f};
+	Result r3 = {circleSDF(x, y, 0.7f, 0.5f, 0.1f), 0.0f};
+	return unionOp(unionOp(r1, r2), r3);
+}
+
 float trace(float ox, float oy, float dx, float dy){
 	float t = 0.0f;
 	for(int i = 0; i < MAX_STEP && t < MAX_DISTANCE; i++){
-		float sd = circleSDF(ox + dx * t, oy + dy * t, 0.5f, 0.5f, 0.1f);
-		if(sd < EPSILON){
-			return 2.0f;
+		Result r = scene(ox + dx * t, oy + dy * t);
+		if(r.sd < EPSILON){
+			return r.emissive;
 		}
-		t += sd;
+		t += r.sd;
 	}
 	return 0.0f;
 }
@@ -33,7 +47,7 @@ float trace(float ox, float oy, float dx, float dy){
 float sample(float x, float y){
 	float sum = 0.0f;
 	for(int i = 0; i < N; i++){
-		float a = TWO_PI * rand() / RAND_MAX;
+		float a = TWO_PI * (i + (float)rand() / RAND_MAX) / N;
 		sum += trace(x, y, cosf(a), sinf(a));
 	}
 	return sum / N;
@@ -47,6 +61,6 @@ int main(){
 			p += 3;
 		}
 	}
-	svpng(fopen("basic.png","wb"), W,H,img,0);
+	svpng(fopen("scene01.png","wb"), W,H,img,0);
 	return 0;
 }

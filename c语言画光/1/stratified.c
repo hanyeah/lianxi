@@ -33,7 +33,7 @@ float trace(float ox, float oy, float dx, float dy){
 float sample(float x, float y){
 	float sum = 0.0f;
 	for(int i = 0; i < N; i++){
-		float a = TWO_PI * rand() / RAND_MAX;
+		float a = TWO_PI * i / N;
 		sum += trace(x, y, cosf(a), sinf(a));
 	}
 	return sum / N;
@@ -47,6 +47,6 @@ int main(){
 			p += 3;
 		}
 	}
-	svpng(fopen("basic.png","wb"), W,H,img,0);
+	svpng(fopen("stratified.png","wb"), W,H,img,0);
 	return 0;
 }
