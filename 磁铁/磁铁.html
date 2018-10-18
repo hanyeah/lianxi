@@ -1,0 +1,119 @@
+<canvas id = "canvas" width = "512" height = "512" style = "width:512px;height:512px;background:#cccccc;"></canvas>
+<style type="text/css">
+	button{
+		width:200px;
+		height:60px;
+	}
+</style>
+<!-- <button onclick="qiaoji()">一直点我</button> -->
+<button onclick="reset()">重置</button>
+<script type="text/javascript">
+	var w = 512;
+	var h = 512; 
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	var q1 = {x : w / 2 - 30, y : h / 2, e: 1};
+	var q2 = {x : w / 2 + 30, y : h / 2, e: -1};
+	var delay = 30;
+	var pause = true;
+	var auto = true;
+	var tiexie = [];
+	var n = 0;
+	init();
+	function init(){
+		tiexie.length = 0;
+		for(var i = 0; i < w; i += 10 ){
+			for(var j = 0; j < h; j += 10){
+				tiexie.push({x : i, y : j});
+			}
+		}
+	}
+	
+	function update(){
+		var len = tiexie.length;
+		for(var i = 0; i < len; i++){
+			var o = tiexie[i];
+			var f = getTotalF(o.x, o.y);
+			var a = getTotalTheta(o.x, o.y);
+			var rand = Math.random();
+			f.x = rand * (f.x > 0 ? 1 : -1) * Math.pow(Math.abs(f.x), 0.1);
+			f.y = rand * (f.y > 0 ? 1 : -1) * Math.pow(Math.abs(f.y), 0.1);
+
+			if(a < 3){
+				o.x -= f.y;
+				o.y += f.x;
+			} else {
+				o.x += f.y;
+				o.y -= f.x;
+			}
+		}
+	}
+
+	function getTotalTheta(x, y){
+		var a1 = getTheta(x, y, q1);
+		var a2 = getTheta(x, y, q2);
+		var a = (a1 + a2 + 360) % 6;
+		return a;
+	}
+
+	function getTheta(x, y, q){
+		var dx = x - q.x;
+		var dy = y - q.y;
+		var angle = Math.atan2(dy, dx);
+		return 180 * angle * q.e / Math.PI;
+	}
+
+	function getTotalF(x, y){
+		var f1 = getF(x, y ,q1);
+		var f2 = getF(x, y ,q2);
+		var f = {x : f1.x + f2.x, y : f1.y + f2.y};
+		return f;
+	}
+
+	function getF(x, y, q){
+		var dx = x - q.x;
+		var dy = y - q.y;
+		var r2 = dx * dx + dy * dy;
+		var r = Math.sqrt(r2);
+		var k = q.e * 10000.0 / (r2 * r);
+		var f = {x : k * dx, y : k * dy};
+		return f;
+	}
+
+	function loop(){
+		if(!pause){
+			n++;
+			if(n > 1){
+				n = 0;
+				pause = !auto;
+			}
+			ctx.clearRect(0, 0, w, h);
+			update();
+			refresh();
+		}
+		setTimeout(loop, delay);
+	}
+
+	function refresh(){
+		var len = tiexie.length;
+		for(var i = 0; i < len; i++){
+			var o = tiexie[i];
+			ctx.fillRect(o.x, o.y, 2, 2);
+		}
+	}
+
+	function reset(){
+		init();
+	}
+
+	function qiaoji(){
+		n = 0;
+		pause = false;
+	}
+	refresh();
+	if(auto){
+		qiaoji();
+	}
+	loop();
+	
+</script>
