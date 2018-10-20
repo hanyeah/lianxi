@@ -11,11 +11,52 @@
 #define EPSILON 1e-6f
 #define BIAS 1e-4f
 #define MAX_DEPTH 3
+#define BLACK {0.0f, 0.0f, 0.0f}
 
-typedef struct { float sd, emissive, reflectivity, eta; } Result;
+// https://zhuanlan.zhihu.com/p/31901449
+
+typedef struct {float r, g, b;} Color;
+
+typedef struct { 
+	float sd, reflectivity, eta; 
+	Color emissive, absorption;
+} Result;
+
+Color colorAdd(Color a, Color b){
+	Color c = {a.r + b.r, a.g + b.g, a.b + b.b};
+	return c;
+}
+
+Color colorMultiply(Color a, Color b){
+	Color c = {a.r * b.r, a.g * b.g, a.b * b.b};
+	return c;
+}
+
+Color colorScale(Color a, float s){
+	Color c = {a.r * s, a.g * s, a.b * s};
+	return c;
+}
 
 unsigned char img[W * H * 3];
-int n = 0;
+
+Color beerLambert(Color a, float d){
+	Color c = {expf(-a.r * d), expf(-a.g * d), expf(-a.b * d)};
+	return c;
+}
+
+float schlick(float cosi, float cost, float etai, float etat){
+	float r0 = (etai - etat) / (etai + etat);
+	r0 *= r0;
+	float a = 1.0f - (etai < etat ? cosi : cost);
+	float aa = a * a;
+	return  r0 + (1.0f - r0) * aa * aa * a;
+}
+
+float fresnel(float cosi, float cost, float etai, float etat){
+	float rs = (etat * cosi - etai * cost) / (etat * cosi + etai * cost);
+	float rp = (etai * cosi - etat * cost) / (etai * cosi + etat * cost);
+	return (rs * rs + rp * rp) * 0.5f;
+}
 
 float circleSDF(float x, float y, float cx, float cy, float r) {
     float ux = x - cx, uy = y - cy;
@@ -34,6 +75,12 @@ float planeSDF(float x, float y, float px, float py, float nx, float ny) {
     return (x - px) * nx + (y - py) * ny;
 }
 
+float ngonSDF(float x, float y, float cx, float cy, float r, float n) {
+    float ux = x - cx, uy = y - cy, a = TWO_PI / n;
+    float t = fmodf(atan2f(uy, ux) + TWO_PI, a), s = sqrtf(ux * ux + uy * uy);
+    return planeSDF(s * cosf(t), s * sinf(t), r, 0.0f, cosf(a * 0.5f), sinf(a * 0.5f));
+}
+
 Result unionOp(Result a, Result b) {
     return a.sd < b.sd ? a : b;
 }
@@ -49,28 +96,9 @@ Result subtractOp(Result a, Result b) {
 }
 
 Result scene(float x, float y) {
-	if(n == 1){
-		Result c = { circleSDF(x, y, 0.5f, -0.5f, 0.05f), 20.0f, 0.0f, 0.0f };
-		Result d = { circleSDF(x, y, 0.5f, 0.2f, 0.35f), 0.0f, 0.2f, 1.5f };
-		Result e = { circleSDF(x, y, 0.5f, 0.8f, 0.35f), 0.0f, 0.2f, 1.5f };
-		return unionOp(c, intersectOp(d, e));
-	}
-	if(n == 2){
-		Result c = { circleSDF(x, y, 0.5f, -0.5f, 0.05f), 20.0f, 0.0f, 0.0f };
-		Result f = {    boxSDF(x, y, 0.5f, 0.5f, 0.0f, 0.2, 0.1f), 0.0f, 0.2f, 1.5f };
-		Result g = { circleSDF(x, y, 0.5f, 0.12f, 0.35f), 0.0f, 0.2f, 1.5f };
-		Result h = { circleSDF(x, y, 0.5f, 0.87f, 0.35f), 0.0f, 0.2f, 1.5f };
-		return unionOp(c, subtractOp(f, unionOp(g, h)));
-	}
-	if(n == 3){
-		Result c = { circleSDF(x, y, 0.5f, -0.5f, 0.05f), 20.0f, 0.0f, 0.0f };
-		Result i = { circleSDF(x, y, 0.5f, 0.5f, 0.2f), 0.0f, 0.2f, 1.5f };
-		Result j = {  planeSDF(x, y, 0.5f, 0.5f, 0.0f, -1.0f), 0.0f, 0.2f, 1.5f };
-		return unionOp(c, intersectOp(i, j));
-	}
-    Result a = { circleSDF(x, y, -0.2f, -0.2f, 0.1f), 10.0f, 0.0f, 0.0f };
-    Result b = {    boxSDF(x, y, 0.5f, 0.5f, 0.0f, 0.3, 0.2f), 0.0f, 0.2f, 1.5f };
-	return unionOp(a, b); 
+	Result a = { circleSDF(x, y, 0.5f, -0.2f, 0.1f), 0.0f, 0.0f, { 10.0f, 10.0f, 10.0f }, BLACK };
+    Result b = {   ngonSDF(x, y, 0.5f, 0.5f, 0.25f, 5.0f), 0.0f, 1.5f, BLACK, { 4.0f, 4.0f, 1.0f} };
+    return unionOp(a, b);
 }
 
 void gradient(float x, float y, float* nx, float* ny) {
@@ -97,14 +125,14 @@ int refract(float ix, float iy, float nx, float ny, float eta, float* rx, float*
 	return 1;
 }
 
-float trace(float ox, float oy, float dx, float dy, int depth) {
+Color trace(float ox, float oy, float dx, float dy, int depth) {
     float t = 0.0f;
 	float sign = scene(ox, oy).sd > 0.0f ? 1.0f : -1.0f;// 内还是外
     for (int i = 0; i < MAX_STEP && t < MAX_DISTANCE; i++) {
         float x = ox + dx * t, y = oy + dy * t;
         Result r = scene(x, y);
         if (r.sd * sign < EPSILON) {
-            float sum = r.emissive;
+            Color sum = r.emissive;
             if (depth < MAX_DEPTH && (r.reflectivity > 0.0f || r.eta > 0.0f) ) {
                 float nx, ny, rx, ry, refl = r.reflectivity;
                 gradient(x, y, &nx, &ny);
@@ -112,52 +140,45 @@ float trace(float ox, float oy, float dx, float dy, int depth) {
 				ny *= sign;
 				if(r.eta > 0.0f){
 					if(refract(dx, dy, nx, ny, sign < 0.0f ? r.eta : 1.0 / r.eta, &rx, &ry)){
-						sum +=  (1 - refl) * trace(x - nx * BIAS, y - ny * BIAS, rx, ry, depth + 1);
+						float cosi = -(dx * nx + dy * ny);
+						float cost = -(rx * nx + ry * ny);
+						refl = sign < 0.0f ? schlick(cosi, cost, r.eta, 1.0f) : schlick(cosi, cost, 1.0f, r.eta);
+						sum =  colorAdd(sum, colorScale(trace(x - nx * BIAS, y - ny * BIAS, rx, ry, depth + 1), 1 - refl));;
 					} else {
 						refl = 1.0f;// 全内反射
 					}
 				}
 				if(refl > 0.0f){
 					reflect(dx, dy, nx, ny, &rx, &ry);
-					sum += refl * trace(x + nx * BIAS, y + ny * BIAS, rx, ry, depth + 1);
+					sum = colorAdd(sum, colorScale(trace(x + nx * BIAS, y + ny * BIAS, rx, ry, depth + 1), refl));
 				}
             }
-            return sum;
+            return colorMultiply(sum , beerLambert(r.absorption, t));
         }
         t += r.sd * sign;
     }
-    return 0.0f;
+	Color black = BLACK;
+    return black;
 }
 
-float sample(float x, float y) {
-    float sum = 0.0f;
+Color sample(float x, float y) {
+    Color sum = BLACK;
     for (int i = 0; i < N; i++) {
         float a = TWO_PI * (i + (float)rand() / RAND_MAX) / N;
-        sum += trace(x, y, cosf(a), sinf(a), 0);
+        sum = colorAdd(sum, trace(x, y, cosf(a), sinf(a), 0));
     }
-    return sum / N;
+    return colorScale(sum, 1.0f / N);
 }
 
 int main() {
-	for(n = 0; n < 4; n++){
-		unsigned char* p = img;
-		for (int y = 0; y < H; y++)
-			for (int x = 0; x < W; x++, p += 3) {
-			//     float nx, ny;
-			//     gradient((float)x / W, (float)y / H, &nx, &ny);
-			//     p[0] = (int)((fmaxf(fminf(nx, 1.0f), -1.0f) * 0.5f + 0.5f) * 255.0f);
-			//     p[1] = (int)((fmaxf(fminf(ny, 1.0f), -1.0f) * 0.5f + 0.5f) * 255.0f);
-			//     p[2] = 0;
-            p[0] = p[1] = p[2] = (int)(fminf(sample((float)x / W, (float)y / H) * 255.0f, 255.0f));
-        }
-		if(n == 1){
-			svpng(fopen("refract01.png", "wb"), W, H, img, 0);
-		} else if(n == 2){
-			svpng(fopen("refract02.png", "wb"), W, H, img, 0);
-		} else if(n == 3){
-			svpng(fopen("refract03.png", "wb"), W, H, img, 0);
-		} else {
-			svpng(fopen("refract00.png", "wb"), W, H, img, 0);
+	unsigned char* p = img;
+	for (int y = 0; y < H; y++){
+		for (int x = 0; x < W; x++, p += 3) {
+			Color c = sample((float)x / W, (float)y / H);
+			p[0] = (int)(fminf(c.r * 255.0f, 255.0f));
+			p[1] = (int)(fminf(c.g * 255.0f, 255.0f));
+			p[2] = (int)(fminf(c.b * 255.0f, 255.0f));
 		}
 	}
+	svpng(fopen("beerLambert_color.png", "wb"), W, H, img, 0);
 }
