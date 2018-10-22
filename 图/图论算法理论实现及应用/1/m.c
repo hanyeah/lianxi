@@ -1,6 +1,7 @@
 #include <stdio.h>
 struct Vertex {int id, degree;};
 struct Edge {Vertex v1, v2;};
+struct Graph {Vertex* V; Edge* E;};
 
 void trace(int* s, int n){
 	for(int i = 0; i < n; i++){
