@@ -7,16 +7,32 @@
 #define D 4
 
 int dir[4][2] = {{-1, 0}, {0, 1}, {0, -1}, {1, 0}};
-const int n = 3;
-const int m = 4;
-int t = 5;
-int map[n][m] = {{S, C, C, C}, {C, X, C, X},{C, C, C, D}};
-int di = 2;
-int dj = 3;
 int escape = 0;
+int di;
+int dj;
+int si;
+int sj;
+
+// 测试数据1
+//const int n = 3;
+//const int m = 4;
+//int t = 5;
+//int map[n][m] = {{S, C, C, C}, {C, X, C, X},{C, C, C, D}};
+
+// 测试数据2
+const int n = 4;
+const int m = 4;
+int t = 8;
+int map[n][m] = {{C, X, C, X}, {C, C, S, C}, {C, C, C, C}, {D, X, C, X}};
+
+// 测试数据3
+//const int n = 4;
+//const int m = 4;
+//int t = 5;
+//int map[n][m] = {{S, C, X, C}, {C, C, X, C}, {C, C, X, D}, {C, C, C, C}};
 
 void dfs(int si, int sj, int cnt){
-	// printf("%d,%d,%d\n",si,sj,cnt);
+	printf("%d,%d,%d\n",si,sj,cnt);
 	if(si >= n || sj >= m || si < 0 || sj < 0){
 		// 边界
 		return;
@@ -52,12 +68,25 @@ int main(){
 	printf("hello bone\n");
 	trace((int **)map, n, m);
 	int wall = 0;
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < m; j++){
+			if(map[i][j] == S){
+				si = i;
+				sj = j;
+			} else if(map[i][j]==D){
+				di = i;
+				dj = j;
+			} else if(map[i][j]==X){
+				wall++;
+			}
+		}
+	}
 	// 搜索前剪枝
 	if(n * m - wall <= t){
 		printf("NO\n");
 	} else {
-		map[0][0] = X;
-		dfs(0, 0, 0);
+		map[si][sj] = X;
+		dfs(si, sj, 0);
 		if(escape){
 			printf("YES\n");
 		} else {
