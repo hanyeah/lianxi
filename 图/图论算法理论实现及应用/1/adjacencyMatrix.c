@@ -1,6 +1,4 @@
 #include "m.c"
-#define LENGTH(a) (sizeof(a) / sizeof(int))
-#define GET(a,n,i,j) *((int*)a + n*i + j)
 
 int isInE(int* e, int n, int u, int v){
 	for(int i = 0; i < n; i+=2){
@@ -14,13 +12,24 @@ int isInE(int* e, int n, int u, int v){
 	return 0;
 }
 
-void trace(int** a, int m, int n){
-	for(int i = 0; i < m; i++){
-		for(int j = 0; j < n; j++){
-			printf("%d ",GET(a, n, i, j));
+int od(int** a, int n, int k){
+	int d = 0;
+	for(int i = 0; i < n; i++){
+		if(GET(a, n, k, i)!=0){
+			d ++;
 		}
-		printf("\n");
 	}
+	return d;
+}
+
+int id(int** a, int n, int k){
+	int d = 0;
+	for(int i = 0; i < n; i++){
+		if(GET(a, n, i, k)!=0){
+			d ++;
+		}
+	}
+	return d;
 }
 
 int main(){
@@ -37,5 +46,10 @@ int main(){
 	}
 	
 	trace((int **)edge, n, n);
+	for(int i = 0; i < n; i++){
+		printf("%d的出度：%d\n", i, od((int **)edge, n, i));
+		printf("%d的入度：%d\n", i, id((int **)edge, n, i));
+	}
+	
 	return 0;
 }

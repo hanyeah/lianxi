@@ -1,0 +1,89 @@
+﻿<script>
+	function ArcNode(){
+		this.adjvex = null;
+		this.nextarc = null;
+	}
+
+	function VNode(){
+		this.data = null;
+		this.head1 = null;
+		this.head2 = null;
+	}
+
+	function LGraph(){
+		this.vertexs = [];
+		this.vexnum = 0;
+		this.arcnum = 0;
+	}
+
+	function createLG(vexnum, arcnum, v){
+		var lg = new LGraph();
+		lg.vexnum = vexnum;
+		lg.arcnum = arcnum;
+		for(var i = 0; i < lg.vexnum; i++){
+			lg.vertexs[i] = new VNode();
+		}
+		for(var i = 0; i < lg.arcnum; i++){
+			var v1 = v[2 * i];
+			var v2 = v[2 * i + 1];
+			var pi = new ArcNode();
+			pi.adjvex = v2;
+			pi.nextarc = lg.vertexs[v1].head1;
+			lg.vertexs[v1].head1 = pi;
+
+			var pi2 = new ArcNode();
+			pi2.adjvex = v1;
+			pi2.nextarc = lg.vertexs[v2].head2;
+			lg.vertexs[v2].head2 = pi2;
+		}
+		return lg;
+	}
+
+	function od(lg, i){
+		var d = 0;
+		var pi = lg.vertexs[i].head1;
+		while(pi){
+			d++;
+			pi = pi.nextarc;
+		}
+		return d;
+	}
+
+	function id(lg, i){
+		var d = 0;
+		var pi = lg.vertexs[i].head2;
+		while(pi){
+			d++;
+			pi = pi.nextarc;
+		}
+		return d;
+	}
+
+	function DFS(lg, i, a, visited){
+		visited[i] = 1;
+		var pi = lg.vertexs[i].head1;
+		while(pi){
+			a.push(pi.adjvex);
+			if(!visited[pi.adjvex]){
+				DFS(lg, pi.adjvex, a, visited);
+			}
+			pi = pi.nextarc;
+		}
+	}
+
+	var vexnum = 8;
+	var arcnum = 18;
+	var v = [1, 2, 2, 3, 2, 5, 2, 6, 3, 5, 4, 3, 5, 2, 5, 4, 6, 7, 4, 7, 1, 4, 2, 1, 2, 2, 2, 3, 2, 3, 4, 2, 4, 3, 0, 0];
+	
+	var lg = createLG(vexnum, arcnum, v);
+	console.log(lg);
+	for(var i = 0; i < vexnum; i++){
+		console.log("-------------------------");
+		console.log(`${i}的出度：${od(lg, i)}`);
+		console.log(`${i}的入度：${id(lg, i)}`);
+		var a = [];
+		var visited = [];
+		DFS(lg, i, a, visited);
+		console.log(`深度遍历：${a}`);
+	}
+</script>

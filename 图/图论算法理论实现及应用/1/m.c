@@ -3,6 +3,9 @@ struct Vertex {int id, degree;};
 struct Edge {Vertex v1, v2;};
 struct Graph {Vertex* V; Edge* E;};
 
+#define LENGTH(a) (sizeof(a) / sizeof(int))
+#define GET(a,n,i,j) *((int*)a + n*i + j)
+
 void trace(int* s, int n){
 	for(int i = 0; i < n; i++){
 		printf("%d ", *(s + i));
@@ -24,8 +27,23 @@ void trace(Edge* E, int n){
 	printf("\n");
 }
 
+void trace(int** a, int m, int n){
+	for(int i = 0; i < m; i++){
+		for(int j = 0; j < n; j++){
+			printf("%d ",GET(a, n, i, j));
+		}
+		printf("\n");
+	}
+}
+
 void swap(Vertex* v, int i, int j){
 	Vertex temp = *(v + i);
+	*(v + i) = *(v + j);
+	*(v + j) = temp;
+}
+
+void swap(int* v, int i, int j){
+	int temp = *(v + i);
 	*(v + i) = *(v + j);
 	*(v + j) = temp;
 }
