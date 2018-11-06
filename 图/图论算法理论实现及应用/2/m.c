@@ -30,7 +30,7 @@ void trace(Edge* E, int n){
 void trace(int** a, int m, int n){
 	for(int i = 0; i < m; i++){
 		for(int j = 0; j < n; j++){
-			printf("%d ",GET(a, n, i, j));
+			printf("%6d",GET(a, n, i, j));
 		}
 		printf("\n");
 	}
