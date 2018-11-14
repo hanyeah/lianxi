@@ -1,0 +1,139 @@
+﻿<script type="text/javascript">
+	var v = [
+		["1", "234"],
+		["2", "135"],
+		["3", "1245"],
+		["4", "135"],
+		["5", "23467"],
+		["6", "57"],
+		["7", "56"]
+	];
+
+
+	var va = v;
+	var n = va.length;
+	var r0 = va[0];
+	for(var i = 1; i < n; i++){
+		//console.log(i,"==========================");
+		r0 = cheng(r0, va[i]);
+	}
+	console.log("极小点覆盖集：", r0);
+
+	//
+	var r2 = [];
+	for(var i = 0; i < r0.length; i++){
+		r2[i] = cha("1234567", r0[i]);
+	}
+	console.log("极大独立点集：",r2);
+	function cha(s1, s2){
+		var c = [];
+		for(var i = 0; i < s1.length; i++){
+			var si = s1.charAt(i);
+			if(s2.indexOf(si)==-1){
+				c.push(si);
+			}
+		}
+		return c.join("");
+	}
+	//
+
+	function cheng(a, b){
+		var jiao = jiaoji(a, b);
+		var chaAB = chaji(a, b);
+		var chaBA = chaji(b, a);
+		//console.log("a∩b",jiao);
+		//console.log("a-b",chaAB);
+		//console.log("b-a",chaBA);
+		var r = jiao.concat(cheng2(chaAB, chaBA));
+		r = quchong(r);
+		//console.log(r);
+		r = xishou(r);
+		return r;
+	}
+
+	function jiaoji(a, b){
+		var n1 = a.length;
+		var c = [];
+		for(var i = 0; i < n1; i++){
+			if(b.indexOf(a[i])!=-1){
+				c.push(a[i]);
+			}
+		}
+		return c;
+	}
+
+	function chaji(a, b){
+		var n1 = a.length;
+		var c = [];
+		for(var i = 0; i < n1; i++){
+			if(b.indexOf(a[i])==-1){
+				c.push(a[i]);
+			}
+		}
+		return c;
+	}
+
+	function quchong(a){
+		var b = a.sort();
+		var c = [];
+		var n0 = b.length;
+		for(var i = 0; i < n0; i++){
+			if(b[i]!=b[i-1]){
+				c.push(b[i]);
+			}
+		}
+		return c;
+	}
+
+	function cheng2(a, b){
+		var n1 = a.length;
+		var n2 = b.length;
+		var c = [];
+		for(var i = 0; i < n1; i++){
+			for(var j = 0; j < n2; j++){
+				c.push(quchong(a[i].split("").concat(b[j].split(""))).join(""));
+			}
+		} 
+		return c;
+	}
+
+	function xishou(a){
+		var b = a.sort();
+		var n = b.length;
+		for(var i = 0; i < n; i++){
+			var bi = b[i];
+			if(bi){
+				for(var j = i+1; j < n; j++){
+					var bj = b[j];
+					if(contains(bj, bi)){
+						b[j] = null;
+					} else if(contains(bi, bj)){
+						b[i] = null;
+						break;
+					}
+				}
+			}
+		}
+		var c = [];
+		for(var i = 0; i < n; i++){
+			if(b[i]){
+				c.push(b[i]);
+			}
+		}
+		return c;
+	}
+
+	function contains(b, a){
+		if(b.indexOf(a)!=-1){
+			return true;
+		}
+		var r = true;
+		for(var i = 0; i < a.length; i++){
+			if(b.indexOf(a.charAt(i))==-1){
+				r = false;
+				break;
+			}
+		}
+		return r;
+	}
+</script>
