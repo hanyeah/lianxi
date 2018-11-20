@@ -1,0 +1,84 @@
+﻿<script type="text/javascript">
+
+function Node(value){
+	this.next;
+	this.value = value;
+}
+
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var head = new Node(arr[0]);
+var node = head;
+for(var i = 1; i < arr.length; i ++){
+	node.next = new Node(arr[i]);
+	node = node.next;
+}
+console.log(arr);
+console.log("middle:", findMid(head));
+console.log("k:", findK(head, 2));
+
+
+var node = head;
+var node2 = head;
+while(node.next){
+	node = node.next;
+	if(Math.random()>0.8){
+		node2 = node;
+	}
+}
+console.log("has loop:", hasLoop(head));
+node.next = node2;
+console.log("has loop:", hasLoop(head));
+
+
+// 查找中间元素
+function findMid(head){
+	var n1, n2;
+	n1 = head;
+	n2 = head;
+	while(n1){
+		n1 = n1.next;
+		if(n1){
+			n1 = n1.next;
+			n2 = n2.next;
+		}
+	}
+	return n2;
+}
+
+// 查找第k个元素
+function findK(head, k){
+	var n1, n2;
+	n1 = head;
+	n2 = head;
+	var i = 0;
+	while(n1){
+		i++;
+		if(i > k){
+			n2 = n2.next;
+		}
+		n1 = n1.next;
+	}
+	return n2;
+}
+
+// 判断有没有环
+function hasLoop(head){
+	var n1, n2;
+	n1 = head;
+	n2 = head;
+	while(n1){
+		n2 = n2.next;
+		n1 = n1.next;
+		if(n1){
+			n1 = n1.next;
+			if(n1 && n1.value == n2.value){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+
+</script>
