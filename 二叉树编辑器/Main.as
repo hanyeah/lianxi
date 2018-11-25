@@ -37,15 +37,18 @@
 				// ctrl+s
 			} else if (e.keyCode == 46){
 				// delete
+				trace(stage.focus);
 				if (e.ctrlKey){
 					// 删除当前节点及所有子节点
 					if (stage.focus is Node){
 						removeNode(stage.focus as Node, true);
+						updateLR();
 					}
 				} else {
 					// 删除一个节点
 					if (stage.focus is Node){
 						removeNode(stage.focus as Node, false);
+						updateLR();
 					}
 				}
 			} else if (e.ctrlKey && e.keyCode == 82){
@@ -61,7 +64,25 @@
 				// 断开节点
 				if (stage.focus is Node){
 					breakNode(stage.focus as Node);
+					updateLR();
 				}
+			} else if (e.ctrlKey && e.keyCode == 187){
+				// ctrl++
+				// 放大
+				con.scaleX += 0.1;
+				con.scaleY += 0.1;
+			} else if (e.ctrlKey && e.keyCode == 189){
+				// ctrl+-
+				// 缩小
+				if(con.scaleX > 0.1){
+					con.scaleX -= 0.1;
+					con.scaleY -= 0.1;
+				}
+			} else if (e.ctrlKey && e.keyCode == 48){
+				// ctrl+0
+				// 1:1
+				con.scaleX = 1.0;
+				con.scaleY = 1.0;
 			}
 			
 		}
@@ -104,6 +125,14 @@
 				return arr;
 			}
 			return o;
+		}
+		
+		private function updateLR(){
+			forEachRoot(function(node:Node){
+				node.updateMaxLR();
+				node.updateLR();
+				dragMove(node);
+			});
 		}
 		
 		/**
@@ -166,6 +195,7 @@
 					checkHit(no, node);
 				}
 			}
+			updateLR();
 		}
 		
 		/**
@@ -204,8 +234,20 @@
 				no1.parentNode = no2;
 				no1.x = no2.x + no2.circleR.x;
 				no1.y = no2.y + no2.circleR.y;
-				dragMove(no2);
+				dragMove(no1);
 			}
+		}
+		
+		/**
+		 * 获取根节点
+		 * @param	node
+		 * @return
+		 */
+		private function getRoot(node:Node):Node{
+			while(node.parentNode){
+				node = node.parentNode;
+			}
+			return node;
 		}
 		
 		/**

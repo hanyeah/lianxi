@@ -1,5 +1,6 @@
 ﻿package  {
 	
+	import flash.display.Graphics;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -16,6 +17,7 @@
 		public var circleL:MovieClip;
 		public var circleR:MovieClip;
 		public var tf:TextField;
+		public var lineMc:MovieClip;
 		private var value:Number;
 		public var left:Node;
 		public var right:Node;
@@ -31,22 +33,59 @@
 			tf.mouseEnabled = false;
 			doubleClickEnabled = true;
 			addEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
+			addEventListener(MouseEvent.CLICK, clickHandler);
+			updateLR();
+			mouseChildren = false;
 		}
 		
-		public function updateMaxLR():Point{
+		private function clickHandler(e:MouseEvent):void 
+		{
+			stage.focus = this;
+		}
+		
+		public function updateLR():void{
+			var w:int = 35;
+			var h:int = 65;
+			circleL.x = -(left?left.LR.y+1:1) * w; 
+			circleL.y = h; 
+			circleR.x = (right?right.LR.x+1:1) * w; 
+			circleR.y = h; 
+			while(lineMc.numChildren){
+				lineMc.removeChildAt(0);
+			}
+			var gra:Graphics = lineMc.graphics;
+			gra.clear();
+			gra.lineStyle(2, 0x000000, 1.0);
+			gra.moveTo(-21, 15);
+			gra.lineTo(circleL.x, circleL.y - 25);
+			gra.moveTo(21, 15);
+			gra.lineTo(circleR.x, circleR.y - 25);
+			if(left){
+				left.updateLR();
+			}
+			if(right){
+				right.updateLR();
+			}
+		}
+		
+		public function updateMaxLR():void{
 			var L:Point;
 			var R:Point;
 			if (left){
 				left.updateMaxLR();
 				L = left.LR;
+			} else {
+				L = new Point(0, 0);
 			}
 			if(right){
 				right.updateMaxLR();
 				R = right.LR;
+			} else {
+				R = new Point(0, 0);
 			}
 			
-			LR.x = Math.max(1, L ? L.x + 1: 2, R.x - 1);
-			LR.y = Math.max(1, L ? L.y - 1: 0, R.y + 1);
+			LR.x = Math.max(1, L.x + L.y + 1);
+			LR.y = Math.max(1, R.x + R.y + 1);
 		}
 		
 		private function doubleClickHandler(e:MouseEvent):void 
@@ -56,6 +95,7 @@
 		
 		public function destroy():void{
 			removeEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
+			removeEventListener(MouseEvent.CLICK, clickHandler);
 		}
 		
 		public function setValue(value:Number):void{
