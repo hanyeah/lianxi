@@ -1,26 +1,50 @@
 ﻿package  {
 	
+	import com.adobe.images.PNGEncoder;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import flash.net.FileReference;
 	import flash.text.TextField;
+	import flash.utils.ByteArray;
 	
 	
 	public class Main extends MovieClip {
 		
 		private var con:Sprite;
 		public var tf:TextField;
+		public var helpTf:TextField;
 		public function Main() {
 			// constructor code
 			con = new Sprite();
 			addChild(con);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+			stage.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
 			tf.visible = false;
+			helpTf.visible = false;
 			travel();
+		}
+		
+		private function mouseWheelHandler(e:MouseEvent):void 
+		{
+			if (e.delta > 0){
+				// 放大
+				con.scaleX += 0.1;
+				con.scaleY += 0.1;
+			} else {
+				if(con.scaleX > 0.1){
+					con.scaleX -= 0.1;
+					con.scaleY -= 0.1;
+				}
+			}
 		}
 		
 		private function keyDownHandler(e:KeyboardEvent):void 
@@ -35,9 +59,11 @@
 				drag(node);
 			} else if (e.ctrlKey && e.keyCode == 83){
 				// ctrl+s
+				// 保存
+				saveBmp();
 			} else if (e.keyCode == 46){
 				// delete
-				trace(stage.focus);
+				// trace(stage.focus);
 				if (e.ctrlKey){
 					// 删除当前节点及所有子节点
 					if (stage.focus is Node){
@@ -51,10 +77,13 @@
 						updateLR();
 					}
 				}
-			} else if (e.ctrlKey && e.keyCode == 82){
-				// ctrl+r
+			} else if (e.keyCode == 113){
+				// f2
 				// 遍历结果
-				showResult();
+				tf.visible = !tf.visible;
+				if (tf.visible){
+					showResult();
+				}
 			} else if (e.keyCode == 27){
 				// ESC
 				// 隐藏遍历结果
@@ -83,21 +112,76 @@
 				// 1:1
 				con.scaleX = 1.0;
 				con.scaleY = 1.0;
+			} else if (e.keyCode == 112){
+				// f1
+				// 帮助
+				helpTf.visible = !helpTf.visible;
 			}
 			
+		}
+		
+		/**
+		 * 保存图片
+		 */
+		private function saveBmp():void{
+			if (con.numChildren){
+				var rect:Rectangle = con.getBounds(this);
+				var bmd:BitmapData = new BitmapData(rect.width, rect.height, true, 0x00000000);
+				bmd.draw(con, new Matrix(con.scaleX, 0, 0, con.scaleY, -rect.x, -rect.y));
+				var bytes:ByteArray = PNGEncoder.encode(bmd);
+				var f:FileReference = new FileReference();
+				var t:Number = new Date().getTime();
+				f.save(bytes, "binary_tree_" + t + '.png');
+				var flag:Boolean = false;
+				f.addEventListener(Event.COMPLETE, function(){
+					if(flag){
+						return;
+					}
+					flag = true;
+					var o:Object = getJson();
+					var s:String = JSON.stringify(o, null, 2);
+					f.save(s, "binary_tree_data_" + t + ".json");
+				});
+			}
+		}
+		
+		private function getJson():Object{
+			var result:Array = [];
+			forEachNode(function (node:Node){
+				var o:Object = {
+					value: node.getValue()
+				};
+				if (node.left){
+					o.left = node.left.getValue();
+				}
+				if (node.right){
+					o.right = node.right.getValue();
+				}
+				if (isRoot(node)){
+					o.x = Math.round(node.x);
+					o.y = Math.round(node.y);
+				}
+				result.push(o);
+			});
+			return {
+				x: Math.round(con.x),
+				y: Math.round(con.y),
+				sx: con.scaleX,
+				Sy: con.scaleY,
+				data: result
+			};
 		}
 		
 		/**
 		 * 显示遍历结果
 		 */
 		private function showResult(){
-			tf.visible = true;
 			tf.text = "-----------\n";
 			if (stage.focus is Node){
-				var o:Object = getResult(stage.focus as Node);trace(o)
+				var o:Object = getResult(stage.focus as Node);
 				appendText(o);
 			} else {
-				var arr:Array = getResult(null) as Array; trace(arr);
+				var arr:Array = getResult(null) as Array;
 				for (var i:int = 0; i < arr.length; i++ ){
 					appendText(arr[i]);
 					tf.appendText("\n");
@@ -106,9 +190,9 @@
 		}
 		
 		private function appendText(o:Object){
-			tf.appendText("前序遍历："+ o.pre.join('') + '\n');
-			tf.appendText("中序遍历："+ o.pre.join('') + '\n');
-			tf.appendText("后序遍历："+ o.pre.join('') + '\n');
+			tf.appendText("前序遍历："+ o.pre.join(',') + '\n');
+			tf.appendText("中序遍历："+ o.order.join(',') + '\n');
+			tf.appendText("后序遍历："+ o.post.join(',') + '\n');
 		}
 		
 		private function getResult(node:Node):Object{
@@ -119,7 +203,7 @@
 				postOrderTreeWalk(node, o.post);
 			} else {
 				var arr:Array = [];
-				forEachNode(function(node:Node){
+				forEachRoot(function(node:Node){
 					arr.push(getResult(node));
 				});
 				return arr;
@@ -144,15 +228,15 @@
 			if(!node){
 				return;
 			}
+			if(digui){
+				removeNode(node.left, digui);
+				removeNode(node.right, digui);
+			}
 			breakNode(node);
 			breakNode(node.left);
 			breakNode(node.right);
 			node.destroy();
 			con.removeChild(node);
-			if(digui){
-				removeNode(node.left, digui);
-				removeNode(node.right, digui);
-			}
 		}
 		
 		/**

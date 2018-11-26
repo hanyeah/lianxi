@@ -5,6 +5,7 @@
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.text.TextField;
@@ -18,7 +19,6 @@
 		public var circleR:MovieClip;
 		public var tf:TextField;
 		public var lineMc:MovieClip;
-		private var value:Number;
 		public var left:Node;
 		public var right:Node;
 		public var parentNode:Node;
@@ -30,17 +30,28 @@
 				value = Node.counting++;
 			}
 			setValue(value);
-			tf.mouseEnabled = false;
 			doubleClickEnabled = true;
 			addEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
-			addEventListener(MouseEvent.CLICK, clickHandler);
+			addEventListener(KeyboardEvent.KEY_DOWN, keyBoardHandler);
+			tf.addEventListener(MouseEvent.MOUSE_DOWN, tfMouseDownHandler);
 			updateLR();
+			tf.mouseEnabled = false;
 			mouseChildren = false;
 		}
 		
-		private function clickHandler(e:MouseEvent):void 
+		private function tfMouseDownHandler(e:MouseEvent):void 
 		{
-			stage.focus = this;
+			e.stopPropagation();
+		}
+		
+		private function keyBoardHandler(e:KeyboardEvent):void 
+		{
+			if (stage.focus == tf){
+				if (e.keyCode == 13){
+					toDynamic();
+					stage.focus = this;
+				}
+			}
 		}
 		
 		public function updateLR():void{
@@ -95,16 +106,16 @@
 		
 		public function destroy():void{
 			removeEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
-			removeEventListener(MouseEvent.CLICK, clickHandler);
+			removeEventListener(KeyboardEvent.KEY_DOWN, keyBoardHandler);
+			tf.removeEventListener(MouseEvent.MOUSE_DOWN, tfMouseDownHandler);
 		}
 		
 		public function setValue(value:Number):void{
 			tf.text = value+"";
-			this.value = value;
 		}
 		
-		public function getValue():Number{
-			return this.value;
+		public function getValue():String{
+			return tf.text;
 		}
 		
 		private function toInput():void {
@@ -113,7 +124,7 @@
 			tf.mouseEnabled = true;
 			tf.background = true;
 			stage.focus = tf;
-			
+			mouseChildren = true;
 			stage.addEventListener(FocusEvent.MOUSE_FOCUS_CHANGE, onFocusChange);
 		}
 		
@@ -127,6 +138,7 @@
 			tf.selectable = false;
 			tf.mouseEnabled = false;
 			tf.background = false;
+			mouseChildren = false;
 		}
 		
 	}
