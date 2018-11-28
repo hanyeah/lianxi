@@ -1,5 +1,6 @@
 ﻿package  {
 	
+	import Box2D.Collision.b2DynamicTreeNode;
 	import com.adobe.images.PNGEncoder;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -12,9 +13,13 @@
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.net.FileFilter;
 	import flash.net.FileReference;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
 	import flash.text.TextField;
 	import flash.utils.ByteArray;
+	import flash.utils.setTimeout;
 	
 	
 	public class Main extends MovieClip {
@@ -22,6 +27,7 @@
 		private var con:Sprite;
 		public var tf:TextField;
 		public var helpTf:TextField;
+		public var alert:TextField;
 		public function Main() {
 			// constructor code
 			con = new Sprite();
@@ -29,7 +35,9 @@
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 			stage.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
 			tf.visible = false;
-			helpTf.visible = false;
+			// helpTf.visible = false;
+			alert.visible = false;
+			alert.mouseEnabled = false;
 			travel();
 		}
 		
@@ -116,8 +124,98 @@
 				// f1
 				// 帮助
 				helpTf.visible = !helpTf.visible;
+			} else if (e.keyCode == 114){
+				// f3
+				// 打开
+				open();
+			} 
+			
+		}
+		
+		var f:FileReference = new FileReference();
+		private function open():void{
+			f.browse([new FileFilter("*.json", "*.json")]);
+			f.addEventListener(Event.SELECT, fileSelected);
+			f.addEventListener(Event.CANCEL, fileCancel);
+		}
+		
+		private function fileCancel(e:Event):void 
+		{
+			f.removeEventListener(Event.SELECT, fileSelected);
+			f.removeEventListener(Event.CANCEL, fileCancel);
+		}
+		
+		private function fileSelected(e:Event):void 
+		{
+			f.load();
+			f.addEventListener(Event.COMPLETE, fileLoaded);
+		}
+		
+		private function fileLoaded(e):void{
+			f.removeEventListener(Event.COMPLETE, fileLoaded);
+			try{
+				var s:String = String(f.data);
+				var o:Object = JSON.parse(s);
+				trace(s);
+				createTreeByJson(o);
+			} catch (e:Event){
+				trace("error:" + e);
+				alert.text = "error:" + e;
+				alert.visible = true;
+				setTimeout(hideAlert, 3000);
+			}
+			trace(s);
+		}
+		
+		private function hideAlert():void{
+			alert.visible = false;
+		}
+		
+		private function createTreeByJson(o:Object):void{
+			con.x = o.x;
+			con.y = o.y;
+			con.scaleX = o.sx;
+			con.scaleY = o.sy;
+			var data:Array = o.data;
+			var n0:Object;
+			for (var i:int = 0; i < data.length; i++){
+				n0 = data[i];
+				var node:Node = new Node(n0.v, n0.uid);
+				n0.node = node;
+				if(n0.x || n0.y){
+					node.x = n0.x;
+					node.y = n0.y;
+				}
+				con.addChild(node);
+				drag(node);
 			}
 			
+			for (var j:int = 0; j < data.length; j++){
+				n0 = data[j];
+				if (n0.l){
+					var lNode:Node = findNode(n0.l);
+					n0.node.left = lNode;
+					n0.node.circleL.visible = false;
+					lNode.parentNode = n0.node;
+				}
+				if(n0.r){
+					var rNode:Node = findNode(n0.r);
+					n0.node.right = rNode;
+					n0.node.circleR.visible = false;
+					rNode.parentNode = n0.node;
+				}
+			}
+			updateLR();
+		}
+		
+		private function findNode(uid:Number):Node{
+			for (var i:int = 0; i < con.numChildren; i++){
+				var node:Node = con.getChildAt(i) as Node;
+				if (node.uid == uid){
+					return node;
+				}
+			}
+			return null;
 		}
 		
 		/**
@@ -149,13 +247,14 @@
 			var result:Array = [];
 			forEachNode(function (node:Node){
 				var o:Object = {
-					value: node.getValue()
+					v: node.getValue(),
+					uid: node.uid
 				};
 				if (node.left){
-					o.left = node.left.getValue();
+					o.l = node.left.uid;
 				}
 				if (node.right){
-					o.right = node.right.getValue();
+					o.r = node.right.uid;
 				}
 				if (isRoot(node)){
 					o.x = Math.round(node.x);
@@ -167,7 +266,7 @@
 				x: Math.round(con.x),
 				y: Math.round(con.y),
 				sx: con.scaleX,
-				Sy: con.scaleY,
+				sy: con.scaleY,
 				data: result
 			};
 		}

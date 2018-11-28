@@ -23,20 +23,30 @@
 		public var right:Node;
 		public var parentNode:Node;
 		public var LR:Point = new Point(1, 1);
+		public var uid:Number;
 		public static var counting:Number = 1;
-		public function Node(value:Number = NaN) {
+		public function Node(value:Number = NaN, uid:Number = NaN) {
 			// constructor code
 			if (isNaN(value)){
 				value = Node.counting++;
 			}
+			this.uid = uid || new Date().getTime() + Math.floor(Math.random() * 1000)+value;
 			setValue(value);
 			doubleClickEnabled = true;
 			addEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
 			addEventListener(KeyboardEvent.KEY_DOWN, keyBoardHandler);
 			tf.addEventListener(MouseEvent.MOUSE_DOWN, tfMouseDownHandler);
+			addEventListener(MouseEvent.CLICK, clickHandler);
 			updateLR();
 			tf.mouseEnabled = false;
 			mouseChildren = false;
+		}
+		
+		private function clickHandler(e:MouseEvent):void 
+		{
+			if (e.target != tf){
+				stage.focus = this;
+			}
 		}
 		
 		private function tfMouseDownHandler(e:MouseEvent):void 
@@ -108,6 +118,7 @@
 			removeEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
 			removeEventListener(KeyboardEvent.KEY_DOWN, keyBoardHandler);
 			tf.removeEventListener(MouseEvent.MOUSE_DOWN, tfMouseDownHandler);
+			removeEventListener(MouseEvent.CLICK, clickHandler);
 		}
 		
 		public function setValue(value:Number):void{
