@@ -1,0 +1,60 @@
+<canvas id = 'canvas' width = '256' height = '256' style = 'width:256px;height:256px;background:#cccccc;'></canvas>
+<script>
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var imagaData = ctx.getImageData(0, 0, 256, 256);
+	var pixels = imagaData.data;
+	var t0 = new Date().getTime();
+	var omiga = Math.PI * 100 / 180;
+
+	function setOmiga(value){
+		omiga = Math.PI * value / 180;
+	}
+
+	function setRot(n) {
+		omiga = 2 * Math.PI * n;
+	}
+
+	function loop(){
+		var t = (new Date().getTime() - t0) * 0.001;
+		var n = 0;
+		for (var i = 0; i < 256; i++) {
+			for(var j = 0; j < 256; j++) {
+				pixels[n++] = getColor(i - 128, j - 128, t);
+				pixels[n++] = 0;
+				pixels[n++] = 0;
+				pixels[n++] = 0xff;
+			}
+		}
+		ctx.putImageData(imagaData, 0, 0);
+	}
+
+	function getColor(x, y, t) {
+		const eyeT = 0.1;
+		const d2 = x * x + y * y;
+		const R2 = 100 * 100; 
+		if(d2 < R2){
+			const wt = 5 / (Math.sqrt(d2) * omiga);
+			const T = 2 * Math.PI / omiga;
+			const a = Math.atan2(y, x) + Math.PI;
+			const t0 = a / omiga;
+			// 有 t0 + N * T + dt = t 
+			// => dt = (t - t0) % T
+			//    N  = (t - t0 - dt) / T
+			const dt = (t - t0) % T;
+			const N = (t - t0 - dt) / T;
+			let color = 0x00;
+			let tn = dt;
+			let n = 0;
+			while(tn + wt > 0 && n <= N && tn < eyeT + wt) {
+				color += /*(100 / N) **/ 0xff * (eyeT - tn + wt) / eyeT;
+				tn += T;
+				n++;
+
+			}
+			return Math.min(color, 0xff);
+		} 
+		return 0x00;
+	}
+	setInterval(loop, 30);
+</script>
