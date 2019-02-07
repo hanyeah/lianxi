@@ -7,39 +7,43 @@ var f = "3+4*5-8/2+(3+1)*((2-1)*(3-1)*2)/3";
 var a = f.split("");
 console.log(a);
 
-var op = [];
-var exp = [];
-for(var i = 0; i < a.length; i++){
-	var s = a[i];
-	if(isNaN(s)){
-		// 符号
-		if(op.length == 0){
-			op.push(s);
-		} else {
-			var y0 = youxianji(s);
-			var y1 = youxianji(op[op.length-1]);
-			if(y0 < y1){
-				exp.push(op.pop());
-				while(op.length && y0 >= youxianji(op[op.length-1])){
-					exp.push(op.pop());
-				}
-			}
-			op.push(s);
-		}
-		
-	} else {
-		// 字符
-		exp.push(s);
-	}
-	console.log('============');
-	console.log(exp.join(''));
-	console.log(op.join(''))
-}
-while(op.length){
-	exp.push(op.pop());
+var root = new Node(a[0]);
+
+for(var i = 1; i < a.length; i++){
+	var node = new Node(a[i]);
+	insert(node);
 }
 
-console.log(exp, op);
+
+function insert(node){
+	var no = root;
+	while(no){
+		if(youxianji(node.key) < youxianji(no.key)){
+			if(no.left){
+				no = no.left;
+			} else {
+				no.left = node;
+				no = null;
+			}
+		} else {
+			if(no.right){
+				no = no.right;
+			} else {
+				no.right = node;
+				no = null;
+			}
+		}
+	}
+}
+
+console.log(root);
+
+
+function Node(key){
+	this.left;
+	this.right;
+	this.key = key;
+}
 
 function youxianji(s){
 	if(s=='+'||s=='-'){
