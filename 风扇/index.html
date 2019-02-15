@@ -58,3 +58,15 @@
 	}
 	setInterval(loop, 30);
 </script>
+转速：<input id = 'rot' value = '10'></input>
+<button onclick = 'setRotClick()'>设置转速</button>
+<script type="text/javascript">
+	var rot = document.getElementById('rot');
+	setRotClick();
+	function setRotClick() {
+		var n = parseFloat(rot.value);
+		if(!isNaN(n)) {
+			setRot(n);
+		}
+	}
+</script>
