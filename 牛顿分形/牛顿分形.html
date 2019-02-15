@@ -1,0 +1,836 @@
+<canvas id = 'canvas' width = '256' height = '256' style = 'width:256px;height:256px;'></canvas>
+<script type="text/javascript">
+	var w = 256;
+	var h = 256;
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var imageData = ctx.getImageData(0,0,w, h);
+	var pixels = imageData.data;
+	var xMin = -2.0;
+	var xMax = 2.0;
+	var yMin = -2.0;
+	var yMax = 2.0;
+	var eps = 1e-6;
+	var maxIter = 40;
+	var roots = [];
+	remder();
+	function remder() {
+		var n = 0;
+		for(var i = 0; i < w; i++) {
+			for(var j = 0; j < h; j++) {
+				var co = draw(i, j);
+				pixels[n++] = co[0];
+				pixels[n++] = co[1];
+				pixels[n++] = co[2];
+				pixels[n++] = 0xff;
+			}
+		}
+		ctx.putImageData(imageData, 0, 0);
+	}
+
+	function newTon(c) {
+		for(var i = 0; i < maxIter; i++) {
+			var c2 = c - f(c) / df(c);
+			if (abs(f(c)) > 1e10) {
+				// 溢出
+				break;
+			}
+			if (abs(f(c)) < eps) {
+				return {
+					c: c,
+					i: i
+				};
+			}
+			c = c2;
+		}
+		return null;
+	}
+
+	function color(ind, level){
+		var colors = [[180, 0, 30], [0, 180, 30], [0, 30, 180],
+              [0, 190, 180], [180, 0, 175], [180, 255, 0],
+              [155, 170, 180], [70, 50, 0],
+              [150, 60, 0], [0, 150, 60], [0, 60, 150],
+              [60, 150, 0], [60, 0, 150], [150, 0, 60],
+              [130, 80, 0], [80, 130, 0], [130, 0, 80],
+              [80, 0, 130], [0, 130, 80], [0, 80, 130],
+              [110, 100, 0], [100, 110, 0], [0, 110, 100],
+              [0, 100, 100], [110, 0, 100], [100, 0, 110],
+              [255, 255, 255]];
+        var c;
+        if(ind < colors.length){
+        	c = colors[ind];
+        } else {
+        	c = [ind % 4 * 4, ind % 8 * 8, ind % 16 * 16];
+        }
+        if (Math.max.apply(this, c)) {
+        	c[0] += level;
+        	c[1] += level;
+        	c[2] += level;
+        }
+        return c;
+	}
+
+	
+	function draw(x, y) {
+		var z = new Complex(
+				x * (xMax - xMin) / (w - 1) + xMin,
+				y * (yMax - yMin) / (h - 1) + yMin
+			);
+		var o = newTon(z);
+		if(o) {
+			var r = o.c;
+			var flag = false;
+			for(var i = 0; i < roots.length ) {
+				if (abs(r - roots[i]) < 1e-4){
+					r = roots[i];
+					flag = true;
+					break;
+				}
+			}
+			if(!flag){
+				roots.push(r);
+			}
+			return color(roots.indexOf(r), o.i);
+		}
+		return [0, 0, 0];
+	}
+
+	function f(x) {
+		return x*x*x - 1;
+	}
+
+	function df(x){
+		return 3 * x * x;
+	}
+
+	function Complex(re, im) {
+		this.re = re;
+		this.im = im;
+	}
+
+	function abs(com) {
+		return Math.sqrt(com.re * com.re + com.im * com.im);
+	}
+</script>
+
+
+/**
+ * Created by hanyeah on 2017/7/4.
+ * 复数。
+ */
+class Complex {
+  constructor(re, im) {
+    this.re = re;
+    this.im = im;
+  }
+
+  /**
+   * 克隆
+   * @returns {Complex}
+   */
+  clone() {
+    return new Complex(this.re, this.im);
+  }
+
+  /**
+   * 归一化
+   * @returns {Complex}
+   */
+  normalize() {
+    let len = this.mod;
+    return new Complex(this.re / len, this.im / len);
+  }
+
+  /**
+   * 加
+   * @param com
+   * @returns {Complex}
+   */
+  add(com){
+    return new Complex(this.re+com.re,this.im+com.im);
+  }
+
+  /**
+   * 减
+   * @param com
+   * @returns {Complex}
+   */
+  reduce(com) {
+    return new Complex(this.re-com.re,this.im-com.im);
+  }
+
+  /**
+   * 共轭
+   * @returns {Complex}
+   */
+  conjugate() {
+    return new Complex(this.re,-this.im);
+  }
+
+  /**
+   * 乘一个实数
+   * @param n
+   * @returns {Complex}
+   */
+  mul0(n) {
+    return new Complex(this.re*n,this.im*n);
+  }
+
+  /**
+   * 乘一个复数
+   * @param com
+   * @returns {Complex}
+   */
+  mul(com) {
+    return new Complex(this.re*com.re-this.im*com.im,this.re*com.im+this.im*com.re);
+  }
+
+  /**
+   * 取模
+   * @returns {number}
+   */
+  get mod() {
+    return Math.sqrt(this.re*this.re+this.im*this.im);
+  }
+
+  /**
+   * 模的平方
+   * @returns {number}
+   */
+  get mod2() {
+    return this.re*this.re+this.im*this.im;
+  }
+
+  /**
+   * 除以一个复数
+   * @param com
+   * @returns {Complex}
+   */
+  div(com) {
+    return this.mul(com.conjugate()).mul0(1/(com.re*com.re+com.im*com.im));
+  }
+
+  /**
+   * 除以一个实数
+   * @param n
+   * @returns {Complex}
+   */
+  div1(n) {
+    n = 1 / n;
+    return new Complex(this.re*n,this.im*n);
+  }
+
+  /**
+   * 倒数
+   * @returns {Complex}
+   */
+  inverse() {
+    let d = this.mod2;
+    return new Complex(this.re / d, -this.im / d);
+  }
+
+  negative() {
+    return new Complex(-this.re, -this.im);
+  }
+
+  pow(z) {
+    let a = this.re;
+    let b = this.im;
+    let c = z.re;
+    let d = z.im;
+    let arg = Math.atan2(b, a);
+    let loh = Complex.logHypot(a, b);
+    a = Math.exp(c*loh - d*arg);
+    b = d*loh + c*arg;
+    return new Complex(a*Math.cos(b), a*Math.sin(b));
+  }
+
+  pow0(n) {
+    let len = this.mod;
+    let theta = Math.atan2(this.im, this.re);
+    theta *= n;
+    return new Complex(len * Math.cos(theta), len * Math.sin(theta));
+  }
+
+  /**
+   * 开方
+   * @returns {Complex}
+   */
+  sqrt() {
+    let a = this.re;
+    let b = this.im;
+    let r = this.mod;
+    let re, im;
+    if (a >= 0) {
+      if (b === 0) {
+        return new Complex(Math.sqrt(a), 0);
+      }
+      re = 0.5 * Math.sqrt(2.0 * (r + a));
+    } else {
+      re = Math.abs(b) / Math.sqrt(2 * (r - a));
+    }
+    if (a <= 0) {
+      im = 0.5 * Math.sqrt(2.0 * (r - a));
+    } else {
+      im = Math.abs(b) / Math.sqrt(2 * (r + a));
+    }
+    return new Complex(re, b < 0 ? -im : im);
+  }
+
+  /**
+   * 指数e^z
+   * @returns {Complex}
+   */
+  exp() {
+    let tmp = Math.exp(this.re);
+    if (this.im === 0) {
+      return new Complex(tmp, 0);
+    }
+    return new Complex(
+      tmp * Math.cos(this.im),
+      tmp * Math.sin(this.im));
+  }
+
+  /**
+   * e^z-1
+   * @returns {Complex}
+   */
+  expm1() {
+    let a = this.re;
+    let b = this.im;
+    return new Complex(
+      Math.expm1(a) * Math.cos(b) + Complex.cosm1(b),
+      Math.exp(a) * Math.sin(b));
+  }
+
+  /**
+   * 自然对数
+   * @returns {Complex}
+   */
+  log() {
+    let a = this.re;
+    let b = this.im;
+    if (b === 0 && a > 0) {
+      return new Complex(Math.log(a), 0);
+    }
+    return new Complex(
+      Complex.logHypot(a, b),
+      Math.atan2(b, a));
+  }
+
+  /**
+   * 幅角
+   * @returns {number}
+   */
+  arg(){
+    return Math.atan2(this.im, this.re);
+  }
+
+  sin(){
+    // sin(c) = (e^b - e^(-b)) / (2i)
+    let a = this.re;
+    let b = this.im;
+    return new Complex(
+      Math.sin(a) * Math.cosh(b),
+      Math.cos(a) * Math.sinh(b));
+  }
+
+  cos() {
+    // cos(z) = (e^b + e^(-b)) / 2
+    let a = this.re;
+    let b = this.im;
+    return new Complex(
+      Math.cos(a) * Math.cosh(b),
+      -Math.sin(a) * Math.sinh(b));
+  }
+
+  tan() {
+    // tan(c) = (e^(ci) - e^(-ci)) / (i(e^(ci) + e^(-ci)))
+    let a = 2 * this.re;
+    let b = 2 * this.im;
+    let d = Math.cos(a) + Math.cosh(b);
+
+    return new Complex(
+      Math.sin(a) / d,
+      Math.sinh(b) / d);
+  }
+
+  cot() {
+    // cot(c) = i(e^(ci) + e^(-ci)) / (e^(ci) - e^(-ci))
+    let a = 2 * this.re;
+    let b = 2 * this.im;
+    let d = Math.cos(a) - Math.cosh(b);
+
+    return new Complex(
+      -Math.sin(a) / d,
+      Math.sinh(b) / d);
+  }
+
+  /**
+   * Calculate the secant
+   *
+   * @returns {Complex}
+   */
+  sec() {
+    // sec(c) = 2 / (e^(ci) + e^(-ci))
+    let a = this.re;
+    let b = this.im;
+    let d = 0.5 * Math.cosh(2 * b) + 0.5 * Math.cos(2 * a);
+
+    return new Complex(
+      Math.cos(a) * Math.cosh(b) / d,
+      Math.sin(a) * Math.sinh(b) / d);
+  }
+
+  /**
+   * Calculate the cosecans
+   *
+   * @returns {Complex}
+   */
+  csc() {
+    // csc(c) = 2i / (e^(ci) - e^(-ci))
+    let a = this.re;
+    let b = this.im;
+    let d = 0.5 * Math.cosh(2 * b) - 0.5 * Math.cos(2 * a);
+    return new Complex(
+      Math.sin(a) * Math.cosh(b) / d,
+      -Math.cos(a) * Math.sinh(b) / d);
+  }
+
+  /**
+   * Calculate the complex arcus sinus
+   *
+   * @returns {Complex}
+   */
+  asin() {
+    // asin(c) = -i * log(ci + sqrt(1 - c^2))
+    let a = this.re;
+    let b = this.im;
+    let t1 = new Complex(
+      b * b - a * a + 1,
+      -2 * a * b).sqrt();
+
+    let t2 = new Complex(
+      t1.re - b,
+      t1.im + a).log();
+    return new Complex(t2.im, -t2.re);
+  }
+
+  /**
+   * Calculate the complex arcus cosinus
+   *
+   * @returns {Complex}
+   */
+  acos() {
+    // acos(c) = i * log(c - i * sqrt(1 - c^2))
+    let a = this.re;
+    let b = this.im;
+    let t1 = new Complex(
+      b * b - a * a + 1,
+      -2 * a * b).sqrt();
+
+    let t2 = new Complex(
+      t1.re - b,
+      t1.im + a).log();
+
+    return new Complex(Math.PI / 2 - t2.im, t2.re);
+  }
+
+  /**
+   * Calculate the complex arcus tangent
+   *
+   * @returns {Complex}
+   */
+  atan() {
+    // atan(c) = i / 2 log((i + x) / (i - x))
+    let a = this.re;
+    let b = this.im;
+    if (a === 0) {
+      if (b === 1) {
+        return new Complex(0, Infinity);
+      }
+      if (b === -1) {
+        return new Complex(0, -Infinity);
+      }
+    }
+    let d = a * a + (1.0 - b) * (1.0 - b);
+    let t1 = new Complex(
+      (1 - b * b - a * a) / d,
+      -2 * a / d).log();
+
+    return new Complex(-0.5 * t1.im, 0.5 * t1.re);
+  }
+
+  /**
+   * Calculate the complex arcus cotangent
+   *
+   * @returns {Complex}
+   */
+  acot() {
+    // acot(c) = i / 2 log((c - i) / (c + i))
+    let a = this.re;
+    let b = this.im;
+    if (b === 0) {
+      return new Complex(Math.atan2(1, a), 0);
+    }
+    let d = a * a + b * b;
+    return (d !== 0)
+      ? new Complex(
+        a / d,
+        -b / d).atan()
+      : new Complex(
+        (a !== 0) ? a / 0 : 0,
+        (b !== 0) ? -b / 0 : 0).atan();
+  }
+
+  /**
+   * Calculate the complex arcus secant
+   *
+   * @returns {Complex}
+   */
+  asec() {
+    // asec(c) = -i * log(1 / c + sqrt(1 - i / c^2))
+    let a = this.re;
+    let b = this.im;
+    if (a === 0 && b === 0) {
+      return new Complex(0, Infinity);
+    }
+    let d = a * a + b * b;
+    return (d !== 0)
+      ? new Complex(
+        a / d,
+        -b / d).acos()
+      : new Complex(
+        (a !== 0) ? a / 0 : 0,
+        (b !== 0) ? -b / 0 : 0).acos();
+  }
+
+  /**
+   * Calculate the complex arcus cosecans
+   *
+   * @returns {Complex}
+   */
+  acsc() {
+    // acsc(c) = -i * log(i / c + sqrt(1 - 1 / c^2))
+    let a = this.re;
+    let b = this.im;
+    if (a === 0 && b === 0) {
+      return new Complex(Math.PI / 2, Infinity);
+    }
+    let d = a * a + b * b;
+    return (d !== 0)
+      ? new Complex(
+        a / d,
+        -b / d).asin()
+      : new Complex(
+        (a !== 0) ? a / 0 : 0,
+        (b !== 0) ? -b / 0 : 0).asin();
+  }
+
+  /**
+   * Calculate the complex Math.sinh
+   *
+   * @returns {Complex}
+   */
+  sinh() {
+    // Math.sinh(c) = (e^c - e^-c) / 2
+    let a = this.re;
+    let b = this.im;
+    return new Complex(
+      Math.sinh(a) * Math.cos(b),
+      Math.cosh(a) * Math.sin(b));
+  }
+
+  /**
+   * Calculate the complex Math.cosh
+   *
+   * @returns {Complex}
+   */
+  cosh() {
+    // Math.cosh(c) = (e^c + e^-c) / 2
+    let a = this.re;
+    let b = this.im;
+    return new Complex(
+      Math.cosh(a) * Math.cos(b),
+      Math.sinh(a) * Math.sin(b));
+  }
+
+  /**
+   * Calculate the complex tanh
+   *
+   * @returns {Complex}
+   */
+  tanh() {
+    // tanh(c) = (e^c - e^-c) / (e^c + e^-c)
+    let a = 2 * this.re;
+    let b = 2 * this.im;
+    let d = Math.cosh(a) + Math.cos(b);
+
+    return new Complex(
+      Math.sinh(a) / d,
+      Math.sin(b) / d);
+  }
+
+  /**
+   * Calculate the complex coth
+   *
+   * @returns {Complex}
+   */
+  coth() {
+    // coth(c) = (e^c + e^-c) / (e^c - e^-c)
+    let a = 2 * this.re;
+    let b = 2 * this.im;
+    let d = Math.cosh(a) - Math.cos(b);
+    return new Complex(
+      Math.sinh(a) / d,
+      -Math.sin(b) / d);
+  }
+
+  /**
+   * Calculate the complex coth
+   *
+   * @returns {Complex}
+   */
+  csch() {
+    // csch(c) = 2 / (e^c - e^-c)
+    let a = this.re;
+    let b = this.im;
+    let d = Math.cos(2 * b) - Math.cosh(2 * a);
+    return new Complex(
+      -2 * Math.sinh(a) * Math.cos(b) / d,
+      2 * Math.cosh(a) * Math.sin(b) / d);
+  }
+
+  /**
+   * Calculate the complex sech
+   *
+   * @returns {Complex}
+   */
+  sech() {
+    // sech(c) = 2 / (e^c + e^-c)
+    let a = this.re;
+    let b = this.im;
+    let d = Math.cos(2 * b) + Math.cosh(2 * a);
+    return new Complex(
+      2 * Math.cosh(a) * Math.cos(b) / d,
+      -2 * Math.sinh(a) * Math.sin(b) / d);
+  }
+
+  /**
+   * Calculate the complex asinh
+   *
+   * @returns {Complex}
+   */
+  asinh() {
+    // asinh(c) = log(c + sqrt(c^2 + 1))
+    let tmp = this.im;
+    this.im = -this.re;
+    this.re = tmp;
+    let res = this.asin();
+    this.re = -this.im;
+    this.im = tmp;
+    tmp = res.re;
+    res.re = -res.im;
+    res.im = tmp;
+    return res;
+  }
+
+  /**
+   * Calculate the complex asinh
+   *
+   * @returns {Complex}
+   */
+  acosh() {
+    // acosh(c) = log(c + sqrt(c^2 - 1))
+    let res = this.acos();
+    if (res.im <= 0) {
+      let tmp = res.re;
+      res.re = -res.im;
+      res.im = tmp;
+    } else {
+      let tmp = res.im;
+      res.im = -res.re;
+      res.re = tmp;
+    }
+    return res;
+  }
+
+  /**
+   * Calculate the complex atanh
+   *
+   * @returns {Complex}
+   */
+  atanh() {
+    // atanh(c) = log((1+c) / (1-c)) / 2
+    let a = this.re;
+    let b = this.im;
+    let noIM = a > 1 && b === 0;
+    let oneMinus = 1 - a;
+    let onePlus = 1 + a;
+    let d = oneMinus * oneMinus + b * b;
+    let x = (d !== 0)
+      ? new Complex(
+        (onePlus * oneMinus - b * b) / d,
+        (b * oneMinus + onePlus * b) / d)
+      : new Complex(
+        (a !== -1) ? (a / 0) : 0,
+        (b !== 0) ? (b / 0) : 0);
+
+    let temp = x.re;
+    x.re = Complex.logHypot(x.re, x.im) / 2;
+    x.im = Math.atan2(x.im, temp) / 2;
+    if (noIM) {
+      x.im = -x.im;
+    }
+    return x;
+  }
+
+  /**
+   * Calculate the complex acoth
+   *
+   * @returns {Complex}
+   */
+  acoth() {
+    // acoth(c) = log((c+1) / (c-1)) / 2
+    let a = this.re;
+    let b = this.im;
+    if (a === 0 && b === 0) {
+      return new Complex(0, Math.PI / 2);
+    }
+    let d = a * a + b * b;
+    return (d !== 0)
+      ? new Complex(
+        a / d,
+        -b / d).atanh()
+      : new Complex(
+        (a !== 0) ? a / 0 : 0,
+        (b !== 0) ? -b / 0 : 0).atanh();
+  }
+
+  /**
+   * Calculate the complex acsch
+   *
+   * @returns {Complex}
+   */
+  acsch() {
+    // acsch(c) = log((1+sqrt(1+c^2))/c)
+    let a = this.re;
+    let b = this.im;
+    if (b === 0) {
+      return new Complex(
+        (a !== 0)
+          ? Math.log(a + Math.sqrt(a * a + 1))
+          : Infinity, 0);
+    }
+    let d = a * a + b * b;
+    return (d !== 0)
+      ? new Complex(
+        a / d,
+        -b / d).asinh()
+      : new Complex(
+        (a !== 0) ? a / 0 : 0,
+        (b !== 0) ? -b / 0 : 0).asinh();
+  }
+
+  /**
+   * Calculate the complex asech
+   *
+   * @returns {Complex}
+   */
+  asech() {
+    // asech(c) = log((1+sqrt(1-c^2))/c)
+    let a = this.re;
+    let b = this.im;
+    if (this.isZero()) {
+      return Complex.INFINITY;
+    }
+    let d = a * a + b * b;
+    return (d !== 0)
+      ? new Complex(
+        a / d,
+        -b / d).acosh()
+      : new Complex(
+        (a !== 0) ? a / 0 : 0,
+        (b !== 0) ? -b / 0 : 0).acosh();
+  }
+
+  //--------------------------------------------
+  /*static Math.cosh(x){
+    return (Math.exp(x)+Math.exp(-x))*0.5;
+  }
+
+  static Math.sinh(x){
+    return (Math.exp(x)-Math.exp(-1))*0.5;
+  }*/
+
+  static cosm1(){
+    let limit = Math.PI/4;
+    if (x < -limit || x > limit) {
+      return (Math.cos(x) - 1.0);
+    }
+    let xx = x * x;
+    return xx *
+      (-0.5 + xx *
+        (1/24 + xx *
+          (-1/720 + xx *
+            (1/40320 + xx *
+              (-1/3628800 + xx *
+                (1/4790014600 + xx *
+                  (-1/87178291200 + xx *
+                    (1/20922789888000)
+                  )
+                )
+              )
+            )
+          )
+        )
+      );
+  }
+
+  static hypot(x, y){
+    let a = Math.abs(x);
+    let b = Math.abs(y);
+    if(a<3000&&b<3000){
+      return Math.sqrt(a*a+b*b);
+    }
+    if(a<b){
+      a=b;
+      b=x/y;
+    } else {
+      b = y/x;
+    }
+    return a*Math.sqrt(1+b*b);
+  }
+
+  static logHypot(a, b){
+    let _a = Math.abs(a);
+    let _b = Math.abs(b);
+    if(a===0){
+      return Math.log(_b);
+    }
+    if(b===0){
+      return Math.log(_a);
+    }
+    if(_a<3000 && _b<3000){
+      return Math.log(a*a+b*b)*0.5;
+    }
+    return Math.log(a/Math.cos(Math.atan2(b,a)));
+  }
+
+  static expm1(a){
+    return Math.exp(a) - 1;
+  }
+
+}
+
+Complex.ZERO = new Complex(0,0);
+Complex.ONE = new Complex(1, 0);
+Complex.I = new Complex(0, 1);
+Complex.PI = new Complex(Math.PI, 0);
+Complex.E = new Complex(Math.E, 0);
+Complex.INFINITY = new Complex(Infinity, Infinity);
+Complex.NAN = new Complex(NaN, NaN);
+Complex.EPSILON = 1e-16;
+
+export default Complex;
