@@ -1,0 +1,31 @@
+<script type="text/javascript">
+// https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Using_promises
+	var promise1 = new Promise(function(resolve, reject){
+		console.log('1111');
+		setTimeout(function(){
+			console.log('2222');
+			resolve('foo');
+			console.log('3333');
+		}, 300);
+		// resolve('foo');
+	});
+
+	promise1.then(function(value){
+		console.log(value);
+		return '123';
+	}).then(function(value){
+		console.log(value);
+	});
+	console.log(promise1);
+	var a = Promise.all([promise1]).then((value)=>{
+		console.log('----',value);
+	});
+	promise1.then((value)=>{
+		console.log('=====',value);
+		throw new Error('------error');
+		return '----123'
+	}).catch((msg)=>{
+		console.log('error: ',msg);
+	});
+	console.log(a);
+</script>
