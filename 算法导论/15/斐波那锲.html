@@ -1,0 +1,41 @@
+<script type="text/javascript">
+	// 递归
+	function fibonacci0(n) {
+		if(n === 1 || n === 2) {
+			return 1;
+		}
+		return fibonacci0(n - 1) + fibonacci0(n - 2);
+	}
+
+	console.time('递归（n = 20）：');
+	fibonacci0(20);
+	console.timeEnd('递归（n = 20）：');
+
+	var arr = [];
+	function fibonacci1(n) {
+		if(!arr[n]) {
+			if(n === 1 || n === 2) {
+				arr[n] = 1;
+			} else{
+				arr[n] = fibonacci1(n - 1) + fibonacci1(n - 2);
+			}
+		}
+		return arr[n];
+	}
+	console.time('备忘录(n = 50)：');
+	fibonacci1(50);
+	console.timeEnd('备忘录(n = 50)：');
+
+	var arr = [];
+	function fibonacci2(n){
+		arr[0] = 1;
+		arr[1] = 1;
+		for(var i =2; i < n; i++) {
+			arr[i] = arr[i - 1] + arr[i - 2];
+		}
+		return arr[n - 1];
+	}
+	console.time('动态规划(n = 50)：');
+	fibonacci2(50);
+	console.timeEnd('动态规划(n = 50)：');
+</script>

@@ -1,0 +1,72 @@
+<script type="text/javascript">
+	var arr = [
+	{r: 47, c: 25},
+	{r: 25, c: 8},
+	{r: 8, c: 46},
+	{r: 46, c: 14},
+	{r: 14, c: 47},
+	{r: 47, c: 42},
+	{r: 42, c: 31},
+	{r: 31, c: 42}
+	];
+
+	function calc(m, n) {
+		if (m === n) {
+			return 0;
+		}
+		var min = Infinity;
+		for(var i = m; i < n; i++) {
+			min = Math.min(min, calc(m, i) + calc(i + 1, n) + arr[m]['r'] * arr[i]['c'] * arr[n]['c']);
+		}
+		return min;
+	}
+	var n = arr.length;
+	console.time('递归');
+	console.log(calc(0, n - 1));
+	console.timeEnd('递归');
+
+	var a = {};
+	function calc1(m, n) {
+		var k = m+'_'+n;
+		if(typeof a[k] == 'undefined') {
+			if (m === n) {
+				a[k] = 0;
+			} else {
+				var min = Infinity;
+				for(var i = m; i < n; i++) {
+					min = Math.min(min, calc1(m, i) + calc1(i + 1, n) + arr[m]['r'] * arr[i]['c'] * arr[n]['c']);
+				}
+				a[k] = min;
+			}
+		}
+		return a[k];
+	}
+	var n = arr.length;
+	console.time('备忘录');
+	console.log(calc1(0, n - 1));
+	console.timeEnd('备忘录');
+
+	function calc2(n) {
+		var a = {};
+		for(var i = 0; i <= n; i++) {
+			for(var j = 0; j <= n - i; j++) {
+				var k = j+'_'+(j + i);
+				if(i === 0) {
+					a[k] = 0;
+				} else {
+					var min = Infinity;
+					for(var p = j; p < j + i; p++) {
+						min = Math.min(min, a[j+'_'+p] + a[(p+1)+'_'+(j + i)] + arr[j]['r'] * arr[p]['c'] * arr[j+i]['c']);
+					}
+					a[k] = min;
+				}
+			}
+		}
+		var k = '0_'+n;
+		return a[k];
+	}
+	var n = arr.length;
+	console.time('动态规划');
+	console.log(calc2(n - 1));
+	console.timeEnd('动态规划');
+</script>

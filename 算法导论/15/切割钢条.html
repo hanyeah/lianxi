@@ -1,0 +1,54 @@
+<script type="text/javascript">
+	var arr = [1,5,8,9,10,17,17,20,24,30,32,34,36,38,40,42,44,48,50,55,56,58,60,62];
+	function cut(n) {
+		if(n === 1) {
+			return arr[0];
+		}
+		var max = 0;
+		for(var i = 1; i < n; i++) {
+			max = Math.max(max, arr[i - 1] + cut(n - i));
+		}
+		return max;
+	}
+	var n = 20;
+	console.time('递归(n='+n+')');
+	console.log(n, cut(n));
+	console.timeEnd('递归(n='+n+')');
+
+	var a = [];
+	function cut1(n) {
+		if(!a[n]){
+			if(n === 1){
+				a[n] = arr[0];
+			} else {
+				var max = 0;
+				for(var i = 1; i < n; i++) {
+					max = Math.max(max, arr[i - 1] + cut(n - i));
+				}
+				a[n] = max;
+			}
+		}
+		return a[n];
+	}
+	var n = 20;
+	console.time('备忘录(n='+n+')');
+	console.log(n, cut1(n));
+	console.timeEnd('备忘录(n='+n+')');
+
+	function cut2(n) {
+		var a = [];
+		a[1] = arr[1];
+		for(var i = 2; i <= n; i++) {
+			var max = 0;
+			for(var j = 1; j < i; j++) {
+				max = Math.max(max, a[j] + a[i - j]);
+			}
+			a[i] = max;
+		}
+		return a[n];
+	}
+	var n = 20;
+	console.time('动态规划(n='+n+')');
+	console.log(n, cut2(n));
+	console.timeEnd('动态规划(n='+n+')');
+</script>
