@@ -1,0 +1,48 @@
+<script type="text/javascript">
+	
+	var n = 4;
+	var agency = [];
+	var num = [];
+	var result = [];
+	for(var i = 0; i < n; i++) {
+		agency[i] = 0;
+	}
+
+	function agency2num() {
+		num.length = 0;
+		for(var i = 0; i < n; i++) {
+			var c = agency[i];
+			for(var j = n - 1; j >= 0; j--) {
+				if(isNaN(num[j])) {
+					c--;
+					if(c < 0) {
+						num[j] = n - i;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	do{
+		agency2num();
+		result.push([agency.concat().join(),num.concat().join()]);
+	} while(!agencyPlusPlus());
+
+	console.table(result);
+
+	function agencyPlusPlus() {
+		var i = 1;
+		var add = 1;
+		while(add && n - i >= 0){
+			agency[n - i] += add;
+			add = 0;
+			if(agency[n - i] >= i) {
+				agency[n - i] = 0;
+				add = 1;
+			}
+			i++;
+		}
+		return add;
+	}
+</script>

@@ -1,0 +1,76 @@
+<script type="text/javascript">
+	var queens = [];
+	var n = 8;
+	var result = [];
+	for(var i = 0; i < n; i++) {
+		queens[i] = i + 1; 
+	}
+
+	while(true){
+		if(isvalid()){
+			result.push(queens.concat());
+		}
+		if(!next()) {
+			break;
+		}
+	}
+
+	/*while(true){
+		result.push(queens.concat().join(''));
+		if(!next()) {
+			break;
+		}
+	}*/
+
+	console.log(result);
+
+	function next() {
+		//
+		var j = n-2;
+		while(j >= 0 && queens[j] > queens[j + 1]){
+			j--;
+		}
+		if(j < 0) {
+			return false;
+		}
+		//
+		var k = j + 1;
+		var min = queens[k];
+		for(var i = k + 1; i < n; i++) {
+			if(queens[i] < queens[j]) {
+				break;
+			}
+			if(queens[i] < min) {
+				min = queens[i];
+				k = i;
+			}
+		}
+		//
+		var temp = queens[j];
+		queens[j] = queens[k];
+		queens[k] = temp;
+		//
+		var a = j + 1;
+		var b = n - 1;
+		while(a < b) {
+			var temp = queens[a];
+			queens[a] = queens[b];
+			queens[b] = temp;
+			a++;
+			b--;
+		}
+		//
+		return true;
+	}
+
+	function isvalid(){
+		for(var i = 0; i < n - 1; i++){
+			for(var j = i + 1; j < n; j++) {
+				if(i - j == queens[i] - queens[j] || j - i == queens[i] - queens[j]){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+</script>
