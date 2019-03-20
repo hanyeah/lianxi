@@ -1,0 +1,20 @@
+<script type="text/javascript">
+	var values = [2,4,1,5,3];
+	var weights = [4,5,6,3,2];
+	var maxWeight = 12;
+	function calc(i, w) {
+		if(i>=weights.length || w <= 0) {
+			return 0;
+		}
+		if(weights[i] <= w) {
+			return Math.max(
+				calc(i + 1, w - weights[i]) + values[i],
+				calc(i + 1, w)
+				);
+		} else {
+			return calc(i + 1, w);
+		}
+	}
+
+	console.log(calc(0, maxWeight));
+</script>

@@ -1,0 +1,92 @@
+<script type="text/javascript">
+	var map = [];
+	var n = 8;
+	for(var i = 0; i < n; i++){
+		map[i] = [];
+		for(var j = 0; j < n; j++) {
+			map[i][j] = 0;
+		}
+	}
+
+	function isSafe(i0, j0) {
+		//console.log('isSafe:', i0, j0);
+		if(map[i0][j0]) {
+			return false;
+		}
+		for(var i = 0; i < n; i++) {
+			if(map[i0][i] || map[i][j0]) {
+				return false;
+			}
+		}
+		var i = i0;
+		var j = j0;
+		while(i >= 0 && j >= 0) {
+			if(map[i][j]) {
+				return false;
+			}
+			i--;
+			j--;
+		}
+		var i = i0;
+		var j = j0;
+		while(i < n && j < n) {
+			if(map[i][j]) {
+				return false;
+			}
+			i++;
+			j++;
+		}
+		var i = i0;
+		var j = j0;
+		while(i >= 0 && j < n) {
+			if(map[i][j]) {
+				return false;
+			}
+			i--;
+			j++;
+		}
+		var i = i0;
+		var j = j0;
+		while(i < n && j >= 0) {
+			if(map[i][j]) {
+				return false;
+			}
+			i++;
+			j--;
+		}
+		//console.log(' safe:', i0, j0);
+		return true;
+	}
+
+	function mark(i, j){
+		map[i][j] = 1;
+	}
+
+	function unmark(i, j){
+		map[i][j] = 0;
+	};
+
+	function nqueen(k){
+		if(k == 0) {
+			return true;
+		}
+		for(var i = 0; i < n; i++) {
+			for(var j = 0; j < n; j++) {
+				if(isSafe(i, j)) {
+					mark(i, j);
+					//console.log('mark', i, j);
+					if(nqueen(k - 1)) {
+						return true;
+					} else {
+						unmark(i, j);
+						//console.log('unmark', i, j);
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	console.log(nqueen(n));
+	console.log(map);
+</script>
