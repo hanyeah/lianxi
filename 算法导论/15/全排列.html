@@ -1,0 +1,24 @@
+<script type="text/javascript">
+	var n = 5;
+	var result = [];
+	quanpailie([], n);
+	console.log(result);
+	function quanpailie(a, n){
+		if(n === 0){
+			result.push(a.join());
+		} else {
+			for(var i = 0; i <= a.length; i++){
+				quanpailie(insert(a, i, n),n-1);
+			}
+		}
+	}
+
+	function insert(a, ind, num) {
+		a = a.concat();
+		for(var i = a.length; i > ind; i--) {
+			a[i] = a[i - 1];
+		}
+		a[ind] = num;
+		return a;
+	}
+</script>

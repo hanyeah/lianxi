@@ -1,0 +1,52 @@
+<script type="text/javascript">
+	var LEFT = -1;
+	var RIGHT = 1; 
+	var a = [];
+	var dir = [];
+	var n = 5;
+	var result = [];
+	// 初始化n个元素的排列为123……n，并规定其元素的方向都是向左的，元素的方向用一个数组b来表示，当b[i]=0，表示第i个元素的方向向左，当b[i]=1时表示地i个元素的方向向右。
+	for(var i = 0; i < n; i++){
+		a[i] = i + 1;
+		dir[i] = LEFT;
+	}
+
+	do{
+		result.push(a.join());
+	} while(next());
+
+	console.log(result);
+
+	function next() {
+		// 在排列中找出排列中所有处于活动状态的元素中最大的一个。
+		var j = -1;
+		var max = -1;
+		for(var i = 0; i < n; i++) {
+			if(a[i + dir[i]] < a[i]) {
+				if (a[i] > max) {
+					max = a[i];
+					j = i;
+				}
+			}
+		}
+		if(j === -1) {
+			return false;
+		}
+		// 将它与它所指向相邻元素交换。
+		var ti = j + dir[j];
+		var temp = a[j];
+		a[j] = a[ti];
+		a[ti] = temp;
+		var tempDir = dir[j];
+		dir[j] = dir[ti];
+		dir[ti] = tempDir;
+		// 把排列中大于上面找出的处在活动状态的最大元素大的其他元素的方向倒转。
+		for(var i = 0; i < n; i++) {
+			if(a[i] > temp) {
+				dir[i] = -dir[i];
+			}
+		}
+		return true;
+	}
+
+</script>
