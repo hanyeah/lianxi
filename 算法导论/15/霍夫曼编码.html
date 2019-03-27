@@ -1,0 +1,78 @@
+<script type="text/javascript">
+	var s = 'rest belongs to the work as the eyelids to the eyes.';
+	var map = {};
+	for(var i = 0; i < s.length; i++){
+		var char = s.charAt(i);
+		map[char] = map[char] || 0;
+		map[char]++;
+	}
+	console.log(map);
+
+	var noArr = [];
+	for(var key in map){
+		noArr.push(new Node(key, map[key]));
+	}
+	noArr.sort((a,b)=>{
+		return a.value - b.value;
+	});
+	console.table(noArr);
+
+	var pt = 1;
+	var n = noArr.length;
+	var node;
+	while(pt < n) {
+		node = mergeNode(noArr[pt - 1], noArr[pt]);
+		noArr[pt] = node;
+		var i = pt;
+		while(i < n - 1 && noArr[i].value > noArr[i + 1].value){
+			var temp = noArr[i];
+			noArr[i] = noArr[i + 1];
+			noArr[i + 1] = temp;
+			i++;
+		}
+		pt++;
+	}
+
+
+	console.log(node);
+	walk(node, '');
+
+	function walk(node, code) {
+		code += node.code;
+		if(isLeaf(node)) {
+			console.log(node.key + ':' + code);
+		} else {
+			if(node.left) {
+				walk(node.left, code);
+			}
+			if(node.right) {
+				walk(node.right, code);
+			}
+		}
+	}
+
+	function isLeaf(node) {
+		return !(node.left || node.right);
+	}
+
+	function mergeNode(node1, node2) {
+		var node = new Node(node1.key+node2.key,node1.value + node2.value);
+		node.left = node1;
+		node.right = node2;
+		node1.parent = node;
+		node2.parent = node;
+		node1.code = '0';
+		node2.code = '1';
+		node.code = '';
+		return node;
+	}
+
+	function Node(key, value) {
+		this.key = key;
+		this.value = value;
+		this.left = null;
+		this.right = null;
+		this.parent = null;
+		this.code = '';
+	}
+</script>
