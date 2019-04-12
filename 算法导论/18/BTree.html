@@ -1,0 +1,22 @@
+<script type="text/javascript">
+	function Node() {
+		this.n = 0;
+		this.keys = [];
+		this.c = [];
+		this.leaf = true;
+	}
+
+	function search(x, k){
+		var i = 0;
+		while(i < x.n && k > x.keys[i]){
+			i++;
+		}
+		if (i < s.n && k === x.keys[i]) {
+			return {x: x, i: i};
+		} else if(x.leaf) {
+			return null;
+		} else {
+			search(x.c[i], k);
+		}
+	}
+</script>
