@@ -1,22 +1,160 @@
+t:<input value = '2'/></input>
+n:<input value = '20'/></input>
+乱序:<input type="checkbox"/></input>
+<button onclick="calc()">计算</button>
+<style>
+	input{
+		width: 50px;
+	}
+</style>
+<div id = 'ary'></div>
+<div id = 'out'></div>
 <script type="text/javascript">
 	function Node() {
 		this.n = 0;
-		this.keys = [];
+		this.key = [];
 		this.c = [];
 		this.leaf = true;
+	}
+	var t = 2;
+	var T = {root: new Node()};
+	var n = 20;
+	var r = false;
+	calc();
+	
+	function calc() {
+		T.root = new Node();
+		var inputs = document.querySelectorAll('input');
+		t = parseInt(inputs[0].value);
+		n = parseInt(inputs[1].value);
+		r = inputs[2].checked;
+		if(!t > 0 || !n>1) {
+			return alert('参数错误',t, n);
+		}
+		var ary = [];
+		var arr = [];
+		for(var k = 0; k < n; k++) {
+			ary.push(k+1);
+			insert(T, k+1);
+			shuchu();
+		}
+		if(r) {
+			ary.sort((a, b)=>{
+				return Math.random() - 0.5;
+			});
+		}
+		for(var k = 0; k < n; k++) {
+			insert(T, ary[k]);
+			shuchu();
+		}
+		console.log(T);
+		document.getElementById('ary').innerHTML = ary.join(',');
+		var out = document.getElementById('out');
+		out.innerHTML = arr.join('\n');
+		function shuchu(){
+			arr.push(
+			`<div style='float:left;border:solid 1px #666666;margin:10px;padding:10px;'>
+				${toString(T.root)}
+			</div>`
+			);
+		}
+	}
+	
+	function toString(x) {
+		var s = x.key.toString();
+		if(x.leaf){
+			return s;
+		} else {
+			var a = [];
+			for(var i = 0; i <= x.n; i++) {
+				a.push(`<li>${toString(x.c[i])}</li>`);
+			}
+			return `
+			${s}
+			<ul>
+				${a.join('')}
+			</ul>
+			`;
+		}
 	}
 
 	function search(x, k){
 		var i = 0;
-		while(i < x.n && k > x.keys[i]){
+		while(i < x.n && k > x.key[i]){
 			i++;
 		}
-		if (i < s.n && k === x.keys[i]) {
+		if (i < s.n && k === x.key[i]) {
 			return {x: x, i: i};
 		} else if(x.leaf) {
 			return null;
 		} else {
 			search(x.c[i], k);
+		}
+	}
+
+	function splitChild(x, i){
+		var z = new Node();
+		y = x.c[i];
+		z.leaf = y.leaf;
+		z.n = t - 1;
+		for(var j = 0; j < t - 1; j++) {
+			z.key[j] = y.key[j + t];
+		}
+		if(!y.leaf){
+			for(var j = 0; j < t; j++){
+				z.c[j] = y.c[j+t]; 
+			}
+		}
+		y.n = t - 1;
+		for (var j = x.n; j >= i + 1; j--) {
+			x.c[j + 1] = x.c[j];
+		}
+		x.c[i+1] = z;
+		for(var j = x.n - 1; j >= i; j--) {
+			x.key[j+1] = x.key[j];
+		}
+		x.key[i] = y.key[t - 1];
+		x.n = x.n + 1;
+		y.key.splice(y.n, 2 * t - 1);
+		y.c.splice(y.n + 1, 2 * t);
+	}
+
+	function insert(T, k) {
+		var r = T.root;
+		if(r.n === 2 * t - 1) {
+			var s = new Node();
+			T.root = s;
+			s.leaf = false;
+			s.n = 0;
+			s.c[0] = r;
+			splitChild(s, 0);
+			insertNonFull(s, k);
+		} else {
+			insertNonFull(r, k);
+		}
+	}
+
+	function insertNonFull(x, k){
+		var i = x.n - 1;
+		if(x.leaf) {
+			while(i >= 0 && k < x.key[i]){
+				x.key[i + 1] = x.key[i];
+				i--;
+			}
+			x.key[i+1] = k;
+			x.n++;
+		} else {
+			while(i >= 0 && k < x.key[i]) {
+				i--;
+			}
+			i++;
+			if(x.c[i].n===2 * t - 1){
+				splitChild(x, i);
+				if(k > x.key[i]) {
+					i++;
+				}
+			}
+			insertNonFull(x.c[i], k);
 		}
 	}
 </script>
