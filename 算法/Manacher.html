@@ -1,0 +1,42 @@
+<script type="text/javascript">
+	// https://www.cnblogs.com/grandyang/p/4475985.html
+	// https://segmentfault.com/a/1190000003914228
+	// https://segmentfault.com/a/1190000008484167
+	// http://www.csie.ntnu.edu.tw/~u91029/index.html
+	
+	manacher('122122');
+	manacher('abbahopxp');
+	function manacher(s){
+		var a = ['#'];
+		for(var i = 0; i < s.length; i++) {
+			a.push(s.charAt(i));
+			a.push('#');
+		}
+		var maxR = 0;
+		var pos = 0;
+		var resLen = 0;
+		var resCenter = 0;
+		var p = [];
+		for(var i = 0; i < a.length; i++) {
+			p[i] = maxR > i ? Math.min(p[2 * pos - i], maxR - i) : 1;
+			while(a[i + p[i]] === a[i - p[i]]) {
+				p[i]++;
+			}
+			if(maxR < i + p[i]) {
+				maxR = i + p[i];
+				pos = i;
+			}
+			if(resLen < p[i]) {
+				resLen = p[i];
+				resCenter = i;
+			}
+		}
+		console.log('---------start----------');
+		console.log(s);
+		console.log(a.join());
+		console.log(p.join());
+		console.log(resCenter, resLen);
+		console.log(s.substr(Math.floor((resCenter + 1 - resLen) / 2), resLen - 1));
+		console.log('---------end----------');
+	}
+</script>
