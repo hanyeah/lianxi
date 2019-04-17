@@ -5,7 +5,9 @@
 	// http://www.csie.ntnu.edu.tw/~u91029/index.html
 	
 	manacher('122122');
+	manacher2('122122');
 	manacher('abbahopxp');
+	manacher2('abbahopxp');
 	function manacher(s){
 		var a = ['#'];
 		for(var i = 0; i < s.length; i++) {
@@ -31,12 +33,61 @@
 				resCenter = i;
 			}
 		}
-		console.log('---------start----------');
+		console.log('---------manacher start----------');
 		console.log(s);
 		console.log(a.join());
 		console.log(p.join());
 		console.log(resCenter, resLen);
 		console.log(s.substr(Math.floor((resCenter + 1 - resLen) / 2), resLen - 1));
-		console.log('---------end----------');
+		console.log('---------manacher end----------');
+	}
+
+	function manacher2(s) {
+		var a = ['#'];
+		for(var i = 0; i < s.length; i++) {
+			a.push(s.charAt(i));
+			a.push('#');
+		}
+		var pos = 0;
+		var maxR = 0;
+		var p = [];
+		for(var i = 0; i < a.length; i++){
+			if (i < maxR) {
+				var L = p[2*pos - i];
+				if(i + L < maxR) {
+					p[i] = L;
+				} else {
+					p[i] = maxR - i;
+					pos = i;
+					while(a[i + p[i]] === a[i - p[i]]){
+						p[i]++;
+					}
+					maxR = i + p[i];
+				}
+			} else {
+				p[i] = 1;
+				pos = i;
+				while(a[i + p[i]] === a[i - p[i]]){
+					p[i]++;
+				}
+				maxR = i + p[i];
+			}
+			if (maxR === a.length) {
+				break;
+			}
+		}
+		console.log('---------manacher2 start----------');
+		console.log(s);
+		console.log(a.join());
+		console.log(p.join());
+		var mi = 0;
+		for(var i = 1; i < p.length; i++) {
+			if(p[i] > p[mi]) {
+				mi = i;
+			}
+		}
+		console.log(mi, p[mi]);
+		console.log(s.substr(Math.floor((mi + 1 - p[mi]) / 2), p[mi] - 1));
+		console.log('---------manacher2 end----------');
 	}
 </script>
