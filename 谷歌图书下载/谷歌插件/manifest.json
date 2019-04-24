@@ -1,0 +1,19 @@
+{
+    "name": "Hello Extensions",
+    "description" : "Hello world Extension",
+    "version": "1.0",
+    "manifest_version": 2,
+    "browser_action": {
+      "default_popup": "hello.html",
+      "default_icon": "hello_extensions.png",
+      "default_title": "Hello CC"
+    },
+    "permissions": [
+	    "storage",
+	    "http://*/*",
+	    "https://*/*", 
+        "bookmarks", 
+        "tabs", 
+        "history" 
+    ]
+  }

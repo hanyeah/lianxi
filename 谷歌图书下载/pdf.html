@@ -1,0 +1,14 @@
+<script type="text/javascript" src = './jspdf.js'></script>
+<script type="text/javascript">
+	var imgData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4ge....../2Q==';
+  
+var doc = new jsPDF();
+  
+doc.setFontSize(40);
+doc.text(35, 25, "Octonyan loves jsPDF");
+// doc.addImage(imgData, 'JPEG', 15, 40, 180, 180);
+
+// var doc = new jsPDF();
+doc.text(20, 20, 'Hello world.');
+doc.save('Test.pdf');
+</script>
