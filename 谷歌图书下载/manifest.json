@@ -1,7 +1,7 @@
 {
     "name": "谷歌图书下载",
     "description" : "谷歌图书下载",
-    "version": "1.0",
+    "version": "1.1",
     "manifest_version": 2,
     "browser_action": {
       "default_popup": "googleDownload.html",
@@ -10,7 +10,8 @@
     },
     "options_page": "googleDownload.html",
     "permissions": [
-	    "https://books.google.*/*"
+      "http://*/*",
+	    "https://*/*"
     ],
     "icons": { "16": "googleDownload.png",
            "48": "googleDownload.png",
