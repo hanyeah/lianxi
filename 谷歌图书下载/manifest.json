@@ -10,12 +10,7 @@
     },
     "options_page": "googleDownload.html",
     "permissions": [
-	    "storage",
-	    "http://*/*",
-	    "https://*/*", 
-        "bookmarks", 
-        "tabs", 
-        "history" 
+	    "https://books.google.*/*"
     ],
     "icons": { "16": "googleDownload.png",
            "48": "googleDownload.png",
