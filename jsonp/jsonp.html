@@ -1,0 +1,95 @@
+
+	<div>JSONP(JSON with Padding) 是一种跨域请求方式。主要原理是利用了script 标签可以跨域请求的特点，由其 src 属性发送请求到服务器，服务器返回 js 代码，网页端接受响应，然后就直接执行了，这和通过 script 标签引用外部文件的原理是一样的。</div>
+	
+	<script type="text/javascript" src = 'jquery.js'></script>
+<script type="text/javascript">
+	//https://www.cnblogs.com/greatluoluo/p/6295082.html
+
+
+
+var url = "https://books.google.com/books";
+
+$.ajax(url, {
+    data:{
+      id: '6IUarHeMWpAC',
+      h1: 'zh-CN',
+      pg: 'PP1',
+      jscmd: 'click3'
+    },
+    dataType: 'jsonp',
+    crossDomain: true,
+    success: function(data) {
+      console.log('jquery',data);
+    },
+    error:function(e){
+      console.log(e);
+    }
+  });
+
+jsonp({
+	url: url,
+	time: 10000,
+	data:{
+		id: '6IUarHeMWpAC',
+		hl: 'zh-CN',
+		pg: 'PP1',
+		jscmd: 'click3'
+	},
+	fail:(obj)=>{
+		console.log('超时');
+	},
+	success:(json)=>{
+		console.log(json);
+	}
+});
+
+function jsonp(options) {
+        options = options || {};
+        if (!options.url) {
+            throw new Error("参数不合法");
+        }
+
+        //创建 script 标签并加入到页面中
+        var callbackName = ('jsonp_' + Math.random()).replace(".", "");
+        var oHead = document.getElementsByTagName('head')[0];
+        options.data['callback'] = callbackName;
+        var params = formatParams(options.data);
+        var oS = document.createElement('script');
+        oHead.appendChild(oS);
+
+        //创建jsonp回调函数
+        window[callbackName] = function (json) {
+            oHead.removeChild(oS);
+            clearTimeout(oS.timer);
+            window[callbackName] = null;
+            options.success && options.success(json);
+        };
+
+        //发送请求
+        oS.src = options.url + '?' + params;
+
+        //超时处理
+        if (options.time) {
+            oS.timer = setTimeout(function () {
+                window[callbackName] = null;
+                oHead.removeChild(oS);
+                options.fail && options.fail({ message: "超时" });
+            }, options.time);
+        }
+    };
+
+    //格式化参数
+    function formatParams(data) {
+        var arr = [];
+        for (var name in data) {
+            arr.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
+        }
+        return arr.join('&');
+    }
+
+    function jsonpCallback(json){
+    	console.log('jsonpCallback:', json);
+	}
+</script>
+
+<script type="text/javascript" src = "https://books.google.com/books?id=6IUarHeMWpAC&hl=zh-CN&pg=PP1&jscmd=click3&callback=jsonpCallback"></script>
