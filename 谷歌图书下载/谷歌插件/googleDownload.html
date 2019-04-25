@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      *{
+          margin: 0;
+          padding: 0;
+      }
+      .con{
+        margin: 10px;
+        width: 600px;
+        overflow: scroll;
+      }
+
+      input{
+        margin: 10 0;
+        width: 100%;
+        height: 30px;
+      }
+
+      button{
+        font-size: 20px;
+        width: 100%;
+        height: 40px;
+      }
+
+      #out{
+        height: 100px;
+        overflow: scroll;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class = "con">
+      <div>谷歌图书地址：</div><input id = 'urlInput' type="text" value = "https://books.google.com/books?id=6IUarHeMWpAC&hl=zh-CN&pg=PP1&jscmd=click3"/>
+      <br/>
+      <div>书名：</div><input id = 'booknameInput' type="text" value = '谷歌图书'/>
+      <br/>
+      <button id = 'downButton'>下载</button>
+      <div id = "imgCon"></div>
+      <div id = 'out'></div>
+    </div>
+    
+    <script src="./jquery.js"></script>
+    <script src="./jspdf.js"></script>
+    <script src="./googleDownload.js"></script>
+  </body>
+</html>

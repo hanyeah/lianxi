@@ -1,13 +1,14 @@
 {
-    "name": "Hello Extensions",
-    "description" : "Hello world Extension",
+    "name": "谷歌图书下载",
+    "description" : "谷歌图书下载",
     "version": "1.0",
     "manifest_version": 2,
     "browser_action": {
-      "default_popup": "hello.html",
-      "default_icon": "hello_extensions.png",
-      "default_title": "Hello CC"
+      "default_popup": "googleDownload.html",
+      "default_icon": "googleDownload.png",
+      "default_title": "谷歌图书下载"
     },
+    "options_page": "googleDownload.html",
     "permissions": [
 	    "storage",
 	    "http://*/*",
@@ -15,5 +16,8 @@
         "bookmarks", 
         "tabs", 
         "history" 
-    ]
+    ],
+    "icons": { "16": "googleDownload.png",
+           "48": "googleDownload.png",
+          "128": "googleDownload.png" }
   }
