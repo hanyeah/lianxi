@@ -1,0 +1,116 @@
+<canvas id="canvas" width="512px" height="512px" style="width:512px;height:512px;"></canvas>
+<script type="text/javascript" src = './MatrixMath.js'></script>
+<script type="text/javascript">
+	//
+	
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var w = 512;
+	var h = 512;
+
+	var pArr = [];
+	var thetas = {a: Math.random() * 0.3, b: Math.random() * 0.2, c: Math.random() * 0.2};
+	console.log(thetas);
+	var hx = function(x){
+		return thetas.a / (x + thetas.b) + thetas.c;
+	};
+	for (let i = 0; i < 200; i++) {
+		var x = Math.random();
+		var y = hx(x) + Math.random() * 0.1;
+		pArr.push({x: x, y: y});
+	}
+
+	
+	refresh();
+
+	function refresh(){
+		nihe();
+		wucha();
+		// console.log(pArr);
+		console.log(thetas);
+		ctx.clearRect(0, 0, w, h);
+		drawPoints();
+		drawLine('#0000ff');
+	}
+
+	function drawPoints(){
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			drawCircle(p.x * w, p.y * h, 5, '#ff0000');
+		}
+	}
+	
+	function drawLine(co) {
+		ctx.beginPath();
+		ctx.strokeStyle = co;
+		for(var i = 0; i < w; i++) {
+			var x = i / w;
+			var y = hx(x);
+			if(i === 0) {
+				ctx.moveTo(x * w, y * h);
+			} else {
+				ctx.lineTo(x * w, y * h);
+			}
+		}
+		ctx.stroke();
+	}
+	
+
+	function drawCircle(x,y,r,co){
+		ctx.beginPath();
+		ctx.strokeStyle = co;
+		ctx.moveTo(x,y);
+		ctx.arc(x,y,r,0,Math.PI*2);
+		ctx.stroke();
+	}
+
+	function nihe() {
+		console.time('用时：');
+		var len = pArr.length;
+		var A = new MatrixMath(len, 3);
+		var Y = new MatrixMath(len, 1);
+		var beta = {a: Math.random(), b: Math.random(), c: Math.random()};
+		thetas = beta;
+
+		var n = 0;
+		while(wucha() > 1e-3) {
+			for(var i = 0; i < len; i++) {
+				A.setElement(i, 0, 1 / (pArr[i].x + thetas.b));
+				A.setElement(i, 1, -thetas.a / Math.pow(pArr[i].x + thetas.b, 2));
+				A.setElement(i, 2, 1);
+				Y.setElement(i, 0, hx(pArr[i].x) - pArr[i].y);
+			}
+			var AT = A.transpose();
+			var ATA = AT.multiply(A);
+			var ATY = AT.multiply(Y);
+			
+			var AN = ATA.inverse();
+			var C = AN.multiply(ATY);
+
+			thetas.a -= C.getElement(0, 0);
+			thetas.b -= C.getElement(1, 0);
+			thetas.c -= C.getElement(2, 0);
+			n++;
+			if(n > 100) {
+				console.log('n超出界限，n = ' + n);
+				break;
+			}
+		}
+		console.log('误差：', wucha());
+	}
+
+	function wucha() {
+		var s = 0;
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			var y = hx(p.x);
+			var d = y - p.y;
+			s += d * d;
+		}
+		s /= pArr.length;
+		// console.log('均方差:', s);
+		return s;
+	}
+	
+	
+</script>

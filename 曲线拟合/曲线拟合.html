@@ -1,0 +1,185 @@
+<canvas id="canvas" width="512px" height="512px" style="width:512px;height:512px;"></canvas>
+<script type="text/javascript" src = './MatrixMath.js'></script>
+<script type="text/javascript">
+	//
+	var gama = 0.1;
+	var pArr = [];
+	// 可替换
+	var thetas = {a: 1, b: 1, c: 1};
+	var hx = function(x){
+		return 1 / (thetas.a * x + thetas.b) + thetas.c;
+	};
+	//
+	function jTheta(){
+		var s = 0;
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			var d = hx(p.x) - p.y;
+			s += d * d;
+		}
+		return s * 0.5;
+	}
+
+	function phi(n, xn){
+		if(n == 0) {
+			return 1;
+		}
+		return 1 / xn;
+	}
+
+	function getX(n){
+		return pArr[n].x;
+	}
+
+	function dj(na) {
+		const j0 = jTheta();
+		const theta = thetas[na];
+		const dTheta = 0.001;
+		thetas[na] = theta + dTheta;
+		const j1 = jTheta();
+		thetas[na] = theta;
+		return (j1 - j0) / dTheta;
+	}
+
+	function nihe() {
+		console.time('用时：');
+		var len = pArr.length;
+		var A = new MatrixMath(len, 3);
+		var Y = new MatrixMath(len, 1);
+		for(var i = 0; i < len; i++) {
+			A.setElement(i, 0, 1);
+			A.setElement(i, 1, -pArr[i].y);
+			A.setElement(i, 2, pArr[i].x);
+			Y.setElement(i, 0, pArr[i].x * pArr[i].y);
+		}
+		var AT = A.transpose();
+		var ATA = AT.multiply(A);
+		var ATY = AT.multiply(Y);
+		
+		var AN = ATA.inverse();
+		var C = AN.multiply(ATY);
+
+		thetas.a = C.getElement(0, 0);
+		thetas.b = C.getElement(1, 0);
+		thetas.c = C.getElement(2, 0);
+
+		console.timeEnd('用时：');
+		[A, AT, ATA, ATY, AN, C].forEach((a)=>{
+			console.log(a);
+		});
+		console.log(thetas);
+	}
+
+	/*function nihe() {
+		console.time('用时：');
+		var len = pArr.length;
+		var A = new MatrixMath(len, 2);
+		var Y = new MatrixMath(len, 1);
+		for(var i = 0; i < len; i++) {
+			A.setElement(i, 0, phi(0, pArr[i].x));
+			A.setElement(i, 1, phi(1, pArr[i].x));
+			Y.setElement(i, 0, pArr[i].y);
+		}
+		var AT = A.transpose();
+		var ATA = AT.multiply(A);
+		var ATY = AT.multiply(Y);
+		
+		var AN = ATA.inverse();
+		var C = AN.multiply(ATY);
+		thetas.a = C.getElement(0, 0);
+		thetas.b = C.getElement(1, 0);
+		console.timeEnd('用时：');
+		[A, AT, ATA, ATY, AN, C].forEach((a)=>{
+			console.log(a);
+		});
+		console.log(thetas);
+	}*/
+
+	/*function nihe() {
+		var n=0;
+		var len = pArr.length;
+		var dThetas = {};
+		while(true){
+			var jt = jTheta();
+			// console.log('n,jt:', n, jt);
+			if(jt < 1e-6){
+				break;
+			}
+			for(var key in thetas) {
+				dThetas[key] = dj(key);
+			}
+			
+			for(var key in thetas) {
+				thetas[key] -= dThetas[key] * gama;
+			}
+			// console.log(dThetas, thetas);
+			n++;
+			if(n>1000){
+				break;
+			}
+		}
+	}
+*/
+	//------------------
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var w = 512;
+	var h = 512;
+
+	gama = 0.001;
+	thetas = {a: Math.random() * 0.3, b: Math.random() * 0.2, c: Math.random() * 0.2};
+	console.log(thetas);
+	hx = function(x){
+		// return thetas.a + thetas.b / x;
+		return thetas.a / (x + thetas.b) + thetas.c;
+	};
+	for (let i = 0; i < 200; i++) {
+		var x = Math.random();
+		var y = hx(x) + Math.random() * 0.1;
+		pArr.push({x: x, y: y});
+	}
+
+	
+	refresh();
+
+	function refresh(){
+		nihe();
+		console.log(pArr);
+		console.log(thetas);
+		ctx.clearRect(0, 0, w, h);
+		drawPoints();
+		drawLine();
+	}
+
+	function drawPoints(){
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			drawCircle(p.x * w, p.y * h, 5, '#ff0000');
+		}
+	}
+	
+	function drawLine() {
+		ctx.beginPath();
+		ctx.strokeStyle = '#0000ff';
+		for(var i = 0; i < w; i++) {
+			var x = i / w;
+			var y = hx(x);
+			if(i === 0) {
+				ctx.moveTo(x * w, y * h);
+			} else {
+				ctx.lineTo(x * w, y * h);
+			}
+		}
+		ctx.stroke();
+	}
+	
+
+	function drawCircle(x,y,r,co){
+		ctx.beginPath();
+		ctx.strokeStyle = co;
+		ctx.moveTo(x,y);
+		ctx.arc(x,y,r,0,Math.PI*2);
+		ctx.stroke();
+	}
+	
+</script>

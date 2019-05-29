@@ -1,0 +1,91 @@
+<canvas id="canvas" width="512px" height="512px" style="width:512px;height:512px;"></canvas>
+<script type="text/javascript" src = './MatrixMath.js'></script>
+<script type="text/javascript">
+	//
+	
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var w = 512;
+	var h = 512;
+	var thetas = {};
+	thetas.a = Math.random() * 20 - 10;
+	thetas.b = 0.5 / Math.exp(thetas.a * 0.5);
+	var pArr = [];
+	console.log(thetas);
+	// y = b * e^(a * x)
+	var hx = function(x){
+		return thetas.b * Math.exp(thetas.a * x);
+	};
+	for (let i = 0; i < 200; i++) {
+		var x = Math.random();
+		var y = hx(x) + Math.random() * 0.1;
+		pArr.push({x: x, y: y});
+	}
+
+	refresh();
+
+	function refresh(){
+		nihe();
+		console.log(pArr);
+		console.log(thetas);
+		ctx.clearRect(0, 0, w, h);
+		drawPoints();
+		drawLine();
+	}
+
+	function drawPoints(){
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			drawCircle(p.x * w, p.y * h, 5, '#ff0000');
+		}
+	}
+	
+	function drawLine() {
+		ctx.beginPath();
+		ctx.strokeStyle = '#0000ff';
+		for(var i = 0; i < w; i++) {
+			var x = i / w;
+			var y = hx(x);
+			if(i === 0) {
+				ctx.moveTo(x * w, y * h);
+			} else {
+				ctx.lineTo(x * w, y * h);
+			}
+		}
+		ctx.stroke();
+	}
+
+	function drawCircle(x,y,r,co){
+		ctx.beginPath();
+		ctx.strokeStyle = co;
+		ctx.moveTo(x,y);
+		ctx.arc(x,y,r,0,Math.PI*2);
+		ctx.stroke();
+	}
+
+	function nihe() {
+		console.time('用时：');
+		var len = pArr.length;
+		var A = new MatrixMath(len, 2);
+		var Y = new MatrixMath(len, 1);
+		for(var i = 0; i < len; i++) {
+			A.setElement(i, 0, pArr[i].x);
+			A.setElement(i, 1, 1);
+			Y.setElement(i, 0, Math.log(pArr[i].y));
+		}
+		var AT = A.transpose();
+		var ATA = AT.multiply(A);
+		var ATY = AT.multiply(Y);
+		
+		var AN = ATA.inverse();
+		var C = AN.multiply(ATY);
+		thetas.a = C.getElement(0, 0);
+		thetas.b = Math.exp(C.getElement(1, 0));
+		console.timeEnd('用时：');
+		[A, AT, ATA, ATY, AN, C].forEach((a)=>{
+			// console.log(a);
+		});
+		console.log(thetas);
+	}
+	
+</script>
