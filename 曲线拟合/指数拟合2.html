@@ -8,7 +8,7 @@
 	var w = 512;
 	var h = 512;
 	var thetas = {};
-	thetas.a = Math.random();
+	thetas.a = Math.random() + 0.51;
 	thetas.b = Math.random();
 	thetas.c = -(0.5 - thetas.b) / Math.log(1 - 0.5 / thetas.a);
 	var pArr = [];
@@ -67,27 +67,73 @@
 	function nihe() {
 		console.time('用时：');
 		var len = pArr.length;
-		var A = new MatrixMath(len, 3);
+		var col = 3;
+		var A = new MatrixMath(len, col);
 		var Y = new MatrixMath(len, 1);
-		for(var i = 0; i < len; i++) {
-			A.setElement(i, 0, pArr[i].x);
-			A.setElement(i, 1, 1);
-			A.setElement(i, 2, 1);
-			Y.setElement(i, 0, pArr[i].y);
+		var beta = {a: Math.random(), b: Math.random(), c: Math.random() + 0.1};
+		thetas = beta;
+
+		var n = 0;
+		var λ = 0.1;
+		var e = wucha();
+		while(true) {
+			for(var i = 0; i < len; i++) {
+				var x = pArr[i].x;
+				var y = pArr[i].y;
+				var a = thetas.a;
+				var b = thetas.b;
+				var c = thetas.c;
+				var e = Math.exp(-(x - b) / c);
+				A.setElement(i, 0, 1 - e);
+				A.setElement(i, 1, -a * e / c);
+				A.setElement(i, 2, -a * e * (x - b) / (c * c));
+				Y.setElement(i, 0, y - hx(x));
+			}
+			var AT = A.transpose();
+			var ATA = AT.multiply(A);
+
+			var ATY = AT.multiply(Y);
+			var I = new MatrixMath(col, col);
+			I.identity();
+			I.scalar(λ);
+			ATA.add(I);
+
+			// var C = MatrixMath.GaussSolution(ATA, ATY);
+			var AN = ATA.inverse();
+			var C = AN.multiply(ATY);
+
+			var da = C.getElement(0, 0);
+			var db = C.getElement(1, 0);
+			var dc = C.getElement(2, 0);;
+			thetas.a += da;
+			thetas.b += db;
+			thetas.c += dc;
+			
+			console.log(da,db,dc);
+			if(da * da + db * db + dc * dc < 1e-6) {
+				break;
+			}
+			n++;
+			if(n > 100) {
+				console.log('n超出界限，n = ' + n);
+				break;
+			}
+			console.log('误差：', wucha());
 		}
-		var AT = A.transpose();
-		var ATA = AT.multiply(A);
-		var ATY = AT.multiply(Y);
-		
-		var AN = ATA.inverse();
-		var C = AN.multiply(ATY);
-		thetas.a = C.getElement(0, 0);
-		thetas.b = C.getElement(1, 0);
-		console.timeEnd('用时：');
-		[A, AT, ATA, ATY, AN, C].forEach((a)=>{
-			// console.log(a);
-		});
-		console.log(thetas);
+		console.log('误差：', wucha());
+	}
+
+	function wucha() {
+		var s = 0;
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			var y = hx(p.x);
+			var d = y - p.y;
+			s += d * d;
+		}
+		s /= pArr.length;
+		// console.log('均方差:', s);
+		return s;
 	}
 	
 </script>

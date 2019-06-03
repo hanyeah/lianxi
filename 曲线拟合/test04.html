@@ -9,7 +9,7 @@
 	var h = 512;
 
 	var pArr = [];
-	var thetas = {a: Math.random() * 0.3, b: Math.random() * 0.2, c: Math.random() * 0.2};
+	var thetas = {a: Math.random() * 0.4 - 0.2, b: Math.random() * 0.2, c: Math.random() * 0.2};
 	console.log(thetas);
 	var hx = function(x){
 		return thetas.a / (x + thetas.b) + thetas.c;
@@ -73,29 +73,25 @@
 		thetas = beta;
 
 		var n = 0;
-		while(wucha() > 1e-3) {
-			for(var i = 0; i < len; i++) {
-				A.setElement(i, 0, 1 / (pArr[i].x + thetas.b));
-				A.setElement(i, 1, -thetas.a / Math.pow(pArr[i].x + thetas.b, 2));
-				A.setElement(i, 2, 1);
-				Y.setElement(i, 0, pArr[i].y - hx(pArr[i].x));
-			}
-			var AT = A.transpose();
-			var ATA = AT.multiply(A);
-			var ATY = AT.multiply(Y);
-			
-			var AN = ATA.inverse();
-			var C = AN.multiply(ATY);
-
-			thetas.a += C.getElement(0, 0);
-			thetas.b += C.getElement(1, 0);
-			thetas.c += C.getElement(2, 0);
-			n++;
-			if(n > 100) {
-				console.log('n超出界限，n = ' + n);
-				break;
-			}
+		for(var i = 0; i < len; i++) {
+			A.setElement(i, 0, 1 / pArr[i].x);
+			A.setElement(i, 1, pArr[i].y);
+			A.setElement(i, 2, 1);
+			Y.setElement(i, 0, pArr[i].y / pArr[i].x);
 		}
+		var AT = A.transpose();
+		var ATA = AT.multiply(A);
+		var ATY = AT.multiply(Y);
+		
+		var AN = ATA.inverse();
+		var C = AN.multiply(ATY);
+
+		var d = C.getElement(0, 0);
+		var e = C.getElement(1, 0);
+		var f = C.getElement(2, 0);
+		thetas.a = -d / e;
+		thetas.b = -1 / e;
+		thetas.c = -f / e;
 		console.log('误差：', wucha());
 	}
 
