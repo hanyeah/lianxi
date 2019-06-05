@@ -1,0 +1,107 @@
+<canvas id = 'canvas' width = '256px' height = '256px' style = 'width:256px;height:256px;'></canvas>
+<script type="text/javascript">
+
+var w = 256;
+var h = 256;
+var charge = {
+	x: 128,
+	y: 100,
+	q: 20
+};
+
+var circle = {
+	x: charge.x,
+	y: 180,
+	r: 40
+};
+
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var imgData = ctx.getImageData(0, 0, w, h);
+var data = imgData.data;
+
+function updateData() {
+	for(var i = 0; i < w; i++) {
+		for(var j = 0; j < h; j++) {
+			var co = getColor(i, j);
+			var n = 4 * (j * w + i);
+			data[n + 0] = co.r;
+			data[n + 1] = co.g;
+			data[n + 2] = co.b;
+			data[n + 3] = co.a;
+		}
+	}
+}
+
+setInterval(render, 30);
+
+function render(){
+	updateData();
+	ctx.putImageData(imgData, 0, 0);
+}
+
+function getTheta(i, j) {
+	if(isInCircle(i, j)) {
+		// return Math.PI;
+	}
+	var r0 = circle.r * circle.r / (circle.y - charge.y);
+	var charge1 = {
+		x: circle.x,
+		y: circle.y,
+		q: -charge.q
+	};
+	var charge2 = {
+		x: circle.x,
+		y: circle.y - r0,
+		q: charge.q
+	};
+	var chargeArr = [charge, charge1, charge2];
+	var theta = 0; 
+	chargeArr.forEach(function(charge){
+		theta += (Math.atan2(j - charge.y, i - charge.x) + Math.PI) * charge.q;
+	});
+	return theta;
+}
+
+function isInCircle(i, j) {
+	var dx = i - circle.x;
+	var dy = j - circle.y;
+	return dx * dx + dy * dy <= circle.r * circle.r;
+}
+
+function normalizTheta(theta) {
+	var value = theta % (Math.PI * 2) / (Math.PI * 2);
+	value = (value + 1) % 1;
+	if(value < 0.5) {
+		value = 2 * (0.5 - value);
+	} else {
+		value = 2 * (value - 0.5);
+	}
+	return value;
+}
+
+function toColor(value) {
+	var n = 3;
+	while(n) {
+		value *= value;
+		n--;
+	}
+	return {
+		r: Math.round(value * 0xff),
+		g: 0,
+		b: 0,
+		a: 0xff
+	};
+}
+
+function getColor(i, j) {
+	var theta = getTheta(i, j);
+	var value = normalizTheta(theta);
+	return toColor(value);
+}
+
+function dis(vec) {
+	return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+}
+
+</script>

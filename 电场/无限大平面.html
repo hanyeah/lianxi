@@ -1,0 +1,133 @@
+<canvas id = 'canvas1' width = '256px' height = '256px' style = 'width:256px;height:256px;'></canvas>
+<canvas id = 'canvas2' width = '256px' height = '256px' style = 'width:256px;height:256px;'></canvas>
+<script type="text/javascript">
+
+var w = 256;
+var h = 256;
+var charge = {
+	x: 128,
+	y: 100,
+	q: 10
+};
+
+var circle = {
+	x: charge.x,
+	y: 150,
+	r: 20
+};
+
+var inverCircle = {
+	x: charge.x,
+	y: (circle.y + circle.r + charge.y) / 2,
+	r: (circle.y + circle.r - charge.y) / 2
+};
+
+var lineY = circle.y + circle.r;
+var mirrorCharge = {
+	x: charge.x,
+	y: lineY * 2 - charge.y,
+	q: -charge.q
+};
+
+function updateParam() {
+	inverCircle.x = charge.x;
+	inverCircle.y = (circle.y + circle.r + charge.y) / 2;
+	inverCircle.r = (circle.y + circle.r - charge.y) / 2;
+
+	lineY = circle.y + circle.r;
+
+	mirrorCharge.x = charge.x;
+	mirrorCharge.y = lineY * 2 - charge.y;
+	mirrorCharge.q = -charge.q;
+}
+
+function bitmap(canvasId, getColorFunc) {
+	var canvas = document.getElementById(canvasId);
+	var ctx = canvas.getContext('2d');
+	var imgData = ctx.getImageData(0, 0, w, h);
+	var data = imgData.data;
+
+	function updateData(getColorFunc) {
+		for(var i = 0; i < w; i++) {
+			for(var j = 0; j < h; j++) {
+				var co = getColorFunc(i, j);
+				var n = 4 * (j * w + i);
+				data[n + 0] = co.r;
+				data[n + 1] = co.g;
+				data[n + 2] = co.b;
+				data[n + 3] = co.a;
+			}
+		}
+	}
+
+	return {
+		render: function(){
+			updateData(getColorFunc);
+			ctx.putImageData(imgData, 0, 0);
+		}
+	};
+}
+
+var bitmap1 = bitmap('canvas1', getColor1);
+var bitmap2 = bitmap('canvas2', getColor2);
+
+setInterval(render, 30);
+
+function render(){
+	bitmap1.render();
+	bitmap2.render();
+}
+
+function getTheta1(i, j) {
+	if(j > lineY) {
+		return Math.PI;
+	}
+	var theta1 = (Math.atan2(j - charge.y, i - charge.x) + Math.PI) * charge.q;
+	var theta2 = (Math.atan2(j - mirrorCharge.y, i - mirrorCharge.x) + Math.PI)* mirrorCharge.q;
+	return theta1 + theta2;
+}
+
+function normalizTheta(theta) {
+	var value = theta % (Math.PI * 2) / (Math.PI * 2);
+	value = (value + 1) % 1;
+	if(value < 0.5) {
+		value = 2 * (0.5 - value);
+	} else {
+		value = 2 * (value - 0.5);
+	}
+	return value;
+}
+
+function toColor(value) {
+	return {
+		r: Math.round(value * 0xff),
+		g: 0,
+		b: 0,
+		a: 0xff
+	};
+}
+
+function getColor1(i, j) {
+	var theta = getTheta1(i, j);
+	var value = normalizTheta(theta);
+	return toColor(value);
+}
+
+function getColor2(i, j) {
+	var r = inverCircle.r;
+	var ox = inverCircle.x;
+	var oy = inverCircle.y;
+
+	var vec0 = {x: i - ox, y : j - oy};
+	var d0 = dis(vec0);
+	var d1 = r * r / d0;
+	var vec1 = {x: d1 * vec0.x / d0, y: d1 * vec0.y / d0};
+
+	return getColor1(ox + vec1.x, oy + vec1.y);
+}
+
+function dis(vec) {
+	return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+}
+
+</script>
