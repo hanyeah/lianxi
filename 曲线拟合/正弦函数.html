@@ -1,0 +1,150 @@
+<canvas id="canvas" width="512px" height="512px" style="width:512px;height:512px;"></canvas>
+<script type="text/javascript" src = './MatrixMath.js'></script>
+<script type="text/javascript">
+	//
+	
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var w = 512;
+	var h = 512;
+
+	var thetas = {};
+	thetas.a = Math.random() * 0.3 + 0.05;
+	thetas.b = (Math.random() * 10 + 1) * Math.PI * 2;
+	thetas.c = Math.random() * Math.PI * 2;
+	thetas.d = 0.5;
+	var pArr = [];
+	console.log(thetas);
+	// y = a * sin(b * x + c)
+	var hx = function(x){
+		return thetas.a * Math.sin(thetas.b * x + thetas.c) + thetas.d;
+	};
+	for (let i = 0; i < 200; i++) {
+		var x = Math.random();
+		var y = hx(x) + Math.random() * 0.1;
+		pArr.push({x: x, y: y});
+	}
+
+	refresh();
+
+	function refresh(){
+		nihe();
+		console.log(pArr);
+		console.log(thetas);
+		ctx.clearRect(0, 0, w, h);
+		drawPoints();
+		drawLine();
+	}
+
+	function drawPoints(){
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			drawCircle(p.x * w, p.y * h, 5, '#ff0000');
+		}
+	}
+	
+	function drawLine() {
+		ctx.beginPath();
+		ctx.strokeStyle = '#0000ff';
+		for(var i = 0; i < w; i++) {
+			var x = i / w;
+			var y = hx(x);
+			if(i === 0) {
+				ctx.moveTo(x * w, y * h);
+			} else {
+				ctx.lineTo(x * w, y * h);
+			}
+		}
+		ctx.stroke();
+	}
+
+	function drawCircle(x,y,r,co){
+		ctx.beginPath();
+		ctx.strokeStyle = co;
+		ctx.moveTo(x,y);
+		ctx.arc(x,y,r,0,Math.PI*2);
+		ctx.stroke();
+	}
+
+
+	function nihe() {
+		console.time('用时：');
+		var len = pArr.length;
+		var A = new MatrixMath(len, 4);
+		var Y = new MatrixMath(len, 1);
+		
+		
+		// thetas.a = 1;
+		// thetas.b = 1;
+		// thetas.c = 1;
+		// thetas.d = 1;
+		
+
+		var n = 100;
+
+		while(n) {
+			n--;
+			if(wucha() < 1e-6){
+				break;
+			}
+			var a = thetas.a;
+			var b = thetas.b;
+			var c = thetas.c;
+			var d = thetas.d;
+			for(var i = 0; i < len; i++) {
+				var x = pArr[i].x;
+				var y = pArr[i].y;
+				var cos = Math.cos(b * x + c);
+				var sin = Math.sin(b * x + c);
+				A.setElement(i, 0, sin);
+				A.setElement(i, 1, a * x * cos);
+				A.setElement(i, 2, a * cos);
+				A.setElement(i, 3, 1);
+				Y.setElement(i, 0, y - hx(x));
+			}
+			var AT = A.transpose();
+			var ATA = AT.multiply(A);
+			var ATY = AT.multiply(Y);
+			
+			var AN = ATA.inverse();
+			var C = AN.multiply(ATY);
+
+			var da = C.getElement(0, 0);
+			var db = C.getElement(1, 0);
+			var dc = C.getElement(2, 0);
+			var dd = C.getElement(3, 0);
+
+			//console.log(da, db, dc, dd);
+			console.log(wucha());
+			thetas.a += da;
+			thetas.b += db;
+			thetas.c += dc;
+			thetas.d += dd;
+			if(da * da + db * db + dc * dc + dd * dd < 1e-6) {
+				console.log('====---', da * da + db * db + dc * dc + dd * dd);
+				break;
+			}
+		}
+		console.log('----------', n);
+		
+		console.timeEnd('用时：');
+		[A, AT, ATA, ATY, AN, C].forEach((a)=>{
+			// console.log(a);
+		});
+		console.log(thetas);
+	}
+
+	function wucha() {
+		var s = 0;
+		for(var i = 0; i < pArr.length; i++) {
+			var p = pArr[i];
+			var y = hx(p.x);
+			var d = y - p.y;
+			s += d * d;
+		}
+		s /= pArr.length;
+		// console.log('均方差:', s);
+		return s;
+	}
+	
+</script>

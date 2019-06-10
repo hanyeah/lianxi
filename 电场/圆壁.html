@@ -6,7 +6,7 @@ var h = 256;
 var charge = {
 	x: 128,
 	y: 100,
-	q: 20
+	q: 100
 };
 
 var circle = {
@@ -42,18 +42,18 @@ function render(){
 
 function getTheta(i, j) {
 	if(isInCircle(i, j)) {
-		// return Math.PI;
+		return Math.PI;
 	}
 	var r0 = circle.r * circle.r / (circle.y - charge.y);
 	var charge1 = {
 		x: circle.x,
 		y: circle.y,
-		q: -charge.q
+		q: charge.q
 	};
 	var charge2 = {
 		x: circle.x,
 		y: circle.y - r0,
-		q: charge.q
+		q: -charge.q
 	};
 	var chargeArr = [charge, charge1, charge2];
 	var theta = 0; 
