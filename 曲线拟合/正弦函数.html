@@ -14,7 +14,7 @@
 	thetas.c = Math.random() * Math.PI * 2;
 	thetas.d = 0.5;
 	var pArr = [];
-	console.log(thetas);
+	console.log('实际参数：', Object.assign({}, thetas));
 	// y = a * sin(b * x + c)
 	var hx = function(x){
 		return thetas.a * Math.sin(thetas.b * x + thetas.c) + thetas.d;
@@ -29,8 +29,8 @@
 
 	function refresh(){
 		nihe();
-		console.log(pArr);
-		console.log(thetas);
+		// console.log(pArr);
+		console.log('拟合之后的参数：', Object.assign({}, thetas));
 		ctx.clearRect(0, 0, w, h);
 		drawPoints();
 		drawLine();
@@ -66,25 +66,122 @@
 		ctx.stroke();
 	}
 
+	function getD() {
+		var len = pArr.length;
+		var d = 0;
+		for(var i = 0; i < len; i++) {
+			d += pArr[i].y;
+		}
+		return d / len;
+	}
+
+	function getA() {
+		var arr = pArr.concat();
+		arr.sort(function(a, b){
+			return a.y - b.y;
+		});
+		var a = 0;
+		var len = arr.length;
+		for(var i = 0; i < 10; i++) {
+			a += (arr[len - 1 - i].y - arr[i].y);
+		}
+		return a / 10 / 2;
+	}
+
+	/**
+	 * 估对了周期拟合就准确了。
+	 * @return {[type]} [description]
+	 */
+	function getB() {
+		var aa = [Infinity,Infinity];
+		var bb = [-Infinity,-Infinity]
+		for(var i = 2; i < 100; i++){
+			thetas.b = i;
+			var w = wucha();
+			aa.push(w);
+			bb.push(w);
+		}
+		// console.log(aa);
+		/*for(let i = 0; i < 100; i++) {
+			var ii = aa.indexOf(Math.min(...aa));
+			console.log(i+":",ii, aa[ii]);
+			aa[ii] = Infinity;
+		}*/
+		return {
+			min: aa.indexOf(Math.min(...aa)),
+			max: bb.indexOf(Math.max(...bb))
+		};
+	}
+
+	function getC() {
+		return Math.random();
+		/*var arr = [];
+		for(var i = 0; i < pArr.length; i++){
+			arr.push({
+				x: pArr[i].x,
+				y: Math.abs(pArr[i].y - thetas.d)
+			});
+		}
+		arr.sort(function(a, b){
+			return a.y - b.y;
+		});
+		var c = -arr[0].x/thetas.b;
+		console.log(arr, c);
+		return c;*/
+	}
 
 	function nihe() {
 		console.time('用时：');
+		var bb = getB();
+		thetas.d = getD();
+		thetas.a = getA();
+		thetas.c = getC();
+		thetas.b = bb.min;
+		nihe0();
+		var thetas0 = {};
+		var wucha0 = wucha();
+		Object.assign(thetas0, thetas);
+		console.log(thetas0);
+
+		thetas.d = getD();
+		thetas.a = getA();
+		thetas.c = Math.random();
+		thetas.b = bb.max;
+		nihe0();
+		var thetas1 = {};
+		var wucha1 = wucha();
+		Object.assign(thetas1, thetas);
+		console.log(thetas1);
+		console.log(bb, wucha0, wucha1);
+		if(wucha0 < wucha1) {
+			thetas = thetas0;
+			console.log('b初始值取最小误差');
+		} else {
+			console.log('b初始值取最大误差');
+		}
+		console.timeEnd('用时：');
+	}
+
+	/*function nihe() {
+		var bb = getB();
+		thetas.d = getD();
+		thetas.a = getA();
+		thetas.c = Math.random();
+		thetas.b = bb.min;
+		nihe0();
+	}*/
+
+	function nihe0() {
 		var len = pArr.length;
 		var A = new MatrixMath(len, 4);
 		var Y = new MatrixMath(len, 1);
-		
-		
-		// thetas.a = 1;
-		// thetas.b = 1;
-		// thetas.c = 1;
-		// thetas.d = 1;
-		
+		console.log("迭代的初始参数：", Object.assign({}, thetas));
 
 		var n = 100;
-
 		while(n) {
 			n--;
 			if(wucha() < 1e-6){
+				console.log("误差很小了", wucha());
 				break;
 			}
 			var a = thetas.a;
@@ -106,32 +203,34 @@
 			var ATA = AT.multiply(A);
 			var ATY = AT.multiply(Y);
 			
-			var AN = ATA.inverse();
-			var C = AN.multiply(ATY);
-
-			var da = C.getElement(0, 0);
-			var db = C.getElement(1, 0);
-			var dc = C.getElement(2, 0);
-			var dd = C.getElement(3, 0);
-
-			//console.log(da, db, dc, dd);
-			console.log(wucha());
-			thetas.a += da;
-			thetas.b += db;
-			thetas.c += dc;
-			thetas.d += dd;
-			if(da * da + db * db + dc * dc + dd * dd < 1e-6) {
-				console.log('====---', da * da + db * db + dc * dc + dd * dd);
+			/*var AN = ATA.inverse();
+			var C = AN.multiply(ATY);*/
+			var C = MatrixMath.GaussSolution(ATA, ATY);
+			// LUPDecomposition
+			if(!C){
 				break;
+			} else {
+				var da = C.getElement(0, 0);
+				var db = C.getElement(1, 0);
+				var dc = C.getElement(2, 0);
+				var dd = C.getElement(3, 0);
+				if(isNaN(da) || isNaN(db) || isNaN(dc) || isNaN(dd)){
+					break;
+				} else {
+					// console.log(da, db, dc, dd);
+					// console.log(wucha());
+					thetas.a += da;
+					thetas.b += db;
+					thetas.c += dc;
+					thetas.d += dd;
+					if(da * da + db * db + dc * dc + dd * dd < 1e-6) {
+						console.log('步长很小了', da * da + db * db + dc * dc + dd * dd);
+						break;
+					}
+				}
 			}
 		}
-		console.log('----------', n);
-		
-		console.timeEnd('用时：');
-		[A, AT, ATA, ATY, AN, C].forEach((a)=>{
-			// console.log(a);
-		});
-		console.log(thetas);
+		console.log('迭代次数：', 100 - n);
 	}
 
 	function wucha() {
