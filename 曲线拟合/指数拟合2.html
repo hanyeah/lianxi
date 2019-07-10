@@ -13,9 +13,9 @@
 	thetas.c = -(0.5 - thetas.b) / Math.log(1 - 0.5 / thetas.a);
 	var pArr = [];
 	console.log(thetas);
-	// y = a * (1 - e^(-(x - b) / c))
+	// y = a * (1 - e^((x - b) / c))
 	var hx = function(x){
-		return thetas.a * (1 - Math.exp(-(x - thetas.b) / thetas.c));
+		return thetas.a * (1 - Math.exp((x - thetas.b) / thetas.c));
 	};
 	for (let i = 0; i < 200; i++) {
 		var x = Math.random();
@@ -65,13 +65,49 @@
 	}
 
 	function nihe() {
+
+		hx = (x)=>{
+			return thetas.a + thetas.b * x + thetas.c * x * x + thetas.d * x * x * x;
+		};
+		console.time('用时：');
+		var len = pArr.length;
+		var A = new MatrixMath(len, 4);
+		var Y = new MatrixMath(len, 1);
+
+		for(var i = 0; i < len; i++) {
+			var x = pArr[i].x;
+			var y = pArr[i].y;
+			A.setElement(i, 0, 1);
+			A.setElement(i, 1, x);
+			A.setElement(i, 2, x*x);
+			A.setElement(i, 3, x*x*x);
+			Y.setElement(i, 0, y);
+		}
+		
+		var AT = A.transpose();
+		var ATA = AT.multiply(A);
+
+		var ATY = AT.multiply(Y);
+		var C = MatrixMath.GaussSolution(ATA, ATY);
+		// var AN = ATA.inverse();
+		// var C = AN.multiply(ATY);
+
+		thetas.a = C.getElement(0, 0);
+		thetas.b = C.getElement(1, 0);
+		thetas.c = C.getElement(2, 0);
+		thetas.d = C.getElement(3, 0);
+		console.log('误差：', wucha());
+	}
+
+	/*function nihe() {
 		console.time('用时：');
 		var len = pArr.length;
 		var col = 3;
 		var A = new MatrixMath(len, col);
 		var Y = new MatrixMath(len, 1);
-		var beta = {a: Math.random(), b: Math.random(), c: Math.random() + 0.1};
-		thetas = beta;
+		thetas.a = Math.random();
+		thetas.b = Math.random();
+		thetas.c = Math.random() + 0.1;
 
 		var n = 0;
 		var λ = 0.1;
@@ -83,33 +119,32 @@
 				var a = thetas.a;
 				var b = thetas.b;
 				var c = thetas.c;
-				var e = Math.exp(-(x - b) / c);
+				var e = Math.exp((x - b) / c);
 				A.setElement(i, 0, 1 - e);
-				A.setElement(i, 1, -a * e / c);
-				A.setElement(i, 2, -a * e * (x - b) / (c * c));
+				A.setElement(i, 1, a * e / c);
+				A.setElement(i, 2, a * e * (x - b) / (c * c));
 				Y.setElement(i, 0, y - hx(x));
 			}
 			var AT = A.transpose();
 			var ATA = AT.multiply(A);
 
 			var ATY = AT.multiply(Y);
-			var I = new MatrixMath(col, col);
-			I.identity();
-			I.scalar(λ);
-			ATA.add(I);
-
-			// var C = MatrixMath.GaussSolution(ATA, ATY);
-			var AN = ATA.inverse();
-			var C = AN.multiply(ATY);
+			var C = MatrixMath.GaussSolution(ATA, ATY);
+			// var AN = ATA.inverse();
+			// var C = AN.multiply(ATY);
 
 			var da = C.getElement(0, 0);
 			var db = C.getElement(1, 0);
-			var dc = C.getElement(2, 0);;
+			var dc = C.getElement(2, 0);
+
+			if(isNaN(da) || isNaN(db) || isNaN(dc)) {
+				break;
+			}
 			thetas.a += da;
 			thetas.b += db;
 			thetas.c += dc;
 			
-			console.log(da,db,dc);
+			// console.log(da,db,dc);
 			if(da * da + db * db + dc * dc < 1e-6) {
 				break;
 			}
@@ -118,10 +153,11 @@
 				console.log('n超出界限，n = ' + n);
 				break;
 			}
-			console.log('误差：', wucha());
+			
+			//console.log('误差：', wucha());
 		}
 		console.log('误差：', wucha());
-	}
+	}*/
 
 	function wucha() {
 		var s = 0;

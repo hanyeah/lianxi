@@ -1,0 +1,81 @@
+<canvas id = 'canvas' width = '256' height = '256' style = 'width:256px;height:256px;background:#cccccc;'></canvas>
+<script>
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var imagaData = ctx.getImageData(0, 0, 256, 256);
+	var pixels = imagaData.data;
+	var t0 = new Date().getTime();
+	var omiga = Math.PI * 100 / 180;
+	var m = 3;
+
+	function setOmiga(value){
+		omiga = Math.PI * value / 180;
+	}
+
+	function setRot(n) {
+		omiga = 2 * Math.PI * n;
+	}
+
+	function loop(){
+		var t = (new Date().getTime() - t0) * 0.001;
+		var n = 0;
+		for (var i = 0; i < 256; i++) {
+			for(var j = 0; j < 256; j++) {
+				pixels[n++] = getColor(i - 128, j - 128, t, omiga, m);
+				pixels[n++] = 0;
+				pixels[n++] = 0;
+				pixels[n++] = 0xff;
+			}
+		}
+		ctx.putImageData(imagaData, 0, 0);
+	}
+
+	function getColor(x, y, t, omiga, m) {
+		const x0 = Math.atan2(y, x) + Math.PI;
+		const step = Math.PI * 2 / m;
+		let color = 0x00;
+		for(let i = 0; i < m; i++) {
+			color += getColor0(x0 + i * step, t, omiga);
+			if(color >= 0xff) {
+				color = 0xff;
+				break;
+			}
+		}
+		return color;
+	}
+
+	function getColor0(x0, t, omiga){
+		const xt = omiga * t;
+		const xt0 = omiga * (t - 0.1);
+		const pi2 = Math.PI * 2;
+		const n = Math.floor((xt - x0) / pi2);
+		const factor = 1 / (xt - xt0);
+		let xx = n * pi2 + x0;
+		let color = 0x00;
+		let f;
+		while(xx > xt0 && xx >= x0) {
+			f = factor * (xx - xt0);
+			color += 0xff * f * f;
+			if(color >= 0xff) {
+				color = 0xff;
+				break;
+			}
+			xx -= pi2;
+		};
+		return color;
+	}
+
+	setInterval(loop, 30);
+</script>
+转速：<input id = 'rot' value = '3'></input>
+<button onclick = 'setRotClick()'>设置转速</button>
+<script type="text/javascript">
+	var rot = document.getElementById('rot');
+	setRotClick();
+	function setRotClick() {
+		var n = parseFloat(rot.value);
+		if(!isNaN(n)) {
+			setRot(n);
+		}
+	}
+</script>

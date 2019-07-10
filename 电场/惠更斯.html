@@ -1,0 +1,142 @@
+<canvas id = 'canvas' width = '128px' height = '128px' style = 'width:256px;height:256px;'></canvas>
+<script type="text/javascript">
+
+var w = 128;
+var h = 128;
+var charge = {
+	x: 64,
+	y: 64,
+	q: 100
+};
+
+var circle = {
+	x: charge.x,
+	y: 100,
+	r: 16
+};
+
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var imgData = ctx.getImageData(0, 0, w, h);
+var data = imgData.data;
+
+var arr1 = [];
+var arr2 = [];
+for(var i = 0; i < w; i++) {
+	arr1[i] = [];
+	arr2[i] = [];
+	for(var j = 0; j < h ; j++) {
+		arr1[i][j] = 0;
+		arr2[i][j] = 0;
+	}
+}
+
+function updateData() {
+	arr1[charge.x][charge.y] = charge.q;
+	for(var i = 0; i < w; i++) {
+		for(var j = 0; j < h; j++) {
+			var co = getColor(i, j);
+			var n = 4 * (j * w + i);
+			data[n + 0] = co.r;
+			data[n + 1] = co.g;
+			data[n + 2] = co.b;
+			data[n + 3] = co.a;
+		}
+	}
+
+	for(var i = 0; i < w; i++) {
+		for(var j = 0; j < h; j++) {
+			arr2[i][j] *= 0.5;
+		}
+	}
+	var n = 0;
+	var q = 0;
+	for(var i = 0 ;i < w; i++) {
+		for(var j = 0; j < h; j++) {
+			if(isInCircle(i, j)){
+				n++;
+				q += arr2[i][j];
+			}
+		}
+	}
+	for(var i = 0 ;i < w; i++) {
+		for(var j = 0; j < h; j++) {
+			if(isInCircle(i, j)){
+				arr2[i][j]  = q / n;
+			}
+		}
+	}
+
+	var temp = arr1;
+	arr1 = arr2;
+	arr2 = temp;
+}
+
+setInterval(render, 10);
+
+function render(){
+	updateData();
+	ctx.putImageData(imgData, 0, 0);
+}
+
+function isInCircle(i, j) {
+	var dx = i - circle.x;
+	var dy = j - circle.y;
+	return dx * dx + dy * dy <= circle.r * circle.r;
+}
+
+function normalizTheta(theta) {
+	var value = theta % (Math.PI * 2) / (Math.PI * 2);
+	value = (value + 1) % 1;
+	if(value < 0.5) {
+		value = 2 * (0.5 - value);
+	} else {
+		value = 2 * (value - 0.5);
+	}
+	return value;
+}
+
+function getColor(i, j) {
+	var neighbors = [
+		{x: -1, y: -1, w: 1 / 12},
+		{x: 0, y: -1, w: 2 / 12},
+		{x: 1, y: -1, w: 1 / 12},
+		{x: -1, y: 0, w: 2 / 12},
+		{x: 1, y: 0, w: 2 / 12},
+		{x: -1, y: 1, w: 1 / 12},
+		{x: 0, y: 1, w: 2 / 12},
+		{x: 1, y: 1, w: 1 / 12}
+	];
+
+	var d = arr1[i][j];
+	for(var k = 0; k < neighbors.length; k++) {
+		var o = neighbors[k];
+		var ii = i + o.x;
+		var jj = j + o.y;
+		if(ii < 0 || ii >= w || jj < 0 || jj >= h) {
+			continue;
+		}
+		d += arr1[ii][jj] * o.w;
+	}
+
+	arr2[i][j] = d;
+
+	return {
+		r: Math.floor(255 * ((d / charge.q) % 0.2)),
+		g: 0,
+		b: 0,
+		a: 0xff
+	};
+}
+
+/*function getColor(i, j) {
+	var theta = getTheta(i, j);
+	var value = normalizTheta(theta);
+	return toColor(value);
+}*/
+
+function dis(vec) {
+	return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+}
+
+</script>
