@@ -3,8 +3,8 @@
  */
 namespace hanyeah.optical.geom {
   export class Point {
-    public x: Number;
-    public y: Number;
+    public x: number;
+    public y: number;
 
     public static add(p1: Point, p2: Point): Point {
       return new Point(p1.x + p2.x, p1.y + p2.y);
@@ -14,11 +14,11 @@ namespace hanyeah.optical.geom {
       return new Point(p1.x - p2.x, p1.y - p2.y);
     }
 
-    public static dot(p1: Point, p2: Point): Number {
+    public static dot(p1: Point, p2: Point): number {
       return p1.x * p2.x + p1.y * p2.y;
     }
 
-    public static cross(p1: Point, p2: Point): Number {
+    public static cross(p1: Point, p2: Point): number {
       return p1.x * p2.y - p1.y * p2.x;
     }
 
@@ -30,11 +30,11 @@ namespace hanyeah.optical.geom {
       return new Point(-p.y, +p.x);
     }
 
-    public static interpolate(p1: Point, p2: Point, f: Number): Point {
+    public static interpolate(p1: Point, p2: Point, f: number): Point {
       return new Point(p1.x + (p2.x - p1.x) * f, p1.y + (p2.y - p1.y) * f);
     }
 
-    public static getFactor(p1: Point, p2: Point, p: Point): Number{
+    public static getFactor(p1: Point, p2: Point, p: Point): number{
       if (p1.x !== p2.x) {
         return (p.x - p1.x) / (p2.x - p1.x);
       }
@@ -44,7 +44,15 @@ namespace hanyeah.optical.geom {
       return NaN;
     }
 
-    constructor(x: Number = 0, y: Number = 0) {
+    public static distance(p1: Point, p2: Point): number{
+      return Point.sub(p2, p1).length();
+    }
+
+    public static sqrDistance(p1: Point, p2: Point): number{
+      return Point.sub(p2, p1).sqrLength();
+    }
+
+    constructor(x: number = 0.0, y: number = 0.0) {
       this.x = x;
       this.y = y;
     }
@@ -53,15 +61,15 @@ namespace hanyeah.optical.geom {
       return new Point(this.x, this.y);
     }
 
-    public length(): Number {
+    public length(): number {
       return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-    public sqrLength(): Number {
+    public sqrLength(): number {
       return this.x * this.x + this.y * this.y;
     }
 
-    public normalize(value: Number = 1) {
+    public normalize(value: number = 1) {
       const inv = value / this.length();
       this.x *= inv;
       this.y *= inv;
@@ -93,26 +101,26 @@ namespace hanyeah.optical.geom {
     }
 
     public rot90() {
-      const t: Number = this.y;
+      const t: number = this.y;
       this.y = -this.x;
       this.y = t;
     }
 
     public rotNeg90() {
-      const t: Number = this.x;
+      const t: number = this.x;
       this.x = -this.y;
       this.y = t;
     }
 
-    public dot(p: Point): Number {
+    public dot(p: Point): number {
       return this.x * p.x + this.y * p.y;
     }
 
-    public cross(p: Point): Number {
+    public cross(p: Point): number {
       return this.x * p.y - this.y * p.x;
     }
 
-    public setXY(x: Number, y: Number) {
+    public setXY(x: number, y: number) {
       this.x = x;
       this.y = y;
     }

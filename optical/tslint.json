@@ -8,7 +8,11 @@
       "variables-before-functions"
     ],
     "no-any": true,
-    "no-inferrable-types": true,
+    "no-inferrable-types": [
+      true,
+      "ignore-params",
+      "ignore-properties"
+    ],
     "no-internal-module": true,
     "no-var-requires": true,
     "typedef": true,

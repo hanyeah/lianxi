@@ -2,7 +2,7 @@
  * Created by hanyeah on 2019/7/11.
  */
 namespace hanyeah.optical.geom {
-  export class Segment extends Geom {
+  export class Line2 extends Geom {
     public p1: Point;
     public p2: Point;
 
@@ -12,8 +12,8 @@ namespace hanyeah.optical.geom {
       this.p2 = p2.clone();
     }
 
-    public clone(): Segment {
-      return new Segment(this.p1, this.p2);
+    public clone(): Line2 {
+      return new Line2(this.p1, this.p2);
     }
 
     public intersectT(ray: Ray): number[] {
@@ -25,11 +25,7 @@ namespace hanyeah.optical.geom {
         const ab: number = a.cross(b);
         const t = ab / db;
         if (t > 0){
-          const position: Point = ray.getPoint(t);
-          const f = Point.getFactor(this.p1, this.p2, position);
-          if (f >= 0 && f <= 1) {
-            result.push(t);
-          }
+          result.push(t);
         }
       }
       return result;

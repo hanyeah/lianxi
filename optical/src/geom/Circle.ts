@@ -1,23 +1,25 @@
 /**
  * Created by hanyeah on 2019/7/11.
  */
+/// <reference path="Geom.ts"/>
 namespace hanyeah.optical.geom {
-  export class Circle implements IGeom {
+  export class Circle extends Geom {
     public cp: Point;
-    private _r: Number;
-    private r2: Number;
+    private _r: number;
+    private r2: number;
 
-    constructor(cp: Point, r: Number) {
+    constructor(cp: Point, r: number) {
+      super();
       this.cp = cp.clone();
       this.r = r;
     }
 
-    public set r(value: Number) {
+    public set r(value: number) {
       this._r = value;
       this.r2 = value * value;
     }
 
-    public get r(): Number {
+    public get r(): number {
       return this._r;
     }
 
@@ -25,29 +27,26 @@ namespace hanyeah.optical.geom {
       return new Circle(this.cp, this.r);
     }
 
-    public intersect(ray: Ray): IntersectResult {
+    public intersectT(ray: Ray): number[] {
+      const result: number[] = [];
       const v: Point = Point.sub(ray.sp, this.cp);
-      const ac: Number = v.sqrLength() - this.r2;
-      const dv: Number = ray.dir.dot(v);
-      const delta: Number = dv * dv - ac;
-      if (delta >= 0) {
-        const sqrDelta: Number = Math.sqrt(delta);
-        let t: Number = -dv - sqrDelta;
-        if (t <= 0) {
-          t = -dv + sqrDelta;
-        }
-        if (t > 0) {
-          const result: IntersectResult = new IntersectResult();
-          result.geom = this;
-          result.distance = t;
-          result.position = ray.getPoint(result.distance);
-          const normal = Point.sub(result.position, this.cp);
-          normal.normalize(ray.dir.dot(normal) > 0 ? -1 : 1);
-          result.normal = normal;
-          return result;
-        }
-      }
-      return IntersectResult.noHit;
+      const c: number = v.sqrLength() - this.r2;
+      const b: number = 2 * ray.dir.dot(v);
+      this.getTbyAbc(result, 1, b, c);
+      return result;
     }
+
+    public getNormal(p: Point, normalize: boolean = false): Point {
+      const normal = Point.sub(p, this.cp);
+      if (normalize) {
+        normal.normalize(1);
+      }
+      return normal;
+    }
+
+    public containsPoint(p: Point): boolean{
+      return Point.sqrDistance(p, this.cp) < this.r * this.r;
+    }
+
   }
 }

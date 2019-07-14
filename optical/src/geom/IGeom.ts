@@ -8,5 +8,11 @@ namespace hanyeah.optical.geom {
 
     intersect(ray: Ray): IntersectResult;
 
+    getNormal(p: Point, normalize: boolean): Point;
+
+    intersectT(ray: Ray): number[];
+
+    containsPoint(p: Point): boolean;
+
   }
 }
