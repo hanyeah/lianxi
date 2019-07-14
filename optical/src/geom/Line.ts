@@ -26,8 +26,8 @@ namespace hanyeah.optical.geom {
       return new Point(-1, 0);
     }
 
-    public containsPoint(p: Point): boolean{
-      return p.x > this.x0;
+    public containsPoint(p: Point): number{
+      return Geom.getSign(p.x - this.x0);
     }
 
   }

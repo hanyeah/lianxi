@@ -12,7 +12,7 @@ namespace hanyeah.optical.geom {
 
     intersectT(ray: Ray): number[];
 
-    containsPoint(p: Point): boolean;
+    containsPoint(p: Point): number;
 
   }
 }

@@ -1,5 +1,10 @@
 namespace hanyeah.optical.geom {
   export class Geom implements IGeom {
+
+    protected static getSign(value: number): number {
+      return value > 0 ? 1 : value < 0 ? -1 : 0;
+    }
+
     constructor() {
 
     }
@@ -48,9 +53,10 @@ namespace hanyeah.optical.geom {
       }
     }
 
-    public containsPoint(p: Point): boolean{
-      return false;
+    public containsPoint(p: Point): number {
+      return -1;
     }
+
     protected getIntersectResult(ray: Ray, t: number): IntersectResult {
       const result: IntersectResult = new IntersectResult();
       result.geom = this;

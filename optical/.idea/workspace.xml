@@ -2,23 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7bb71688-820b-4f43-a662-34db4e53497f" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/test.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/geom/Ellipse.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/geom/Geom.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/geom/Line2.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/geom/Parabola.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Optical.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Optical.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Optical.js" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Optical.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/geom/Circle.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Circle.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/geom/Ellipse.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Ellipse.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/geom/Geom.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Geom.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/geom/Hyperbola.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Hyperbola.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/geom/IGeom.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/IGeom.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/geom/IntersectResult.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/IntersectResult.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/geom/Line.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Line.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/geom/Point.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Point.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/geom/Ray.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Ray.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/geom/Segment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Segment.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tslint.json" beforeDir="false" afterPath="$PROJECT_DIR$/tslint.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/geom/Parabola.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/geom/Parabola.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -33,6 +26,7 @@
     <session id="-1485542344">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.23" value="1" />
           <entry key="project.opened" value="2" />
@@ -49,7 +43,7 @@
           <entry key="html" value="1" />
           <entry key="js" value="6" />
           <entry key="json" value="6" />
-          <entry key="ts" value="33" />
+          <entry key="ts" value="34" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
@@ -57,7 +51,7 @@
           <entry key="HTML" value="1" />
           <entry key="JSON" value="2" />
           <entry key="JavaScript" value="6" />
-          <entry key="TypeScript" value="33" />
+          <entry key="TypeScript" value="34" />
           <entry key="tsconfig" value="4" />
         </counts>
       </usages-collector>
@@ -66,14 +60,14 @@
           <entry key="html" value="19" />
           <entry key="js" value="1" />
           <entry key="json" value="22" />
-          <entry key="ts" value="3591" />
+          <entry key="ts" value="3750" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="19" />
           <entry key="JavaScript" value="1" />
-          <entry key="TypeScript" value="3591" />
+          <entry key="TypeScript" value="3750" />
           <entry key="tsconfig" value="22" />
         </counts>
       </usages-collector>
@@ -81,11 +75,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/geom/Line2.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-359">
+              <caret line="14" column="3" lean-forward="true" selection-start-line="14" selection-start-column="3" selection-end-line="16" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geom/Circle.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="235">
-              <caret line="42" column="7" lean-forward="true" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
+            <state relative-caret-position="360">
+              <caret line="47" column="44" selection-start-line="47" selection-start-column="44" selection-end-line="47" selection-end-column="44" />
             </state>
           </provider>
         </entry>
@@ -100,19 +103,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/geom/Point.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
-              <caret line="51" column="42" selection-start-line="51" selection-start-column="42" selection-end-line="51" selection-end-column="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geom/Hyperbola.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="298">
-              <caret line="59" column="43" selection-start-line="59" selection-start-column="4" selection-end-line="59" selection-end-column="43" />
+            <state relative-caret-position="323">
+              <caret line="60" column="111" selection-start-line="60" selection-start-column="111" selection-end-line="60" selection-end-column="111" />
             </state>
           </provider>
         </entry>
@@ -121,16 +115,16 @@
         <entry file="file://$PROJECT_DIR$/lib/Optical.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-835">
-              <caret line="110" column="13" lean-forward="true" selection-start-line="110" selection-start-column="13" selection-end-line="110" selection-end-column="13" />
+              <caret line="113" column="13" lean-forward="true" selection-start-line="113" selection-start-column="13" selection-end-line="113" selection-end-column="13" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/geom/Line.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="501">
-              <caret line="30" column="5" lean-forward="true" selection-start-line="28" selection-start-column="4" selection-end-line="30" selection-end-column="5" />
+            <state relative-caret-position="355">
+              <caret line="26" column="5" lean-forward="true" selection-start-line="26" selection-start-column="5" selection-end-line="26" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -139,7 +133,7 @@
         <entry file="file://$PROJECT_DIR$/src/geom/Parabola.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="414">
-              <caret line="37" column="80" selection-start-line="37" selection-start-column="80" selection-end-line="37" selection-end-column="80" />
+              <caret line="37" column="88" selection-start-line="37" selection-start-column="88" selection-end-line="37" selection-end-column="88" />
             </state>
           </provider>
         </entry>
@@ -147,8 +141,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geom/Ellipse.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="61" column="5" lean-forward="true" selection-start-line="59" selection-start-column="4" selection-end-line="61" selection-end-column="5" />
+            <state relative-caret-position="291">
+              <caret line="60" column="123" selection-start-line="60" selection-start-column="123" selection-end-line="60" selection-end-column="123" />
             </state>
           </provider>
         </entry>
@@ -156,8 +150,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geom/Geom.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="205">
-              <caret line="50" column="43" selection-start-line="50" selection-start-column="36" selection-end-line="50" selection-end-column="43" />
+            <state relative-caret-position="1423">
+              <caret line="60" column="31" lean-forward="true" selection-start-line="60" selection-start-column="31" selection-end-line="60" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -166,7 +160,7 @@
         <entry file="file://$PROJECT_DIR$/src/geom/IGeom.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="350">
-              <caret line="14" column="36" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="36" />
+              <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
             </state>
           </provider>
         </entry>
@@ -216,11 +210,11 @@
         <option value="$PROJECT_DIR$/tsconfig.json" />
         <option value="$PROJECT_DIR$/lib/test.html" />
         <option value="$PROJECT_DIR$/src/geom/Point.ts" />
+        <option value="$PROJECT_DIR$/src/geom/Geom.ts" />
+        <option value="$PROJECT_DIR$/src/geom/IGeom.ts" />
+        <option value="$PROJECT_DIR$/src/geom/Circle.ts" />
         <option value="$PROJECT_DIR$/src/geom/Ellipse.ts" />
         <option value="$PROJECT_DIR$/src/geom/Hyperbola.ts" />
-        <option value="$PROJECT_DIR$/src/geom/IGeom.ts" />
-        <option value="$PROJECT_DIR$/src/geom/Geom.ts" />
-        <option value="$PROJECT_DIR$/src/geom/Circle.ts" />
         <option value="$PROJECT_DIR$/src/geom/Line.ts" />
         <option value="$PROJECT_DIR$/src/geom/Parabola.ts" />
       </list>
@@ -341,16 +335,15 @@
       <workItem from="1562891702465" duration="9594000" />
       <workItem from="1562920331057" duration="5001000" />
       <workItem from="1562979464694" duration="16833000" />
-      <workItem from="1563071681752" duration="11628000" />
+      <workItem from="1563071681752" duration="13472000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51741000" />
+    <option name="totallyTimeSpent" value="53585000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15437302" />
       <window_info id="Structure" order="1" weight="0.25" />
@@ -418,13 +411,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/Line2.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-104">
-          <caret line="14" column="3" lean-forward="true" selection-start-line="14" selection-start-column="3" selection-end-line="16" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tsconfig.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -446,48 +432,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/IGeom.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="14" column="36" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/Geom.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="50" column="43" selection-start-line="50" selection-start-column="36" selection-end-line="50" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/Ellipse.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="61" column="5" lean-forward="true" selection-start-line="59" selection-start-column="4" selection-end-line="61" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/Hyperbola.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="59" column="43" selection-start-line="59" selection-start-column="4" selection-end-line="59" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/Line.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="501">
-          <caret line="30" column="5" lean-forward="true" selection-start-line="28" selection-start-column="4" selection-end-line="30" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geom/Parabola.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="37" column="80" selection-start-line="37" selection-start-column="80" selection-end-line="37" selection-end-column="80" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/geom/Ray.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="322">
@@ -498,14 +442,63 @@
     <entry file="file://$PROJECT_DIR$/lib/Optical.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-835">
-          <caret line="110" column="13" lean-forward="true" selection-start-line="110" selection-start-column="13" selection-end-line="110" selection-end-column="13" />
+          <caret line="113" column="13" lean-forward="true" selection-start-line="113" selection-start-column="13" selection-end-line="113" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/IGeom.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/geom/Circle.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="235">
-          <caret line="42" column="7" lean-forward="true" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
+        <state relative-caret-position="360">
+          <caret line="47" column="44" selection-start-line="47" selection-start-column="44" selection-end-line="47" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/Ellipse.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="60" column="123" selection-start-line="60" selection-start-column="123" selection-end-line="60" selection-end-column="123" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/Geom.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1423">
+          <caret line="60" column="31" lean-forward="true" selection-start-line="60" selection-start-column="31" selection-end-line="60" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/Hyperbola.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="60" column="111" selection-start-line="60" selection-start-column="111" selection-end-line="60" selection-end-column="111" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/Line2.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-359">
+          <caret line="14" column="3" lean-forward="true" selection-start-line="14" selection-start-column="3" selection-end-line="16" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/Parabola.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="37" column="88" selection-start-line="37" selection-start-column="88" selection-end-line="37" selection-end-column="88" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geom/Line.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="355">
+          <caret line="26" column="5" lean-forward="true" selection-start-line="26" selection-start-column="5" selection-end-line="26" selection-end-column="5" />
         </state>
       </provider>
     </entry>

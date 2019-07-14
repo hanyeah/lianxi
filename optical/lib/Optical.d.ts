@@ -7,13 +7,14 @@ declare namespace hanyeah.optical {
 }
 declare namespace hanyeah.optical.geom {
     class Geom implements IGeom {
+        protected static getSign(value: number): number;
         constructor();
         clone(): Geom;
         intersectT(ray: Ray): number[];
         intersect(ray: Ray): IntersectResult;
         getNormal(p: Point, normalize?: boolean): Point;
         protected getTbyAbc(result: number[], a: number, b: number, c: number): void;
-        containsPoint(p: Point): boolean;
+        containsPoint(p: Point): number;
         protected getIntersectResult(ray: Ray, t: number): IntersectResult;
     }
 }
@@ -30,7 +31,7 @@ declare namespace hanyeah.optical.geom {
         clone(): Circle;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): boolean;
+        containsPoint(p: Point): number;
     }
 }
 declare namespace hanyeah.optical.geom {
@@ -48,7 +49,7 @@ declare namespace hanyeah.optical.geom {
         calcC(): void;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): boolean;
+        containsPoint(p: Point): number;
     }
 }
 /**
@@ -70,7 +71,7 @@ declare namespace hanyeah.optical.geom {
         calcC(): void;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): boolean;
+        containsPoint(p: Point): number;
     }
 }
 /**
@@ -82,7 +83,7 @@ declare namespace hanyeah.optical.geom {
         intersect(ray: Ray): IntersectResult;
         getNormal(p: Point, normalize: boolean): Point;
         intersectT(ray: Ray): number[];
-        containsPoint(p: Point): boolean;
+        containsPoint(p: Point): number;
     }
 }
 /**
@@ -96,6 +97,39 @@ declare namespace hanyeah.optical.geom {
         position: Point;
         normal: Point;
         constructor();
+    }
+}
+declare namespace hanyeah.optical.geom {
+    class Line extends Geom {
+        x0: number;
+        constructor(x0: number);
+        clone(): Line;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+        containsPoint(p: Point): number;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class Line2 extends Geom {
+        p1: Point;
+        p2: Point;
+        constructor(p1: Point, p2: Point);
+        clone(): Line2;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+    }
+}
+declare namespace hanyeah.optical.geom {
+    class Parabola extends Geom {
+        p: number;
+        constructor(p: number);
+        clone(): Parabola;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+        containsPoint(p: Point): number;
     }
 }
 /**
@@ -158,38 +192,5 @@ declare namespace hanyeah.optical.geom {
         clone(): Segment;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-    }
-}
-declare namespace hanyeah.optical.geom {
-    class Parabola extends Geom {
-        p: number;
-        constructor(p: number);
-        clone(): Parabola;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): boolean;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    class Line2 extends Geom {
-        p1: Point;
-        p2: Point;
-        constructor(p1: Point, p2: Point);
-        clone(): Line2;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
-    }
-}
-declare namespace hanyeah.optical.geom {
-    class Line extends Geom {
-        x0: number;
-        constructor(x0: number);
-        clone(): Line;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): boolean;
     }
 }

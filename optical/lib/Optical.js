@@ -4,7 +4,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -35,6 +35,9 @@ var hanyeah;
             var Geom = /** @class */ (function () {
                 function Geom() {
                 }
+                Geom.getSign = function (value) {
+                    return value > 0 ? 1 : value < 0 ? -1 : 0;
+                };
                 Geom.prototype.clone = function () {
                     return new Geom();
                 };
@@ -77,7 +80,7 @@ var hanyeah;
                     }
                 };
                 Geom.prototype.containsPoint = function (p) {
-                    return false;
+                    return -1;
                 };
                 Geom.prototype.getIntersectResult = function (ray, t) {
                     var result = new geom.IntersectResult();
@@ -143,7 +146,7 @@ var hanyeah;
                     return normal;
                 };
                 Circle.prototype.containsPoint = function (p) {
-                    return geom.Point.sqrDistance(p, this.cp) < this.r * this.r;
+                    return geom.Geom.getSign(this.r * this.r - geom.Point.sqrDistance(p, this.cp));
                 };
                 return Circle;
             }(geom.Geom));
@@ -210,7 +213,7 @@ var hanyeah;
                     return normal;
                 };
                 Ellipse.prototype.containsPoint = function (p) {
-                    return geom.Point.distance(p, new geom.Point(this.c, 0)) + geom.Point.distance(p, new geom.Point(-this.c, 0)) < 2 * this.a;
+                    return geom.Geom.getSign(2 * this.a - (geom.Point.distance(p, new geom.Point(this.c, 0)) + geom.Point.distance(p, new geom.Point(-this.c, 0))));
                 };
                 return Ellipse;
             }(geom.Geom));
@@ -274,7 +277,7 @@ var hanyeah;
                     return normal;
                 };
                 Hyperbola.prototype.containsPoint = function (p) {
-                    return geom.Point.distance(p, new geom.Point(-this.c, 0)) - geom.Point.distance(p, new geom.Point(this.c, 0)) > 2 * this.a;
+                    return geom.Geom.getSign(geom.Point.distance(p, new geom.Point(-this.c, 0)) - geom.Point.distance(p, new geom.Point(this.c, 0)) - 2 * this.a);
                 };
                 return Hyperbola;
             }(geom.Geom));
@@ -298,6 +301,141 @@ var hanyeah;
                 return IntersectResult;
             }());
             geom.IntersectResult = IntersectResult;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Line = /** @class */ (function (_super) {
+                __extends(Line, _super);
+                function Line(x0) {
+                    var _this = _super.call(this) || this;
+                    _this.x0 = x0;
+                    return _this;
+                }
+                Line.prototype.clone = function () {
+                    return new Line(this.x0);
+                };
+                Line.prototype.intersectT = function (ray) {
+                    var result = [];
+                    if (ray.dir.x !== 0) {
+                        var t = (this.x0 - ray.sp.x) / ray.dir.x;
+                        if (t > 0) {
+                            result.push(t);
+                        }
+                    }
+                    return result;
+                };
+                Line.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    return new geom.Point(-1, 0);
+                };
+                Line.prototype.containsPoint = function (p) {
+                    return geom.Geom.getSign(p.x - this.x0);
+                };
+                return Line;
+            }(geom.Geom));
+            geom.Line = Line;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Line2 = /** @class */ (function (_super) {
+                __extends(Line2, _super);
+                function Line2(p1, p2) {
+                    var _this = _super.call(this) || this;
+                    _this.p1 = p1.clone();
+                    _this.p2 = p2.clone();
+                    return _this;
+                }
+                Line2.prototype.clone = function () {
+                    return new Line2(this.p1, this.p2);
+                };
+                Line2.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var b = geom.Point.sub(this.p2, this.p1);
+                    var db = ray.dir.cross(b);
+                    if (db !== 0) {
+                        var a = geom.Point.sub(ray.sp, this.p1);
+                        var ab = a.cross(b);
+                        var t = ab / db;
+                        if (t > 0) {
+                            result.push(t);
+                        }
+                    }
+                    return result;
+                };
+                Line2.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var b = geom.Point.sub(this.p2, this.p1);
+                    var normal = geom.Point.rotNeg90(b);
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                return Line2;
+            }(geom.Geom));
+            geom.Line2 = Line2;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Parabola = /** @class */ (function (_super) {
+                __extends(Parabola, _super);
+                function Parabola(p) {
+                    var _this = _super.call(this) || this;
+                    _this.p = p;
+                    return _this;
+                }
+                Parabola.prototype.clone = function () {
+                    return new Parabola(this.p);
+                };
+                Parabola.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var a = ray.dir.y * ray.dir.y;
+                    var b = 2 * (ray.sp.y * ray.dir.y - this.p * ray.dir.x);
+                    var c = ray.sp.y * ray.sp.y - 2 * this.p * ray.sp.x;
+                    var arr = [];
+                    this.getTbyAbc(arr, a, b, c);
+                    arr.forEach(function (t) {
+                        if (ray.sp.x + ray.dir.x * t > 0) {
+                            result.push(t);
+                        }
+                    });
+                    return result;
+                };
+                Parabola.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var normal = new geom.Point(-1, p.y / this.p);
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                Parabola.prototype.containsPoint = function (p) {
+                    return geom.Geom.getSign(p.x + this.p / 2 - geom.Point.distance(p, new geom.Point(this.p / 2, 0)));
+                };
+                return Parabola;
+            }(geom.Geom));
+            geom.Parabola = Parabola;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
@@ -525,141 +663,6 @@ var hanyeah;
                 return Segment;
             }(geom.Geom));
             geom.Segment = Segment;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Parabola = /** @class */ (function (_super) {
-                __extends(Parabola, _super);
-                function Parabola(p) {
-                    var _this = _super.call(this) || this;
-                    _this.p = p;
-                    return _this;
-                }
-                Parabola.prototype.clone = function () {
-                    return new Parabola(this.p);
-                };
-                Parabola.prototype.intersectT = function (ray) {
-                    var result = [];
-                    var a = ray.dir.y * ray.dir.y;
-                    var b = 2 * (ray.sp.y * ray.dir.y - this.p * ray.dir.x);
-                    var c = ray.sp.y * ray.sp.y - 2 * this.p * ray.sp.x;
-                    var arr = [];
-                    this.getTbyAbc(arr, a, b, c);
-                    arr.forEach(function (t) {
-                        if (ray.sp.x + ray.dir.x * t > 0) {
-                            result.push(t);
-                        }
-                    });
-                    return result;
-                };
-                Parabola.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    var normal = new geom.Point(-1, p.y / this.p);
-                    if (normalize) {
-                        normal.normalize(1);
-                    }
-                    return normal;
-                };
-                Parabola.prototype.containsPoint = function (p) {
-                    return p.x + this.p / 2 - geom.Point.distance(p, new geom.Point(this.p / 2, 0)) > 0;
-                };
-                return Parabola;
-            }(geom.Geom));
-            geom.Parabola = Parabola;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/11.
- */
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Line2 = /** @class */ (function (_super) {
-                __extends(Line2, _super);
-                function Line2(p1, p2) {
-                    var _this = _super.call(this) || this;
-                    _this.p1 = p1.clone();
-                    _this.p2 = p2.clone();
-                    return _this;
-                }
-                Line2.prototype.clone = function () {
-                    return new Line2(this.p1, this.p2);
-                };
-                Line2.prototype.intersectT = function (ray) {
-                    var result = [];
-                    var b = geom.Point.sub(this.p2, this.p1);
-                    var db = ray.dir.cross(b);
-                    if (db !== 0) {
-                        var a = geom.Point.sub(ray.sp, this.p1);
-                        var ab = a.cross(b);
-                        var t = ab / db;
-                        if (t > 0) {
-                            result.push(t);
-                        }
-                    }
-                    return result;
-                };
-                Line2.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    var b = geom.Point.sub(this.p2, this.p1);
-                    var normal = geom.Point.rotNeg90(b);
-                    if (normalize) {
-                        normal.normalize(1);
-                    }
-                    return normal;
-                };
-                return Line2;
-            }(geom.Geom));
-            geom.Line2 = Line2;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Line = /** @class */ (function (_super) {
-                __extends(Line, _super);
-                function Line(x0) {
-                    var _this = _super.call(this) || this;
-                    _this.x0 = x0;
-                    return _this;
-                }
-                Line.prototype.clone = function () {
-                    return new Line(this.x0);
-                };
-                Line.prototype.intersectT = function (ray) {
-                    var result = [];
-                    if (ray.dir.x !== 0) {
-                        var t = (this.x0 - ray.sp.x) / ray.dir.x;
-                        if (t > 0) {
-                            result.push(t);
-                        }
-                    }
-                    return result;
-                };
-                Line.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    return new geom.Point(-1, 0);
-                };
-                Line.prototype.containsPoint = function (p) {
-                    return p.x > this.x0;
-                };
-                return Line;
-            }(geom.Geom));
-            geom.Line = Line;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));

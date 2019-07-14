@@ -57,8 +57,8 @@ namespace hanyeah.optical.geom {
       return normal;
     }
 
-    public containsPoint(p: Point): boolean{
-      return Point.distance(p, new Point(-this.c, 0)) -  Point.distance(p, new Point(this.c, 0)) > 2 * this.a;
+    public containsPoint(p: Point): number{
+      return Geom.getSign(Point.distance(p, new Point(-this.c, 0)) -  Point.distance(p, new Point(this.c, 0)) - 2 * this.a);
     }
 
   }
