@@ -3,12 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <style>
+    html,body{
+      margin: 0;
+      padding: 0;
+    }
+    #canvas{
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
   <script src = "Optical.js"></script>
   <script>
+    var canvas;
+    var ctx;
+    window.onload = function loaded() {
+      canvas = document.getElementById('canvas');
+      ctx = canvas.getContext('2d');
+      setTimeout(window.onresize);
+      new hanyeah.optical.Example01(ctx);
+    };
+
+    window.onresize = function() {
+      canvas.height = document.documentElement.clientHeight + 'px';
+      canvas.setAttribute('width', document.documentElement.clientWidth + 'px');
+      canvas.setAttribute('height', document.documentElement.clientHeight + 'px');
+    };
 
   </script>
 </head>
 <body>
-
+  <canvas id = 'canvas'></canvas>
 </body>
 </html>

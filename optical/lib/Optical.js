@@ -12,6 +12,60 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 /**
+ * Created by hanyeah on 2019/7/17.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var Ray = hanyeah.optical.geom.Ray;
+        var Point = hanyeah.optical.geom.Point;
+        var Circle = hanyeah.optical.geom.Circle;
+        var Example01 = /** @class */ (function () {
+            function Example01(ctx) {
+                this.arr = [];
+                this.mouseP = new Point();
+                console.log(ctx);
+                this.ctx = ctx;
+                this.ray = new Ray(new Point(100, 100), new Point(100, 100));
+                this.arr.push(this.ray);
+                this.circle = new Circle(50);
+                this.arr.push(this.circle);
+                this.circle.setPosition(400, 300);
+                setInterval(this.loop.bind(this));
+                ctx.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+            }
+            Example01.prototype.onMouseMove = function (e) {
+                this.mouseP.x = e.clientX;
+                this.mouseP.y = e.clientY;
+                this.ray.dir.setXY(this.mouseP.x - this.ray.sp.x, this.mouseP.y - this.ray.sp.y);
+                this.ray.dir.normalize(1);
+            };
+            Example01.prototype.loop = function () {
+                var ctx = this.ctx;
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.canvas.style.backgroundColor = "#cccccc";
+                ctx.beginPath();
+                ctx.lineWidth = 1; // 设置线条宽度
+                ctx.strokeStyle = "red"; // 设置线条颜色
+                ctx.moveTo(this.ray.sp.x, this.ray.sp.y);
+                var p = this.ray.getPoint(300);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke(); // 用于绘制线条
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.lineWidth = 1; // 设置线条宽度
+                ctx.strokeStyle = "green"; // 设置线条颜色
+                ctx.arc(this.circle.x, this.circle.y, this.circle.r, 0, 2 * Math.PI);
+                ctx.stroke(); // 用于绘制线条
+                ctx.closePath();
+            };
+            return Example01;
+        }());
+        optical.Example01 = Example01;
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/7/11.
  */
 var hanyeah;
@@ -34,6 +88,11 @@ var hanyeah;
         (function (geom) {
             var Geom = /** @class */ (function () {
                 function Geom() {
+                    this.x = 0;
+                    this.y = 0;
+                    this.rotation = 0;
+                    this.matrix = new geom.Matrix();
+                    this.invMatrix = new geom.Matrix();
                 }
                 Geom.getSign = function (value) {
                     return value > 0 ? 1 : value < 0 ? -1 : 0;
@@ -82,6 +141,25 @@ var hanyeah;
                 Geom.prototype.containsPoint = function (p) {
                     return -1;
                 };
+                Geom.prototype.toLocal = function (p) {
+                    return this.invMatrix.transformPoint(p);
+                };
+                Geom.prototype.toGlobal = function (p) {
+                    return this.matrix.transformPoint(p);
+                };
+                Geom.prototype.setPosition = function (x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.updateTransform();
+                };
+                Geom.prototype.setRotation = function (rotation) {
+                    this.rotation = rotation;
+                    this.updateTransform();
+                };
+                Geom.prototype.updateTransform = function () {
+                    this.matrix.createBox(1, 1, this.rotation, this.x, this.y);
+                    this.invMatrix.createBox(1, 1, -this.rotation, -this.x, -this.y);
+                };
                 Geom.prototype.getIntersectResult = function (ray, t) {
                     var result = new geom.IntersectResult();
                     result.geom = this;
@@ -98,7 +176,7 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
- * Created by hanyeah on 2019/7/11.
+ * Created by hanyeah on 2019/7/15.
  */
 /// <reference path="Geom.ts"/>
 var hanyeah;
@@ -109,35 +187,68 @@ var hanyeah;
         (function (geom) {
             var Circle = /** @class */ (function (_super) {
                 __extends(Circle, _super);
-                function Circle(cp, r) {
+                function Circle(r) {
+                    var _this = _super.call(this) || this;
+                    _this.r = r;
+                    return _this;
+                }
+                Circle.prototype.clone = function () {
+                    return new Circle(this.r);
+                };
+                Circle.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var c = ray.sp.sqrLength() - this.r * this.r;
+                    var b = 2 * ray.dir.dot(ray.sp);
+                    this.getTbyAbc(result, 1, b, c);
+                    return result;
+                };
+                Circle.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var normal = p.clone();
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                Circle.prototype.containsPoint = function (p) {
+                    return geom.Geom.getSign(this.r * this.r - p.sqrLength());
+                };
+                return Circle;
+            }(geom.Geom));
+            geom.Circle = Circle;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+/// <reference path="Geom.ts"/>
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Circle2 = /** @class */ (function (_super) {
+                __extends(Circle2, _super);
+                function Circle2(cp, r) {
                     var _this = _super.call(this) || this;
                     _this.cp = cp.clone();
                     _this.r = r;
                     return _this;
                 }
-                Object.defineProperty(Circle.prototype, "r", {
-                    get: function () {
-                        return this._r;
-                    },
-                    set: function (value) {
-                        this._r = value;
-                        this.r2 = value * value;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Circle.prototype.clone = function () {
-                    return new Circle(this.cp, this.r);
+                Circle2.prototype.clone = function () {
+                    return new Circle2(this.cp, this.r);
                 };
-                Circle.prototype.intersectT = function (ray) {
+                Circle2.prototype.intersectT = function (ray) {
                     var result = [];
                     var v = geom.Point.sub(ray.sp, this.cp);
-                    var c = v.sqrLength() - this.r2;
+                    var c = v.sqrLength() - this.r * this.r;
                     var b = 2 * ray.dir.dot(v);
                     this.getTbyAbc(result, 1, b, c);
                     return result;
                 };
-                Circle.prototype.getNormal = function (p, normalize) {
+                Circle2.prototype.getNormal = function (p, normalize) {
                     if (normalize === void 0) { normalize = false; }
                     var normal = geom.Point.sub(p, this.cp);
                     if (normalize) {
@@ -145,12 +256,12 @@ var hanyeah;
                     }
                     return normal;
                 };
-                Circle.prototype.containsPoint = function (p) {
+                Circle2.prototype.containsPoint = function (p) {
                     return geom.Geom.getSign(this.r * this.r - geom.Point.sqrDistance(p, this.cp));
                 };
-                return Circle;
+                return Circle2;
             }(geom.Geom));
-            geom.Circle = Circle;
+            geom.Circle2 = Circle2;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
@@ -389,6 +500,115 @@ var hanyeah;
                 return Line2;
             }(geom.Geom));
             geom.Line2 = Line2;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Matrix = /** @class */ (function () {
+                function Matrix(a, b, c, d, tx, ty) {
+                    if (a === void 0) { a = 1.0; }
+                    if (b === void 0) { b = 0.0; }
+                    if (c === void 0) { c = 0.0; }
+                    if (d === void 0) { d = 1.0; }
+                    if (tx === void 0) { tx = 0.0; }
+                    if (ty === void 0) { ty = 0.0; }
+                    this.a = a;
+                    this.b = b;
+                    this.c = c;
+                    this.d = d;
+                    this.tx = tx;
+                    this.ty = ty;
+                }
+                Matrix.prototype.clone = function () {
+                    return new Matrix(this.a, this.b, this.c, this.d, this.tx, this.ty);
+                };
+                Matrix.prototype.setMatrix = function (m) {
+                    this.a = m.a;
+                    this.b = m.b;
+                    this.c = m.c;
+                    this.d = m.d;
+                    this.tx = m.tx;
+                    this.ty = m.ty;
+                };
+                Matrix.prototype.identity = function () {
+                    this.a = 1.0;
+                    this.b = 0.0;
+                    this.c = 0.0;
+                    this.d = 1.0;
+                    this.tx = 0.0;
+                    this.ty = 0.0;
+                };
+                Matrix.prototype.rotate = function (angle) {
+                    var sin = Math.sin(angle);
+                    var cos = Math.cos(angle);
+                    var m = new Matrix(cos, sin, -sin, cos, 0.0, 0.0);
+                    this.concat(m);
+                };
+                Matrix.prototype.scale = function (sx, sy) {
+                    var m = new Matrix(sx, 0.0, 0.0, sy, 0.0, 0.0);
+                    this.concat(m);
+                };
+                Matrix.prototype.translate = function (dx, dy) {
+                    this.tx += dx;
+                    this.ty += dy;
+                };
+                Matrix.prototype.transformPoint = function (p) {
+                    return new geom.Point(this.a * p.x + this.b * p.y + this.tx, this.c * p.x + this.d * p.y + this.ty);
+                };
+                Matrix.prototype.deltaTransformPoint = function (p) {
+                    return new geom.Point(this.a * p.x + this.b * p.y, this.c * p.x + this.d * p.y);
+                };
+                Matrix.prototype.createBox = function (sx, sy, rotation, tx, ty) {
+                    this.identity();
+                    this.rotate(rotation);
+                    this.scale(sx, sy);
+                    this.translate(tx, ty);
+                };
+                Matrix.prototype.concat = function (m) {
+                    var a0 = this.a * m.a + this.b * m.c;
+                    var b0 = this.a * m.b + this.b * m.d;
+                    var c0 = this.c * m.a + this.d * m.c;
+                    var d0 = this.c * m.b + this.d * m.d;
+                    var tx0 = this.a * m.tx + this.b * m.ty + this.tx;
+                    var ty0 = this.c * m.tx + this.d * m.ty + this.ty;
+                    this.a = a0;
+                    this.b = b0;
+                    this.c = c0;
+                    this.d = d0;
+                    this.tx = tx0;
+                    this.ty = ty0;
+                };
+                Matrix.prototype.invert = function () {
+                    var c0 = this.c / (this.b * this.c - this.a * this.d);
+                    var a0 = this.d / (this.a * this.d - this.b * this.c);
+                    var d0 = this.a / (this.a * this.d - this.b * this.c);
+                    var b0 = this.b / (this.b * this.c - this.a * this.d);
+                    var tx0 = (this.b * this.ty - this.d * this.tx) / (this.a * this.d - this.b * this.c);
+                    var ty0 = (this.a * this.ty - this.c * this.tx) / (this.b * this.c - this.a * this.d);
+                    this.a = a0;
+                    this.b = b0;
+                    this.c = c0;
+                    this.d = d0;
+                    this.tx = tx0;
+                    this.ty = ty0;
+                };
+                Matrix.prototype.toString = function () {
+                    return "( a=" + this.a + ", b=" + this.b + " ,c=" + this.c + " ,d=" + this.d + " ,tx=" + this.tx + " ,ty=" + this.ty + " )";
+                };
+                Matrix.prototype.toJsonString = function () {
+                    return "{a: " + this.a + ", b: " + this.b + ", c: " + this.c + ", d: " + this.d + ", tx: " + this.tx + ", ty: " + this.ty;
+                };
+                return Matrix;
+            }());
+            geom.Matrix = Matrix;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
@@ -664,5 +884,192 @@ var hanyeah;
             }(geom.Geom));
             geom.Segment = Segment;
         })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var Lens = /** @class */ (function () {
+                function Lens() {
+                }
+                return Lens;
+            }());
+            lens.Lens = Lens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹凹透镜
+ */
+/// <reference path="Lens.ts"/>
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var CCLens = /** @class */ (function (_super) {
+                __extends(CCLens, _super);
+                function CCLens() {
+                    return _super.call(this) || this;
+                }
+                return CCLens;
+            }(lens.Lens));
+            lens.CCLens = CCLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹平透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var CFLens = /** @class */ (function (_super) {
+                __extends(CFLens, _super);
+                function CFLens() {
+                    return _super.call(this) || this;
+                }
+                return CFLens;
+            }(lens.Lens));
+            lens.CFLens = CFLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹凸透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var CVLens = /** @class */ (function (_super) {
+                __extends(CVLens, _super);
+                function CVLens() {
+                    return _super.call(this) || this;
+                }
+                return CVLens;
+            }(lens.Lens));
+            lens.CVLens = CVLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 平凹透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var FCLens = /** @class */ (function (_super) {
+                __extends(FCLens, _super);
+                function FCLens() {
+                    return _super.call(this) || this;
+                }
+                return FCLens;
+            }(lens.Lens));
+            lens.FCLens = FCLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 平凸透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var FVLens = /** @class */ (function (_super) {
+                __extends(FVLens, _super);
+                function FVLens() {
+                    return _super.call(this) || this;
+                }
+                return FVLens;
+            }(lens.Lens));
+            lens.FVLens = FVLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凸凹透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var VCLens = /** @class */ (function (_super) {
+                __extends(VCLens, _super);
+                function VCLens() {
+                    return _super.call(this) || this;
+                }
+                return VCLens;
+            }(lens.Lens));
+            lens.VCLens = VCLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凸平透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var VFLens = /** @class */ (function (_super) {
+                __extends(VFLens, _super);
+                function VFLens() {
+                    return _super.call(this) || this;
+                }
+                return VFLens;
+            }(lens.Lens));
+            lens.VFLens = VFLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凸凸透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var VVLens = /** @class */ (function (_super) {
+                __extends(VVLens, _super);
+                function VVLens() {
+                    return _super.call(this) || this;
+                }
+                return VVLens;
+            }(lens.Lens));
+            lens.VVLens = VVLens;
+        })(lens = optical.lens || (optical.lens = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));

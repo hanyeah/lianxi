@@ -1,6 +1,7 @@
 /**
  * Created by hanyeah on 2019/7/15.
  */
+/// <reference path="Geom.ts"/>
 namespace hanyeah.optical.geom{
   export class Circle extends Geom{
     public r: number;
