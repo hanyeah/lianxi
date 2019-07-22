@@ -1,26 +1,3 @@
-/**
- * Created by hanyeah on 2019/7/17.
- */
-declare namespace hanyeah.optical {
-    import IGeom = hanyeah.optical.geom.IGeom;
-    class Example01 {
-        ctx: CanvasRenderingContext2D;
-        arr: Array<IGeom>;
-        private ray;
-        private circle;
-        private mouseP;
-        constructor(ctx: CanvasRenderingContext2D);
-        onMouseMove(e: MouseEvent): void;
-        loop(): void;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical {
-    class OpticalWorld {
-    }
-}
 declare namespace hanyeah.optical.geom {
     class Geom implements IGeom {
         x: number;
@@ -38,10 +15,61 @@ declare namespace hanyeah.optical.geom {
         containsPoint(p: Point): number;
         toLocal(p: Point): Point;
         toGlobal(p: Point): Point;
+        toLocalRay(ray: Ray): Ray;
+        toGlobalRay(ray: Ray): Ray;
         setPosition(x: number, y: number): void;
         setRotation(rotation: number): void;
         updateTransform(): void;
         protected getIntersectResult(ray: Ray, t: number): IntersectResult;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class Ray extends Geom {
+        sp: Point;
+        private _dir;
+        constructor(sp: Point, dir: Point);
+        dir: Point;
+        clone(): Ray;
+        getPoint(t: number): Point;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class Point {
+        x: number;
+        y: number;
+        static add(p1: Point, p2: Point): Point;
+        static sub(p1: Point, p2: Point): Point;
+        static dot(p1: Point, p2: Point): number;
+        static cross(p1: Point, p2: Point): number;
+        static rot90(p: Point): Point;
+        static rotNeg90(p: Point): Point;
+        static interpolate(p1: Point, p2: Point, f: number): Point;
+        static getFactor(p1: Point, p2: Point, p: Point): number;
+        static distance(p1: Point, p2: Point): number;
+        static sqrDistance(p1: Point, p2: Point): number;
+        constructor(x?: number, y?: number);
+        clone(): Point;
+        length(): number;
+        sqrLength(): number;
+        normalize(value?: number): void;
+        negate(): void;
+        multiplay(f: any): void;
+        divide(f: any): void;
+        add(p: Point): void;
+        sub(p: Point): void;
+        rot90(): void;
+        rotNeg90(): void;
+        dot(p: Point): number;
+        cross(p: Point): number;
+        setXY(x: number, y: number): void;
     }
 }
 /**
@@ -90,6 +118,45 @@ declare namespace hanyeah.optical.geom {
     }
 }
 /**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class IntersectResult {
+        static noHit: IntersectResult;
+        geom: IGeom;
+        distance: number;
+        position: Point;
+        normal: Point;
+        constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/17.
+ */
+declare namespace hanyeah.optical {
+    import IGeom = hanyeah.optical.geom.IGeom;
+    import Point = hanyeah.optical.geom.Point;
+    class Example01 {
+        ctx: CanvasRenderingContext2D;
+        arr: Array<IGeom>;
+        private ray;
+        private mouseP;
+        constructor(ctx: CanvasRenderingContext2D);
+        onMouseMove(e: MouseEvent): void;
+        loop(): void;
+        drawEllipse(ctx: CanvasRenderingContext2D, x: number, y: number, a: number, b: number, w?: number, co?: string): void;
+        drawLine(ctx: CanvasRenderingContext2D, p0: Point, p1: Point, w?: number, co?: string): void;
+        drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, w?: number, co?: string): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical {
+    class OpticalWorld {
+    }
+}
+/**
  * Created by hanyeah on 2019/7/12.
  */
 declare namespace hanyeah.optical.geom {
@@ -123,22 +190,11 @@ declare namespace hanyeah.optical.geom {
         containsPoint(p: Point): number;
         toLocal(p: Point): Point;
         toGlobal(p: Point): Point;
+        toLocalRay(ray: Ray): Ray;
+        toGlobalRay(ray: Ray): Ray;
         setPosition(x: number, y: number): any;
         setRotation(rotation: number): any;
         updateTransform(): any;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    class IntersectResult {
-        static noHit: IntersectResult;
-        geom: IGeom;
-        distance: number;
-        position: Point;
-        normal: Point;
-        constructor();
     }
 }
 declare namespace hanyeah.optical.geom {
@@ -199,55 +255,6 @@ declare namespace hanyeah.optical.geom {
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
         containsPoint(p: Point): number;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    class Point {
-        x: number;
-        y: number;
-        static add(p1: Point, p2: Point): Point;
-        static sub(p1: Point, p2: Point): Point;
-        static dot(p1: Point, p2: Point): number;
-        static cross(p1: Point, p2: Point): number;
-        static rot90(p: Point): Point;
-        static rotNeg90(p: Point): Point;
-        static interpolate(p1: Point, p2: Point, f: number): Point;
-        static getFactor(p1: Point, p2: Point, p: Point): number;
-        static distance(p1: Point, p2: Point): number;
-        static sqrDistance(p1: Point, p2: Point): number;
-        constructor(x?: number, y?: number);
-        clone(): Point;
-        length(): number;
-        sqrLength(): number;
-        normalize(value?: number): void;
-        negate(): void;
-        multiplay(f: any): void;
-        divide(f: any): void;
-        add(p: Point): void;
-        sub(p: Point): void;
-        rot90(): void;
-        rotNeg90(): void;
-        dot(p: Point): number;
-        cross(p: Point): number;
-        setXY(x: number, y: number): void;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    class Ray extends Geom {
-        sp: Point;
-        private _dir;
-        constructor(sp: Point, dir: Point);
-        dir: Point;
-        clone(): Ray;
-        getPoint(t: number): Point;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
     }
 }
 /**

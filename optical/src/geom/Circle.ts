@@ -33,5 +33,6 @@ namespace hanyeah.optical.geom{
     public containsPoint(p: Point): number{
       return Geom.getSign(this.r * this.r - p.sqrLength());
     }
+
   }
 }

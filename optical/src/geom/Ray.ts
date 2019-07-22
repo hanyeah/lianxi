@@ -1,6 +1,7 @@
 /**
  * Created by hanyeah on 2019/7/11.
  */
+/// <reference path="Geom.ts"/>
 namespace hanyeah.optical.geom {
   export class Ray extends Geom {
     public sp: Point;

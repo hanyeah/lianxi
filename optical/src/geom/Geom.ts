@@ -70,6 +70,20 @@ namespace hanyeah.optical.geom {
       return this.matrix.transformPoint(p);
     }
 
+    public toLocalRay(ray: Ray): Ray{
+      const result = ray.clone();
+      result.sp = this.invMatrix.transformPoint(result.sp);
+      result.dir = this.invMatrix.deltaTransformPoint(result.dir);
+      return result;
+    }
+
+    public toGlobalRay(ray: Ray): Ray{
+      const result = ray.clone();
+      result.sp = this.matrix.transformPoint(result.sp);
+      result.dir = this.matrix.deltaTransformPoint(result.dir);
+      return result;
+    }
+
     public setPosition(x: number, y: number) {
       this.x = x;
       this.y = y;

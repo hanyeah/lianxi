@@ -1,0 +1,13 @@
+{
+  "name": "Optical-Engine",
+  "main": "Optical.js",
+  "version": "0.0.0",
+  "description": "hanyeah's optical engine",
+  "typings": "index.d.ts",
+  "author": "hanyeah <hanlidong@yeah.net> (http://hanyeah.com)",
+  "scripts":{
+    "start": "npm run build && npm run server",
+    "build": "tsc --w",
+    "server": "live-server"
+  }
+}
