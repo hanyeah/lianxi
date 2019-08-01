@@ -5,8 +5,9 @@ namespace hanyeah.optical.geom {
 
   export class IntersectResult {
     public static noHit: IntersectResult = new IntersectResult();
-    public geom: IGeom;
-    public distance: number;
+    public shape: Shape;
+    public geom: Geom;
+    public distance: number = Infinity;
     public position: Point;
     public normal: Point;
 

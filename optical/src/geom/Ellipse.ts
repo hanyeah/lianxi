@@ -37,7 +37,7 @@ namespace hanyeah.optical.geom {
       const a: number = ray.dir.x * ray.dir.x * tb2 + ray.dir.y * ray.dir.y * ta2;
       const b: number = 2 * (ray.sp.x * ray.dir.x * tb2 + ray.sp.y * ray.dir.y * ta2);
       const c: number = ray.sp.x * ray.sp.x * tb2 + ray.sp.y * ray.sp.y * ta2 - ta2 * tb2;
-      this.getTbyAbc(result, a, b, c);
+      Geom.getTbyAbc(result, a, b, c);
       return result;
     }
 

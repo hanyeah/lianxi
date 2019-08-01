@@ -1,26 +1,74 @@
+/**
+ * Created by hanyeah on 2019/7/29.
+ */
 declare namespace hanyeah.optical.geom {
-    class Geom implements IGeom {
+    class Space {
         x: number;
         y: number;
         rotation: number;
-        private matrix;
-        private invMatrix;
+        protected invMatrix: Matrix;
+        protected gInvMatrix: Matrix;
+        constructor();
+        clone(): Space;
+        globalToLocal(p: Point): Point;
+        deltaGlobalToLocal(p: Point): Point;
+        globalRayToLocalRay(ray: Ray): Ray;
+        setPosition(x: number, y: number): void;
+        updateTransform(gInvMatrix?: Matrix): void;
+    }
+}
+declare namespace hanyeah.optical.geom {
+    /**
+     * 几何图形基类。
+     */
+    class Geom extends Space implements IGeom {
+        /**
+         * 求一元二次方程的根。
+         * @param result
+         * @param a
+         * @param b
+         * @param c
+         */
+        static getTbyAbc(result: number[], a: number, b: number, c: number): void;
         protected static getSign(value: number): number;
         constructor();
+        /**
+         * 克隆。
+         * @returns {Geom}
+         */
         clone(): Geom;
+        /**
+         * 计算和射线相交的所有点的t值，射线的表达式为r(t) = o + t*d，t>=0。
+         * @param ray
+         * @returns {Array}
+         */
         intersectT(ray: Ray): number[];
+        /**
+         * 计算与射线相交的最近的点。
+         * @param ray
+         * @returns {IntersectResult}
+         */
         intersect(ray: Ray): IntersectResult;
+        /**
+         * 获取法线
+         * @param p 图形上的点
+         * @param normalize 是否归一化，默认不归一化。
+         * @returns {Point} 法线
+         */
         getNormal(p: Point, normalize?: boolean): Point;
-        protected getTbyAbc(result: number[], a: number, b: number, c: number): void;
+        /**
+         * 点与图形的关系
+         * @param p
+         * @returns {number} 1：点在图形内，0：点在图形上，-1：点在图形外。
+         */
         containsPoint(p: Point): number;
-        toLocal(p: Point): Point;
-        toGlobal(p: Point): Point;
-        toLocalRay(ray: Ray): Ray;
-        toGlobalRay(ray: Ray): Ray;
-        setPosition(x: number, y: number): void;
-        setRotation(rotation: number): void;
-        updateTransform(): void;
-        protected getIntersectResult(ray: Ray, t: number): IntersectResult;
+        /**
+         * 封装与射线相交的结果。
+         * @param ray
+         * @param t
+         * @returns {IntersectResult}
+         */
+        getIntersectResult(ray: Ray, t: number): IntersectResult;
     }
 }
 /**
@@ -123,7 +171,8 @@ declare namespace hanyeah.optical.geom {
 declare namespace hanyeah.optical.geom {
     class IntersectResult {
         static noHit: IntersectResult;
-        geom: IGeom;
+        shape: Shape;
+        geom: Geom;
         distance: number;
         position: Point;
         normal: Point;
@@ -176,25 +225,6 @@ declare namespace hanyeah.optical.geom {
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
         containsPoint(p: Point): number;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    interface IGeom {
-        clone(): IGeom;
-        intersect(ray: Ray): IntersectResult;
-        getNormal(p: Point, normalize: boolean): Point;
-        intersectT(ray: Ray): number[];
-        containsPoint(p: Point): number;
-        toLocal(p: Point): Point;
-        toGlobal(p: Point): Point;
-        toLocalRay(ray: Ray): Ray;
-        toGlobalRay(ray: Ray): Ray;
-        setPosition(x: number, y: number): any;
-        setRotation(rotation: number): any;
-        updateTransform(): any;
     }
 }
 declare namespace hanyeah.optical.geom {
@@ -355,5 +385,30 @@ declare namespace hanyeah.optical.lens {
 declare namespace hanyeah.optical.lens {
     class VVLens extends Lens {
         constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/31.
+ */
+declare namespace hanyeah.optical.geom {
+    class Shape extends Space {
+        protected geoms: Array<Geom>;
+        constructor();
+        addGeom(geom: Geom): void;
+        removeGeom(geom: Geom): void;
+        removeAllGeoms(): void;
+        intersect(ray: Ray): IntersectResult;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    interface IGeom {
+        clone(): IGeom;
+        intersect(ray: Ray): IntersectResult;
+        getNormal(p: Point, normalize: boolean): Point;
+        intersectT(ray: Ray): number[];
+        containsPoint(p: Point): number;
     }
 }

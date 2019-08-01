@@ -22,7 +22,7 @@ namespace hanyeah.optical.geom {
       const v: Point = Point.sub(ray.sp, this.cp);
       const c: number = v.sqrLength() - this.r * this.r;
       const b: number = 2 * ray.dir.dot(v);
-      this.getTbyAbc(result, 1, b, c);
+      Geom.getTbyAbc(result, 1, b, c);
       return result;
     }
 

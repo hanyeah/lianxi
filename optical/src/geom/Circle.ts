@@ -18,7 +18,7 @@ namespace hanyeah.optical.geom{
       const result: number[] = [];
       const c: number = ray.sp.sqrLength() - this.r * this.r;
       const b: number = 2 * ray.dir.dot(ray.sp);
-      this.getTbyAbc(result, 1, b, c);
+      Geom.getTbyAbc(result, 1, b, c);
       return result;
     }
 

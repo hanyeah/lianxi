@@ -17,7 +17,7 @@ namespace hanyeah.optical.geom {
       const b: number = 2 * (ray.sp.y * ray.dir.y - this.p * ray.dir.x);
       const c: number = ray.sp.y * ray.sp.y - 2 * this.p * ray.sp.x;
       const arr: number[] = [];
-      this.getTbyAbc(arr, a, b, c);
+      Geom.getTbyAbc(arr, a, b, c);
       arr.forEach((t: number) => {
         if (ray.sp.x + ray.dir.x * t > 0) {
           result.push(t);

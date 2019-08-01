@@ -1,41 +1,18 @@
+/// <reference path="Space.ts"/>
 namespace hanyeah.optical.geom {
-  export class Geom implements IGeom {
-    public x: number = 0;
-    public y: number = 0;
-    public rotation: number = 0;
-    private matrix: Matrix = new Matrix();
-    private invMatrix: Matrix = new Matrix();
+  /**
+   * 几何图形基类。
+   */
+  export class Geom extends Space implements IGeom {
 
-    protected static getSign(value: number): number {
-      return value > 0 ? 1 : value < 0 ? -1 : 0;
-    }
-
-    constructor() {
-
-    }
-
-    public clone(): Geom {
-      return new Geom();
-    }
-
-    public intersectT(ray: Ray): number[] {
-      return [];
-    }
-
-    public intersect(ray: Ray): IntersectResult {
-      const tArr: number[] = this.intersectT(ray);
-      if (tArr.length) {
-        const t: number = tArr[0];
-        return this.getIntersectResult(ray, t);
-      }
-      return IntersectResult.noHit;
-    }
-
-    public getNormal(p: Point, normalize: boolean = false): Point {
-      return new Point();
-    }
-
-    protected getTbyAbc(result: number[], a: number, b: number, c: number) {
+    /**
+     * 求一元二次方程的根。
+     * @param result
+     * @param a
+     * @param b
+     * @param c
+     */
+    public static getTbyAbc(result: number[], a: number, b: number, c: number) {
       if (a === 0) {
         const t: number = -c / b;
         if (t > 0) {
@@ -58,49 +35,71 @@ namespace hanyeah.optical.geom {
       }
     }
 
+    protected static getSign(value: number): number {
+      return value > 0 ? 1 : value < 0 ? -1 : 0;
+    }
+
+    constructor() {
+      super();
+    }
+
+    /**
+     * 克隆。
+     * @returns {Geom}
+     */
+    public clone(): Geom {
+      return new Geom();
+    }
+
+    /**
+     * 计算和射线相交的所有点的t值，射线的表达式为r(t) = o + t*d，t>=0。
+     * @param ray
+     * @returns {Array}
+     */
+    public intersectT(ray: Ray): number[] {
+      return [];
+    }
+
+    /**
+     * 计算与射线相交的最近的点。
+     * @param ray
+     * @returns {IntersectResult}
+     */
+    public intersect(ray: Ray): IntersectResult {
+      const tArr: number[] = this.intersectT(ray);
+      if (tArr.length) {
+        const t: number = tArr[0];
+        return this.getIntersectResult(ray, t);
+      }
+      return IntersectResult.noHit;
+    }
+
+    /**
+     * 获取法线
+     * @param p 图形上的点
+     * @param normalize 是否归一化，默认不归一化。
+     * @returns {Point} 法线
+     */
+    public getNormal(p: Point, normalize: boolean = false): Point {
+      return new Point();
+    }
+
+    /**
+     * 点与图形的关系
+     * @param p
+     * @returns {number} 1：点在图形内，0：点在图形上，-1：点在图形外。
+     */
     public containsPoint(p: Point): number {
       return -1;
     }
 
-    public toLocal(p: Point): Point {
-      return this.invMatrix.transformPoint(p);
-    }
-
-    public toGlobal(p: Point): Point {
-      return this.matrix.transformPoint(p);
-    }
-
-    public toLocalRay(ray: Ray): Ray{
-      const result = ray.clone();
-      result.sp = this.invMatrix.transformPoint(result.sp);
-      result.dir = this.invMatrix.deltaTransformPoint(result.dir);
-      return result;
-    }
-
-    public toGlobalRay(ray: Ray): Ray{
-      const result = ray.clone();
-      result.sp = this.matrix.transformPoint(result.sp);
-      result.dir = this.matrix.deltaTransformPoint(result.dir);
-      return result;
-    }
-
-    public setPosition(x: number, y: number) {
-      this.x = x;
-      this.y = y;
-      this.updateTransform();
-    }
-
-    public setRotation(rotation: number) {
-      this.rotation = rotation;
-      this.updateTransform();
-    }
-
-    public updateTransform() {
-      this.matrix.createBox(1, 1, this.rotation, this.x, this.y);
-      this.invMatrix.createBox(1, 1, -this.rotation, -this.x, -this.y);
-    }
-
-    protected getIntersectResult(ray: Ray, t: number): IntersectResult {
+    /**
+     * 封装与射线相交的结果。
+     * @param ray
+     * @param t
+     * @returns {IntersectResult}
+     */
+    public getIntersectResult(ray: Ray, t: number): IntersectResult {
       const result: IntersectResult = new IntersectResult();
       result.geom = this;
       result.distance = t;

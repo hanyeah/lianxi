@@ -14,19 +14,5 @@ namespace hanyeah.optical.geom {
 
     containsPoint(p: Point): number;
 
-    toLocal(p: Point): Point;
-
-    toGlobal(p: Point): Point;
-
-    toLocalRay(ray: Ray): Ray;
-
-    toGlobalRay(ray: Ray): Ray;
-
-    setPosition(x: number, y: number);
-
-    setRotation(rotation: number);
-
-    updateTransform();
-
   }
 }
