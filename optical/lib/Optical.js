@@ -19,11 +19,13 @@ var hanyeah;
         (function (geom) {
             var Space = (function () {
                 function Space() {
+                    this.UID = 1;
                     this.x = 0;
                     this.y = 0;
                     this.rotation = 0;
                     this.invMatrix = new geom.Matrix();
                     this.gInvMatrix = new geom.Matrix();
+                    this.UID = Space.COUNTING++;
                 }
                 Space.prototype.clone = function () {
                     return new Space();
@@ -57,6 +59,7 @@ var hanyeah;
                 };
                 return Space;
             }());
+            Space.COUNTING = 1;
             geom.Space = Space;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
@@ -1016,6 +1019,52 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * Created by hanyeah on 2019/7/31.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom_1) {
+            var Shape = (function (_super) {
+                __extends(Shape, _super);
+                function Shape() {
+                    var _this = _super.call(this) || this;
+                    _this.geoms = [];
+                    return _this;
+                }
+                Shape.prototype.addGeom = function (geom) {
+                    if (this.geoms.indexOf(geom) === -1) {
+                        this.geoms.push(geom);
+                    }
+                };
+                Shape.prototype.removeGeom = function (geom) {
+                    var ind = this.geoms.indexOf(geom);
+                    if (ind !== -1) {
+                        this.geoms.splice(ind, 1);
+                    }
+                };
+                Shape.prototype.removeAllGeoms = function () {
+                    this.geoms.length = 0;
+                };
+                Shape.prototype.intersect = function (ray) {
+                    var result = geom_1.IntersectResult.noHit;
+                    this.geoms.forEach(function (geom) {
+                        var r0 = geom.intersect(ray);
+                        if (r0.distance < result.distance) {
+                            result = r0;
+                        }
+                    });
+                    return result;
+                };
+                return Shape;
+            }(geom_1.Space));
+            geom_1.Shape = Shape;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/7/15.
  */
 var hanyeah;
@@ -1024,11 +1073,17 @@ var hanyeah;
     (function (optical) {
         var lens;
         (function (lens) {
-            var Lens = (function () {
+            var Shape = hanyeah.optical.geom.Shape;
+            var Lens = (function (_super) {
+                __extends(Lens, _super);
                 function Lens() {
+                    var _this = _super.call(this) || this;
+                    _this.f = 100;
+                    _this.n = 1.5;
+                    return _this;
                 }
                 return Lens;
-            }());
+            }(Shape));
             lens.Lens = Lens;
         })(lens = optical.lens || (optical.lens = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
@@ -1191,11 +1246,33 @@ var hanyeah;
     (function (optical) {
         var lens;
         (function (lens) {
+            var Circle = hanyeah.optical.geom.Circle;
+            var IntersectResult = hanyeah.optical.geom.IntersectResult;
             var VVLens = (function (_super) {
                 __extends(VVLens, _super);
                 function VVLens() {
-                    return _super.call(this) || this;
+                    var _this = _super.call(this) || this;
+                    _this.a = 10;
+                    _this.circleL = new Circle(1);
+                    _this.circleR = new Circle(1);
+                    return _this;
                 }
+                VVLens.prototype.update = function () {
+                    var r = 2.0 * (this.n - 1.0) * this.f;
+                    if (this.a > r) {
+                        this.a = r;
+                    }
+                    this.circleL.r = r;
+                    this.circleR.r = r;
+                };
+                VVLens.prototype.intersect = function (ray) {
+                    var result = IntersectResult.noHit;
+                    var tArrL = this.circleL.intersectT(ray);
+                    var tArrR = this.circleR.intersectT(ray);
+                    while () {
+                    }
+                    return result;
+                };
                 return VVLens;
             }(lens.Lens));
             lens.VVLens = VVLens;
@@ -1203,48 +1280,22 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
- * Created by hanyeah on 2019/7/31.
+ * Created by hanyeah on 2019/8/2.
  */
 var hanyeah;
 (function (hanyeah) {
     var optical;
     (function (optical) {
         var geom;
-        (function (geom_1) {
-            var Shape = (function (_super) {
-                __extends(Shape, _super);
-                function Shape() {
-                    var _this = _super.call(this) || this;
-                    _this.geoms = [];
-                    return _this;
+        (function (geom) {
+            var SimpleIntersectResult = (function () {
+                function SimpleIntersectResult(t, UID) {
+                    this.t = t;
+                    this.UID = UID;
                 }
-                Shape.prototype.addGeom = function (geom) {
-                    if (this.geoms.indexOf(geom) === -1) {
-                        this.geoms.push(geom);
-                    }
-                };
-                Shape.prototype.removeGeom = function (geom) {
-                    var ind = this.geoms.indexOf(geom);
-                    if (ind !== -1) {
-                        this.geoms.splice(ind, 1);
-                    }
-                };
-                Shape.prototype.removeAllGeoms = function () {
-                    this.geoms.length = 0;
-                };
-                Shape.prototype.intersect = function (ray) {
-                    var result = geom_1.IntersectResult.noHit;
-                    this.geoms.forEach(function (geom) {
-                        var r0 = geom.intersect(ray);
-                        if (r0.distance < result.distance) {
-                            result = r0;
-                        }
-                    });
-                    return result;
-                };
-                return Shape;
-            }(geom_1.Space));
-            geom_1.Shape = Shape;
+                return SimpleIntersectResult;
+            }());
+            geom.SimpleIntersectResult = SimpleIntersectResult;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));

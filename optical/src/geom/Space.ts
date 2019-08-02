@@ -3,6 +3,8 @@
  */
 namespace hanyeah.optical.geom {
   export class Space {
+    private static COUNTING: number = 1;
+    public UID: number = 1;
     public x: number = 0;
     public y: number = 0;
     public rotation: number = 0;
@@ -10,7 +12,7 @@ namespace hanyeah.optical.geom {
     protected gInvMatrix: Matrix = new Matrix();
 
     constructor() {
-
+      this.UID = Space.COUNTING++;
     }
 
     public clone(): Space {

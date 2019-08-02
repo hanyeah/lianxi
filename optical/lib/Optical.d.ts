@@ -3,6 +3,8 @@
  */
 declare namespace hanyeah.optical.geom {
     class Space {
+        private static COUNTING;
+        UID: number;
         x: number;
         y: number;
         rotation: number;
@@ -227,6 +229,18 @@ declare namespace hanyeah.optical.geom {
         containsPoint(p: Point): number;
     }
 }
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    interface IGeom {
+        clone(): IGeom;
+        intersect(ray: Ray): IntersectResult;
+        getNormal(p: Point, normalize: boolean): Point;
+        intersectT(ray: Ray): number[];
+        containsPoint(p: Point): number;
+    }
+}
 declare namespace hanyeah.optical.geom {
     class Line extends Geom {
         x0: number;
@@ -301,10 +315,26 @@ declare namespace hanyeah.optical.geom {
     }
 }
 /**
+ * Created by hanyeah on 2019/7/31.
+ */
+declare namespace hanyeah.optical.geom {
+    class Shape extends Space {
+        protected geoms: Array<Geom>;
+        constructor();
+        addGeom(geom: Geom): void;
+        removeGeom(geom: Geom): void;
+        removeAllGeoms(): void;
+        intersect(ray: Ray): IntersectResult;
+    }
+}
+/**
  * Created by hanyeah on 2019/7/15.
  */
 declare namespace hanyeah.optical.lens {
-    class Lens implements ILens {
+    import Shape = hanyeah.optical.geom.Shape;
+    class Lens extends Shape implements ILens {
+        f: number;
+        n: number;
         constructor();
     }
 }
@@ -383,32 +413,24 @@ declare namespace hanyeah.optical.lens {
  * 凸凸透镜
  */
 declare namespace hanyeah.optical.lens {
+    import Ray = hanyeah.optical.geom.Ray;
+    import IntersectResult = hanyeah.optical.geom.IntersectResult;
     class VVLens extends Lens {
+        a: number;
+        private circleL;
+        private circleR;
         constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/31.
- */
-declare namespace hanyeah.optical.geom {
-    class Shape extends Space {
-        protected geoms: Array<Geom>;
-        constructor();
-        addGeom(geom: Geom): void;
-        removeGeom(geom: Geom): void;
-        removeAllGeoms(): void;
+        update(): void;
         intersect(ray: Ray): IntersectResult;
     }
 }
 /**
- * Created by hanyeah on 2019/7/11.
+ * Created by hanyeah on 2019/8/2.
  */
 declare namespace hanyeah.optical.geom {
-    interface IGeom {
-        clone(): IGeom;
-        intersect(ray: Ray): IntersectResult;
-        getNormal(p: Point, normalize: boolean): Point;
-        intersectT(ray: Ray): number[];
-        containsPoint(p: Point): number;
+    class SimpleIntersectResult {
+        t: number;
+        UID: number;
+        constructor(t: number, UID: number);
     }
 }
