@@ -35,8 +35,28 @@ namespace hanyeah.optical.geom {
       }
     }
 
-    protected static getSign(value: number): number {
+    public static getSign(value: number): number {
       return value > 0 ? 1 : value < 0 ? -1 : 0;
+    }
+
+    public static In(geom: Geom, p: Point): boolean {
+      return geom.containsPoint(p) === 1;
+    }
+
+    public static Out(geom: Geom, p: Point): boolean {
+      return geom.containsPoint(p) === -1;
+    }
+
+    public static NotIn(geom: Geom, p: Point): boolean {
+      return geom.containsPoint(p) !== 1;
+    }
+
+    public static NotOut(geom: Geom, p: Point): boolean {
+      return geom.containsPoint(p) !== -1;
+    }
+
+    public static On(geom: Geom, p: Point): boolean {
+      return geom.containsPoint(p) === 0;
     }
 
     constructor() {
@@ -61,6 +81,19 @@ namespace hanyeah.optical.geom {
     }
 
     /**
+     *  封装的intersectT。
+     * @param ray
+     */
+    public intersectSimpleResult(ray: Ray): SimpleIntersectResult[] {
+      const tArr: number[] = this.intersectT(ray);
+      const result: Array<SimpleIntersectResult> = [];
+      tArr.forEach((t: number) => {
+        result.push(new SimpleIntersectResult(t, this));
+      });
+      return result;
+    }
+
+    /**
      * 计算与射线相交的最近的点。
      * @param ray
      * @returns {IntersectResult}
@@ -72,6 +105,19 @@ namespace hanyeah.optical.geom {
         return this.getIntersectResult(ray, t);
       }
       return IntersectResult.noHit;
+    }
+
+    /**
+     * 计算所有与射线交互的点。
+     * @param ray
+     */
+    public intersects(ray: Ray): IntersectResult[] {
+      const tArr: number[] = this.intersectT(ray);
+      const result: IntersectResult[] = [];
+      tArr.forEach((t: number) => {
+        result.push(this.getIntersectResult(ray, t));
+      });
+      return result;
     }
 
     /**

@@ -1,24 +1,30 @@
 /**
  * Created by hanyeah on 2019/7/17.
  */
+
 /// <reference path="geom/Ray.ts"/>
 /// <reference path="geom/Point.ts"/>
 /// <reference path="geom/Circle.ts"/>
 /// <reference path="geom/Circle2.ts"/>
 /// <reference path="geom/Ellipse.ts"/>
 /// <reference path="geom/IntersectResult.ts"/>
-namespace hanyeah.optical{
+/// <reference path="lens/VVLens.ts"/>
+namespace hanyeah.optical {
   import IGeom = hanyeah.optical.geom.IGeom;
   import Ray = hanyeah.optical.geom.Ray;
   import Point = hanyeah.optical.geom.Point;
   import Circle = hanyeah.optical.geom.Circle;
   import IntersectResult = hanyeah.optical.geom.IntersectResult;
   import Ellipse = hanyeah.optical.geom.Ellipse;
-  export class Example01{
+  import VVLens = hanyeah.optical.lens.VVLens;
+  import Lens = hanyeah.optical.lens.Lens;
+
+  export class Example01 {
     public ctx: CanvasRenderingContext2D;
     public arr: Array<IGeom> = [];
     private ray: Ray;
     private mouseP: Point = new Point();
+    private lens: Lens;
     constructor(ctx: CanvasRenderingContext2D) {
       console.log(ctx);
       this.ctx = ctx;
@@ -26,14 +32,8 @@ namespace hanyeah.optical{
       this.ray = new Ray(new Point(100, 100), new Point(100, 100));
       this.arr.push(this.ray);
 
-      const circle = new Circle(50);
-      this.arr.push(circle);
-      circle.setPosition(400, 300);
-      const ellipse = new Ellipse(60, 30);
-      this.arr.push(ellipse);
-      ellipse.setPosition(300, 100);
-
-      console.log(circle);
+      this.lens = new VVLens();
+      this.lens.setPosition(400, 300);
 
       setInterval(this.loop.bind(this));
 
@@ -47,39 +47,16 @@ namespace hanyeah.optical{
       this.ray.dir.normalize(1);
     }
 
-    loop(){
+    loop() {
       const ctx: CanvasRenderingContext2D = this.ctx;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.canvas.style.backgroundColor = "#cccccc";
 
       // const result: IntersectResult = this.circle.intersect(this.ray);
 
-      let result: IntersectResult = IntersectResult.noHit;
-
-      this.arr.forEach((geom: IGeom) => {
-        const res = geom.intersect(geom.toLocalRay(this.ray));
-        if (res !== IntersectResult.noHit) {
-          if (result === IntersectResult.noHit || res.distance < result.distance) {
-            result = res;
-          }
-        }
-      });
+      let result: IntersectResult = this.lens.intersect(this.ray);
       const d: number = result.distance || 1000;
-
-      this.arr.forEach((geom: IGeom) => {
-        if (geom instanceof Circle) {
-          const circle: Circle = geom as Circle;
-          const p: Point = geom.toGlobal(new Point());
-          this.drawCircle(ctx, p.x, p.y, circle.r);
-        } else if (geom instanceof Ellipse) {
-          const ellipse: Ellipse = geom as Ellipse;
-          const p: Point = geom.toGlobal(new Point());
-          this.drawEllipse(ctx, p.x, p.y, ellipse.a, ellipse.b);
-        } else if (geom instanceof Ray) {
-          const ray: Ray = geom as Ray;
-          this.drawLine(ctx, ray.sp, ray.getPoint(d));
-        }
-      });
+      this.drawLine(ctx, this.ray.sp, this.ray.getPoint(d));
     }
 
     drawEllipse(ctx: CanvasRenderingContext2D, x: number, y: number, a: number, b: number, w: number = 1, co: string = "red") {

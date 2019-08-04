@@ -4,10 +4,10 @@
 namespace hanyeah.optical.geom{
   export class SimpleIntersectResult{
     public t: number;
-    public UID: number;
-    constructor(t: number, UID: number) {
+    public geom: Geom;
+    constructor(t: number, geom: Geom) {
       this.t = t;
-      this.UID = UID;
+      this.geom = geom;
     }
   }
 }

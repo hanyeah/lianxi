@@ -32,7 +32,12 @@ declare namespace hanyeah.optical.geom {
          * @param c
          */
         static getTbyAbc(result: number[], a: number, b: number, c: number): void;
-        protected static getSign(value: number): number;
+        static getSign(value: number): number;
+        static In(geom: Geom, p: Point): boolean;
+        static Out(geom: Geom, p: Point): boolean;
+        static NotIn(geom: Geom, p: Point): boolean;
+        static NotOut(geom: Geom, p: Point): boolean;
+        static On(geom: Geom, p: Point): boolean;
         constructor();
         /**
          * 克隆。
@@ -46,11 +51,21 @@ declare namespace hanyeah.optical.geom {
          */
         intersectT(ray: Ray): number[];
         /**
+         *  封装的intersectT。
+         * @param ray
+         */
+        intersectSimpleResult(ray: Ray): SimpleIntersectResult[];
+        /**
          * 计算与射线相交的最近的点。
          * @param ray
          * @returns {IntersectResult}
          */
         intersect(ray: Ray): IntersectResult;
+        /**
+         * 计算所有与射线交互的点。
+         * @param ray
+         */
+        intersects(ray: Ray): IntersectResult[];
         /**
          * 获取法线
          * @param p 图形上的点
@@ -182,6 +197,46 @@ declare namespace hanyeah.optical.geom {
     }
 }
 /**
+ * Created by hanyeah on 2019/7/31.
+ */
+declare namespace hanyeah.optical.geom {
+    class Shape extends Space {
+        protected geoms: Array<Geom>;
+        constructor();
+        addGeom(geom: Geom): void;
+        removeGeom(geom: Geom): void;
+        removeAllGeoms(): void;
+        intersect(ray: Ray): IntersectResult;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ */
+declare namespace hanyeah.optical.lens {
+    import Shape = hanyeah.optical.geom.Shape;
+    class Lens extends Shape implements ILens {
+        f: number;
+        n: number;
+        constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凸凸透镜
+ */
+declare namespace hanyeah.optical.lens {
+    import Ray = hanyeah.optical.geom.Ray;
+    import IntersectResult = hanyeah.optical.geom.IntersectResult;
+    class VVLens extends Lens {
+        a: number;
+        private circleL;
+        private circleR;
+        constructor();
+        update(): void;
+        intersect(ray: Ray): IntersectResult;
+    }
+}
+/**
  * Created by hanyeah on 2019/7/17.
  */
 declare namespace hanyeah.optical {
@@ -192,6 +247,7 @@ declare namespace hanyeah.optical {
         arr: Array<IGeom>;
         private ray;
         private mouseP;
+        private lens;
         constructor(ctx: CanvasRenderingContext2D);
         onMouseMove(e: MouseEvent): void;
         loop(): void;
@@ -315,27 +371,13 @@ declare namespace hanyeah.optical.geom {
     }
 }
 /**
- * Created by hanyeah on 2019/7/31.
+ * Created by hanyeah on 2019/8/2.
  */
 declare namespace hanyeah.optical.geom {
-    class Shape extends Space {
-        protected geoms: Array<Geom>;
-        constructor();
-        addGeom(geom: Geom): void;
-        removeGeom(geom: Geom): void;
-        removeAllGeoms(): void;
-        intersect(ray: Ray): IntersectResult;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- */
-declare namespace hanyeah.optical.lens {
-    import Shape = hanyeah.optical.geom.Shape;
-    class Lens extends Shape implements ILens {
-        f: number;
-        n: number;
-        constructor();
+    class SimpleIntersectResult {
+        t: number;
+        geom: Geom;
+        constructor(t: number, geom: Geom);
     }
 }
 /**
@@ -406,31 +448,5 @@ declare namespace hanyeah.optical.lens {
 declare namespace hanyeah.optical.lens {
     class VFLens extends Lens {
         constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 凸凸透镜
- */
-declare namespace hanyeah.optical.lens {
-    import Ray = hanyeah.optical.geom.Ray;
-    import IntersectResult = hanyeah.optical.geom.IntersectResult;
-    class VVLens extends Lens {
-        a: number;
-        private circleL;
-        private circleR;
-        constructor();
-        update(): void;
-        intersect(ray: Ray): IntersectResult;
-    }
-}
-/**
- * Created by hanyeah on 2019/8/2.
- */
-declare namespace hanyeah.optical.geom {
-    class SimpleIntersectResult {
-        t: number;
-        UID: number;
-        constructor(t: number, UID: number);
     }
 }
