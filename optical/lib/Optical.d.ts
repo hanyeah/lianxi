@@ -18,6 +18,9 @@ declare namespace hanyeah.optical.geom {
         globalToLocal(p: Point): Point;
         deltaGlobalToLocal(p: Point): Point;
         globalRayToLocalRay(ray: Ray): Ray;
+        globalToLocal2(p: Point, lp: Point): void;
+        deltaGlobalToLocal2(p: Point, lp: Point): void;
+        globalRayToLocalRay2(ray: Ray, localRay: Ray): void;
         localToGlobal(p: Point): Point;
         deltaLocalToGlobal(p: Point): Point;
         localRayToGlobal(ray: Ray): Ray;
@@ -61,6 +64,7 @@ declare namespace hanyeah.optical.geom {
          * @param ray
          */
         intersectSimpleResult(ray: Ray): SimpleIntersectResult[];
+        intersectSimpleResult2(ray: Ray, arr: SimpleIntersectResult[]): void;
         /**
          * 计算与射线相交的最近的点。
          * @param ray
@@ -248,6 +252,9 @@ declare namespace hanyeah.optical.lens {
     class VVLens extends Lens {
         circleL: Circle;
         circleR: Circle;
+        private rayL;
+        private rayR;
+        private arr;
         constructor();
         update(): void;
         intersect(ray: Ray): IntersectResult;
@@ -376,7 +383,9 @@ declare namespace hanyeah.optical.geom {
         scale(sx: number, sy: number): void;
         translate(dx: number, dy: number): void;
         transformPoint(p: Point): Point;
+        transformPoint2(p: Point, p2: Point): void;
         deltaTransformPoint(p: Point): Point;
+        deltaTransformPoint2(p: Point, p2: Point): void;
         createBox(sx: number, sy: number, rotation: number, tx: number, ty: number): void;
         concat(m: Matrix): void;
         invert(): void;

@@ -93,6 +93,13 @@ namespace hanyeah.optical.geom {
       return result;
     }
 
+    public intersectSimpleResult2(ray: Ray, arr: SimpleIntersectResult[]): void {
+      const tArr: number[] = this.intersectT(ray);
+      tArr.forEach((t: number) => {
+        arr.push(new SimpleIntersectResult(t, this));
+      });
+    }
+
     /**
      * 计算与射线相交的最近的点。
      * @param ray

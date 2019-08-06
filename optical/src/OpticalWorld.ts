@@ -45,12 +45,15 @@ namespace hanyeah.optical{
      */
     public rayCast(ray: Ray): IntersectResult {
       let result: IntersectResult = IntersectResult.noHit;
-      this.shapes.forEach((shape: Shape) => {
+      const len: number = this.shapes.length;
+      let shape: Shape;
+      for(let i = 0; i < len; i++ ) {
+        shape = this.shapes[i];
         const r0: IntersectResult = shape.intersect(ray);
         if (r0.distance < result.distance) {
           result = r0;
         }
-      });
+      }
       return result;
     }
 

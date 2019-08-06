@@ -46,6 +46,16 @@ var hanyeah;
                     result.dir = this.deltaGlobalToLocal(result.dir);
                     return result;
                 };
+                Space.prototype.globalToLocal2 = function (p, lp) {
+                    this.gInvMatrix.transformPoint2(p, lp);
+                };
+                Space.prototype.deltaGlobalToLocal2 = function (p, lp) {
+                    this.gInvMatrix.deltaTransformPoint2(p, lp);
+                };
+                Space.prototype.globalRayToLocalRay2 = function (ray, localRay) {
+                    this.gInvMatrix.transformPoint2(ray.sp, localRay.sp);
+                    this.gInvMatrix.deltaTransformPoint2(ray.dir, localRay.dir);
+                };
                 Space.prototype.localToGlobal = function (p) {
                     return this.gMatrix.transformPoint(p);
                 };
@@ -170,6 +180,13 @@ var hanyeah;
                         result.push(new geom_1.SimpleIntersectResult(t, _this));
                     });
                     return result;
+                };
+                Geom.prototype.intersectSimpleResult2 = function (ray, arr) {
+                    var _this = this;
+                    var tArr = this.intersectT(ray);
+                    tArr.forEach(function (t) {
+                        arr.push(new geom_1.SimpleIntersectResult(t, _this));
+                    });
                 };
                 /**
                  * 计算与射线相交的最近的点。
@@ -696,12 +713,17 @@ var hanyeah;
         var lens;
         (function (lens) {
             var Circle = hanyeah.optical.geom.Circle;
+            var Ray = hanyeah.optical.geom.Ray;
             var IntersectResult = hanyeah.optical.geom.IntersectResult;
             var Geom = hanyeah.optical.geom.Geom;
+            var Point = hanyeah.optical.geom.Point;
             var VVLens = (function (_super) {
                 __extends(VVLens, _super);
                 function VVLens() {
                     var _this = _super.call(this) || this;
+                    _this.rayL = new Ray(new Point(1, 0), new Point(1, 0));
+                    _this.rayR = new Ray(new Point(1, 0), new Point(1, 0));
+                    _this.arr = [];
                     _this.circleL = new Circle(30);
                     _this.circleR = new Circle(30);
                     _this.circleL.x = -5;
@@ -717,25 +739,36 @@ var hanyeah;
                 };
                 VVLens.prototype.intersect = function (ray) {
                     var result = IntersectResult.noHit;
-                    var rayL = this.circleL.globalRayToLocalRay(ray);
-                    var rayR = this.circleR.globalRayToLocalRay(ray);
-                    var arrL = this.circleL.intersectSimpleResult(rayL);
-                    var arrR = this.circleR.intersectSimpleResult(rayR);
-                    var arr = arrL.concat(arrR);
-                    arr.sort(function (a, b) {
+                    this.circleL.globalRayToLocalRay2(ray, this.rayL);
+                    this.circleR.globalRayToLocalRay2(ray, this.rayR);
+                    this.circleL.intersectSimpleResult2(this.rayL, this.arr);
+                    this.circleR.intersectSimpleResult2(this.rayR, this.arr);
+                    this.arr.sort(function (a, b) {
                         return a.t - b.t;
                     });
-                    for (var i = 0; i < arr.length; i++) {
-                        var r = arr[i];
-                        if (r.geom === this.circleL && Geom.In(this.circleR, rayR.getPoint(r.t))) {
-                            result = this.circleR.getGlobalIntersectResult(ray, rayL, r.t);
+                    var len = this.arr.length;
+                    var temp;
+                    for (var j = 1; j < len; j++) {
+                        var i = j;
+                        temp = this.arr[j];
+                        while (i > 0) {
+                            this.arr[i + 1] = this.arr[i];
+                            i--;
+                        }
+                    }
+                    var r;
+                    for (var i = 0; i < len; i++) {
+                        r = this.arr[i];
+                        if (r.geom === this.circleL && Geom.In(this.circleR, this.rayR.getPoint(r.t))) {
+                            result = this.circleR.getGlobalIntersectResult(ray, this.rayL, r.t);
                             break;
                         }
-                        else if (r.geom === this.circleR && Geom.In(this.circleL, rayL.getPoint(r.t))) {
-                            result = this.circleL.getGlobalIntersectResult(ray, rayR, r.t);
+                        else if (r.geom === this.circleR && Geom.In(this.circleL, this.rayL.getPoint(r.t))) {
+                            result = this.circleL.getGlobalIntersectResult(ray, this.rayR, r.t);
                             break;
                         }
                     }
+                    this.arr = [];
                     return result;
                 };
                 return VVLens;
@@ -905,12 +938,15 @@ var hanyeah;
              */
             OpticalWorld.prototype.rayCast = function (ray) {
                 var result = IntersectResult.noHit;
-                this.shapes.forEach(function (shape) {
+                var len = this.shapes.length;
+                var shape;
+                for (var i = 0; i < len; i++) {
+                    shape = this.shapes[i];
                     var r0 = shape.intersect(ray);
                     if (r0.distance < result.distance) {
                         result = r0;
                     }
-                });
+                }
                 return result;
             };
             /**
@@ -1150,8 +1186,16 @@ var hanyeah;
                 Matrix.prototype.transformPoint = function (p) {
                     return new geom.Point(this.a * p.x + this.b * p.y + this.tx, this.c * p.x + this.d * p.y + this.ty);
                 };
+                Matrix.prototype.transformPoint2 = function (p, p2) {
+                    p2.x = this.a * p.x + this.b * p.y + this.tx;
+                    p2.y = this.c * p.x + this.d * p.y + this.ty;
+                };
                 Matrix.prototype.deltaTransformPoint = function (p) {
                     return new geom.Point(this.a * p.x + this.b * p.y, this.c * p.x + this.d * p.y);
+                };
+                Matrix.prototype.deltaTransformPoint2 = function (p, p2) {
+                    p2.x = this.a * p.x + this.b * p.y;
+                    p2.y = this.c * p.x + this.d * p.y;
                 };
                 Matrix.prototype.createBox = function (sx, sy, rotation, tx, ty) {
                     this.identity();

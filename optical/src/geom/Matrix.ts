@@ -62,8 +62,18 @@ namespace hanyeah.optical.geom {
       return new Point(this.a * p.x + this.b * p.y + this.tx, this.c * p.x + this.d * p.y + this.ty);
     }
 
+    public transformPoint2(p: Point, p2: Point): void {
+      p2.x = this.a * p.x + this.b * p.y + this.tx;
+      p2.y = this.c * p.x + this.d * p.y + this.ty;
+    }
+
     public deltaTransformPoint(p: Point): Point {
       return new Point(this.a * p.x + this.b * p.y, this.c * p.x + this.d * p.y);
+    }
+
+    public deltaTransformPoint2(p: Point, p2: Point): void {
+      p2.x = this.a * p.x + this.b * p.y;
+      p2.y = this.c * p.x + this.d * p.y;
     }
 
     public createBox(sx: number, sy: number, rotation: number, tx: number, ty: number) {

@@ -40,6 +40,19 @@ namespace hanyeah.optical.geom {
       return result;
     }
 
+    public globalToLocal2(p: Point, lp: Point): void {
+      this.gInvMatrix.transformPoint2(p, lp);
+    }
+
+    public deltaGlobalToLocal2(p: Point, lp: Point): void {
+      this.gInvMatrix.deltaTransformPoint2(p, lp);
+    }
+
+    public globalRayToLocalRay2(ray: Ray, localRay: Ray): void {
+      this.gInvMatrix.transformPoint2(ray.sp, localRay.sp);
+      this.gInvMatrix.deltaTransformPoint2(ray.dir, localRay.dir);
+    }
+
     public localToGlobal(p: Point): Point {
       return this.gMatrix.transformPoint(p);
     }

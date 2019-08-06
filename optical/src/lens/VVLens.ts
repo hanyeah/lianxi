@@ -9,9 +9,13 @@ namespace hanyeah.optical.lens {
   import IntersectResult = hanyeah.optical.geom.IntersectResult;
   import SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
   import Geom = hanyeah.optical.geom.Geom;
+  import Point = hanyeah.optical.geom.Point;
   export class VVLens extends Lens {
     public circleL: Circle;
     public circleR: Circle;
+    private rayL: Ray = new Ray(new Point(1, 0), new Point(1, 0));
+    private rayR: Ray = new Ray(new Point(1, 0), new Point(1, 0));
+    private arr: SimpleIntersectResult[] = [];
 
     constructor() {
       super();
@@ -31,24 +35,38 @@ namespace hanyeah.optical.lens {
 
     public intersect(ray: Ray): IntersectResult{
       let result: IntersectResult = IntersectResult.noHit;
-      const rayL: Ray = this.circleL.globalRayToLocalRay(ray);
-      const rayR: Ray = this.circleR.globalRayToLocalRay(ray);
-      const arrL: SimpleIntersectResult[] = this.circleL.intersectSimpleResult(rayL);
-      const arrR: SimpleIntersectResult[] = this.circleR.intersectSimpleResult(rayR);
-      const arr: SimpleIntersectResult[] = arrL.concat(arrR);
-      arr.sort((a: SimpleIntersectResult, b: SimpleIntersectResult) => {
+      this.circleL.globalRayToLocalRay2(ray, this.rayL);
+      this.circleR.globalRayToLocalRay2(ray, this.rayR);
+      this.circleL.intersectSimpleResult2(this.rayL, this.arr);
+      this.circleR.intersectSimpleResult2(this.rayR, this.arr);
+
+
+      this.arr.sort((a: SimpleIntersectResult, b: SimpleIntersectResult) => {
         return a.t - b.t;
       });
-      for (let i = 0; i < arr.length; i++) {
-        const r: SimpleIntersectResult = arr[i];
-        if (r.geom === this.circleL && Geom.In(this.circleR, rayR.getPoint(r.t))) {
-          result = this.circleR.getGlobalIntersectResult(ray, rayL, r.t);
+      const len: number = this.arr.length;
+      let temp: SimpleIntersectResult;
+      for(let j: number = 1; j < len; j++) {
+        let i: number = j;
+        temp = this.arr[j];
+        while(i > 0) {
+          this.arr[i + 1] = this.arr[i];
+          i--;
+        }
+      }
+
+      let r: SimpleIntersectResult;
+      for (let i: number = 0; i < len; i++) {
+        r = this.arr[i];
+        if (r.geom === this.circleL && Geom.In(this.circleR, this.rayR.getPoint(r.t))) {
+          result = this.circleR.getGlobalIntersectResult(ray, this.rayL, r.t);
           break;
-        } else if (r.geom === this.circleR && Geom.In(this.circleL, rayL.getPoint(r.t))) {
-          result = this.circleL.getGlobalIntersectResult(ray, rayR, r.t);
+        } else if (r.geom === this.circleR && Geom.In(this.circleL, this.rayL.getPoint(r.t))) {
+          result = this.circleL.getGlobalIntersectResult(ray, this.rayR, r.t);
           break;
         }
       }
+      this.arr = [];
       return result;
     }
 
