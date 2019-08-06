@@ -3,12 +3,12 @@
  */
 /// <reference path="Geom.ts"/>
 namespace hanyeah.optical.geom {
-  export class Ray extends Geom {
+  export class Ray {
     public sp: Point;
+    public distance: number;
     private _dir: Point;
 
     constructor(sp: Point, dir: Point) {
-      super();
       this.sp = sp.clone();
       this.dir = dir;
     }

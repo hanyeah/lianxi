@@ -8,6 +8,10 @@ namespace hanyeah.optical.geom{
       super();
     }
 
+    public destroy() {
+      super.destroy();
+    }
+
     public addGeom(geom: Geom): void{
       if (this.geoms.indexOf(geom) === -1) {
         this.geoms.push(geom);
@@ -34,6 +38,13 @@ namespace hanyeah.optical.geom{
         }
       });
       return result;
+    }
+
+    public updateTransform(gMatrix: Matrix = null) {
+      super.updateTransform(gMatrix);
+      this.geoms.forEach((geom: Geom) => {
+        geom.updateTransform(this.gMatrix);
+      });
     }
 
   }

@@ -18,22 +18,29 @@ namespace hanyeah.optical {
   import Ellipse = hanyeah.optical.geom.Ellipse;
   import VVLens = hanyeah.optical.lens.VVLens;
   import Lens = hanyeah.optical.lens.Lens;
+  import Shape = hanyeah.optical.geom.Shape;
 
   export class Example01 {
     public ctx: CanvasRenderingContext2D;
-    public arr: Array<IGeom> = [];
-    private ray: Ray;
     private mouseP: Point = new Point();
-    private lens: Lens;
+    private world: OpticalWorld = new OpticalWorld();
     constructor(ctx: CanvasRenderingContext2D) {
       console.log(ctx);
       this.ctx = ctx;
 
-      this.ray = new Ray(new Point(100, 100), new Point(100, 100));
-      this.arr.push(this.ray);
+      for (let i: number = 0; i < 100; i++) {
+        const ang: number = Math.PI * i / 50;
+        const ray: Ray = new Ray(new Point(400 + 200 * Math.cos(ang), 300 + 200 * Math.sin(ang)), new Point(100, 100));
+        this.world.addRay(ray);
+      }
 
-      this.lens = new VVLens();
-      this.lens.setPosition(400, 300);
+      for(let i: number = 0; i < 100; i++) {
+        const ang: number = Math.PI * i / 50;
+        const vvlens: VVLens = new VVLens();
+        vvlens.setPosition(400 + 100 * Math.cos(ang), 300 + 100 * Math.sin(ang));
+        vvlens.updateTransform();
+        this.world.addShape(vvlens);
+      }
 
       setInterval(this.loop.bind(this));
 
@@ -43,8 +50,10 @@ namespace hanyeah.optical {
     onMouseMove(e: MouseEvent) {
       this.mouseP.x = e.clientX;
       this.mouseP.y = e.clientY;
-      this.ray.dir.setXY(this.mouseP.x - this.ray.sp.x, this.mouseP.y - this.ray.sp.y);
-      this.ray.dir.normalize(1);
+      this.world.rays.forEach((ray: Ray) => {
+        ray.dir.setXY(this.mouseP.x - ray.sp.x, this.mouseP.y - ray.sp.y);
+        ray.dir.normalize(1);
+      });
     }
 
     loop() {
@@ -53,10 +62,39 @@ namespace hanyeah.optical {
       ctx.canvas.style.backgroundColor = "#cccccc";
 
       // const result: IntersectResult = this.circle.intersect(this.ray);
+      // console.time("计算用时：");
+      this.world.rays.forEach((ray: Ray) => {
+        let result: IntersectResult = this.world.rayCast(ray);
+        const d: number = result.distance === Infinity ?  1000 : result.distance;
+        ray.distance = d;
+      });
+      // console.timeEnd("计算用时：");
 
-      let result: IntersectResult = this.lens.intersect(this.ray);
-      const d: number = result.distance || 1000;
-      this.drawLine(ctx, this.ray.sp, this.ray.getPoint(d));
+      // console.time("渲染用时：");
+      this.world.rays.forEach((ray: Ray) => {
+        this.drawLine(ctx, ray.sp, ray.getPoint(ray.distance));
+      });
+
+      this.world.shapes.forEach((shape: Shape) => {
+        if (shape instanceof VVLens) {
+          // a
+          const vvlens: VVLens = shape as VVLens;
+          ctx.save();
+          ctx.rotate(vvlens.rotation);
+          ctx.translate(vvlens.x, vvlens.y);
+
+          ctx.beginPath();
+          ctx.fillStyle = "red";
+          ctx.arc(vvlens.circleL.x, vvlens.circleL.y, vvlens.circleL.r, 0, 2 * Math.PI);
+          ctx.clip('nonzero'); // 'nonzero', 'evenodd'
+          ctx.arc(vvlens.circleR.x, vvlens.circleR.y, vvlens.circleR.r, 0, 2 * Math.PI);
+          ctx.stroke(); // 用于绘制线条
+          ctx.closePath();
+
+          ctx.restore();
+        }
+      });
+      // console.timeEnd("渲染用时：");
     }
 
     drawEllipse(ctx: CanvasRenderingContext2D, x: number, y: number, a: number, b: number, w: number = 1, co: string = "red") {

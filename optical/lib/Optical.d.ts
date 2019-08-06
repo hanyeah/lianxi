@@ -8,15 +8,21 @@ declare namespace hanyeah.optical.geom {
         x: number;
         y: number;
         rotation: number;
+        protected matrix: Matrix;
         protected invMatrix: Matrix;
+        protected gMatrix: Matrix;
         protected gInvMatrix: Matrix;
         constructor();
+        destroy(): void;
         clone(): Space;
         globalToLocal(p: Point): Point;
         deltaGlobalToLocal(p: Point): Point;
         globalRayToLocalRay(ray: Ray): Ray;
+        localToGlobal(p: Point): Point;
+        deltaLocalToGlobal(p: Point): Point;
+        localRayToGlobal(ray: Ray): Ray;
         setPosition(x: number, y: number): void;
-        updateTransform(gInvMatrix?: Matrix): void;
+        updateTransform(gMatrix?: Matrix): void;
     }
 }
 declare namespace hanyeah.optical.geom {
@@ -86,14 +92,23 @@ declare namespace hanyeah.optical.geom {
          * @returns {IntersectResult}
          */
         getIntersectResult(ray: Ray, t: number): IntersectResult;
+        /**
+         * 封装与射线相交的结果，转换到全局坐标。
+         * @param ray
+         * @param lacalRay
+         * @param t
+         * @returns {IntersectResult}
+         */
+        getGlobalIntersectResult(ray: Ray, lacalRay: Ray, t: number): IntersectResult;
     }
 }
 /**
  * Created by hanyeah on 2019/7/11.
  */
 declare namespace hanyeah.optical.geom {
-    class Ray extends Geom {
+    class Ray {
         sp: Point;
+        distance: number;
         private _dir;
         constructor(sp: Point, dir: Point);
         dir: Point;
@@ -203,10 +218,12 @@ declare namespace hanyeah.optical.geom {
     class Shape extends Space {
         protected geoms: Array<Geom>;
         constructor();
+        destroy(): void;
         addGeom(geom: Geom): void;
         removeGeom(geom: Geom): void;
         removeAllGeoms(): void;
         intersect(ray: Ray): IntersectResult;
+        updateTransform(gMatrix?: Matrix): void;
     }
 }
 /**
@@ -225,12 +242,12 @@ declare namespace hanyeah.optical.lens {
  * 凸凸透镜
  */
 declare namespace hanyeah.optical.lens {
+    import Circle = hanyeah.optical.geom.Circle;
     import Ray = hanyeah.optical.geom.Ray;
     import IntersectResult = hanyeah.optical.geom.IntersectResult;
     class VVLens extends Lens {
-        a: number;
-        private circleL;
-        private circleR;
+        circleL: Circle;
+        circleR: Circle;
         constructor();
         update(): void;
         intersect(ray: Ray): IntersectResult;
@@ -240,14 +257,11 @@ declare namespace hanyeah.optical.lens {
  * Created by hanyeah on 2019/7/17.
  */
 declare namespace hanyeah.optical {
-    import IGeom = hanyeah.optical.geom.IGeom;
     import Point = hanyeah.optical.geom.Point;
     class Example01 {
         ctx: CanvasRenderingContext2D;
-        arr: Array<IGeom>;
-        private ray;
         private mouseP;
-        private lens;
+        private world;
         constructor(ctx: CanvasRenderingContext2D);
         onMouseMove(e: MouseEvent): void;
         loop(): void;
@@ -260,7 +274,30 @@ declare namespace hanyeah.optical {
  * Created by hanyeah on 2019/7/11.
  */
 declare namespace hanyeah.optical {
+    import Shape = hanyeah.optical.geom.Shape;
+    import IntersectResult = hanyeah.optical.geom.IntersectResult;
+    import Ray = hanyeah.optical.geom.Ray;
     class OpticalWorld {
+        shapes: Array<Shape>;
+        rays: Array<Ray>;
+        constructor();
+        addShape(shape: Shape): void;
+        removeShape(shape: Shape): void;
+        addRay(ray: Ray): void;
+        removeRay(ray: Ray): void;
+        /**
+         * 获取与光线碰撞的结果。
+         * @param ray
+         * @returns {IntersectResult}
+         */
+        rayCast(ray: Ray): IntersectResult;
+        /**
+         * 获取所有与光线碰撞的结果。
+         * @param ray
+         * @param sort
+         * @returns {IntersectResult[]}
+         */
+        rayMultiCast(ray: Ray, sort?: boolean): IntersectResult[];
     }
 }
 /**

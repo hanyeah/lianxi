@@ -155,5 +155,25 @@ namespace hanyeah.optical.geom {
       return result;
     }
 
+    /**
+     * 封装与射线相交的结果，转换到全局坐标。
+     * @param ray
+     * @param lacalRay
+     * @param t
+     * @returns {IntersectResult}
+     */
+    public getGlobalIntersectResult(ray: Ray, lacalRay: Ray, t: number): IntersectResult {
+      const result: IntersectResult = new IntersectResult();
+      result.geom = this;
+      result.distance = t;
+      result.position = ray.getPoint(result.distance);
+
+      const normal: Point = this.getNormal(lacalRay.getPoint(result.distance));
+      normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
+      result.normal = this.deltaLocalToGlobal(normal);
+
+      return result;
+    }
+
   }
 }
