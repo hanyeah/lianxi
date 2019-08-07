@@ -1,9 +1,10 @@
 /**
  * Created by hanyeah on 2019/7/31.
  */
-namespace hanyeah.optical.geom{
-  export class Shape extends Space{
+namespace hanyeah.optical.geom {
+  export class Shape extends Space {
     protected geoms: Array<Geom> = [];
+
     constructor() {
       super();
     }
@@ -12,7 +13,7 @@ namespace hanyeah.optical.geom{
       super.destroy();
     }
 
-    public addGeom(geom: Geom): void{
+    public addGeom(geom: Geom): void {
       if (this.geoms.indexOf(geom) === -1) {
         this.geoms.push(geom);
       }
@@ -29,7 +30,7 @@ namespace hanyeah.optical.geom{
       this.geoms.length = 0;
     }
 
-    public intersect(ray: Ray): IntersectResult{
+    public intersect(ray: Ray): IntersectResult {
       let result: IntersectResult = IntersectResult.noHit;
       this.geoms.forEach((geom: Geom) => {
         const r0: IntersectResult = geom.intersect(ray);
@@ -38,6 +39,23 @@ namespace hanyeah.optical.geom{
         }
       });
       return result;
+    }
+
+    public intersect2(ray: Ray, result: SimpleIntersectResult): void {
+      const len: number = this.geoms.length;
+      let geom: Geom;
+      let tArr: number[] = [];
+      for (let i: number = 0; i < len; i++) {
+        geom = this.geoms[i];
+        tArr = geom.intersectT(ray);
+        for (let j: number = 0; j < tArr.length; j++) {
+          if (tArr[i] < result.t) {
+            result.t = tArr[i];
+            result.geom = geom;
+            result.shape = this;
+          }
+        }
+      }
     }
 
     public updateTransform(gMatrix: Matrix = null) {

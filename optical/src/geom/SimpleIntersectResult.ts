@@ -6,10 +6,12 @@ namespace hanyeah.optical.geom{
     public t: number;
     public geom: Geom;
     public shape: Shape;
-    constructor(t: number, geom: Geom, shape: Shape = void 0) {
+    public localRay: Ray;
+    constructor(t: number = Infinity, geom: Geom = void 0, shape: Shape = void 0, localRay: Ray = void 0) {
       this.t = t;
       this.geom = geom;
       this.shape = shape;
+      this.localRay = localRay;
     }
   }
 }

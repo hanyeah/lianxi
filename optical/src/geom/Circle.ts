@@ -4,7 +4,22 @@
 /// <reference path="Geom.ts"/>
 namespace hanyeah.optical.geom{
   export class Circle extends Geom{
-    public r: number;
+    public _r: number;
+    private _r2: number;
+
+    public get r(): number {
+      return this._r;
+    }
+
+    public set r(v: number) {
+      this._r = v;
+      this._r2 = v * v;
+    }
+
+    public get r2(): number{
+      return this._r2;
+    }
+
     constructor(r: number) {
       super();
       this.r = r;
@@ -16,7 +31,7 @@ namespace hanyeah.optical.geom{
 
     public intersectT(ray: Ray): number[] {
       const result: number[] = [];
-      const c: number = ray.sp.sqrLength() - this.r * this.r;
+      const c: number = ray.sp.sqrLength() - this.r2;
       const b: number = 2 * ray.dir.dot(ray.sp);
       Geom.getTbyAbc(result, 1, b, c);
       return result;
@@ -31,7 +46,7 @@ namespace hanyeah.optical.geom{
     }
 
     public containsPoint(p: Point): number{
-      return Geom.getSign(this.r * this.r - p.sqrLength());
+      return Geom.getSign(this.r2 - p.sqrLength());
     }
 
   }

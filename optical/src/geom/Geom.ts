@@ -13,23 +13,33 @@ namespace hanyeah.optical.geom {
      * @param c
      */
     public static getTbyAbc(result: number[], a: number, b: number, c: number) {
+      let n = 0;
+      let t: number;
       if (a === 0) {
-        const t: number = -c / b;
+        t = -c / b;
         if (t > 0) {
-          result.push(t);
+          result[n] = t;
+          n++;
+          // result.push(t);
         }
       } else {
         const delta: number = b * b - 4 * a * c;
         if (delta >= 0) {
-          const a2: number = 2 * a;
+          a = 1 / (2 * a);
           const sqrDelta: number = Math.sqrt(delta);
-          const t1: number = (-b - sqrDelta) / a2;
-          if (t1 > 0) {
-            result.push(t1);
+          const sa: number = sqrDelta * a;
+          const ba: number = - b * a;
+          t = ba - sa; // (-b - sqrDelta) * a;
+          if (t > 0) {
+            result[n] = t;
+            n++;
+            // result.push(t);
           }
-          const t2: number = (-b + sqrDelta) / a2;
-          if (t2 > 0) {
-            result.push(t2);
+          t = ba + sa ; // (-b + sqrDelta) * a;
+          if (t > 0) {
+            result[n] = t;
+            n++;
+            // result.push(t);
           }
         }
       }

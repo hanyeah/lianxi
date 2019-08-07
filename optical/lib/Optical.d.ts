@@ -163,7 +163,10 @@ declare namespace hanyeah.optical.geom {
  */
 declare namespace hanyeah.optical.geom {
     class Circle extends Geom {
+        _r: number;
+        private _r2;
         r: number;
+        readonly r2: number;
         constructor(r: number);
         clone(): Circle;
         intersectT(ray: Ray): number[];
@@ -229,6 +232,7 @@ declare namespace hanyeah.optical.geom {
         removeGeom(geom: Geom): void;
         removeAllGeoms(): void;
         intersect(ray: Ray): IntersectResult;
+        intersect2(ray: Ray, result: SimpleIntersectResult): void;
         updateTransform(gMatrix?: Matrix): void;
     }
 }
@@ -244,6 +248,18 @@ declare namespace hanyeah.optical.lens {
     }
 }
 /**
+ * Created by hanyeah on 2019/8/2.
+ */
+declare namespace hanyeah.optical.geom {
+    class SimpleIntersectResult {
+        t: number;
+        geom: Geom;
+        shape: Shape;
+        localRay: Ray;
+        constructor(t?: number, geom?: Geom, shape?: Shape, localRay?: Ray);
+    }
+}
+/**
  * Created by hanyeah on 2019/7/15.
  * 凸凸透镜
  */
@@ -251,19 +267,21 @@ declare namespace hanyeah.optical.lens {
     import Circle = hanyeah.optical.geom.Circle;
     import Ray = hanyeah.optical.geom.Ray;
     import IntersectResult = hanyeah.optical.geom.IntersectResult;
+    import SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
     class VVLens extends Lens {
         circleL: Circle;
         circleR: Circle;
+        result: IntersectResult;
         private rayL;
         private rayR;
-        constructor();
-        update(): void;
         private tArr1;
         private tArr2;
         private p;
-        result: IntersectResult;
+        constructor();
+        update(): void;
         intersect(ray: Ray): IntersectResult;
-        intersect2(ray: Ray, result: IntersectResult): void;
+        intersect2(ray: Ray, result: SimpleIntersectResult): void;
+        intersect0(ray: Ray): IntersectResult;
     }
 }
 /**
@@ -304,6 +322,7 @@ declare namespace hanyeah.optical {
          * @returns {IntersectResult}
          */
         rayCast(ray: Ray): IntersectResult;
+        rayCast2(ray: Ray, result: IntersectResult): void;
         /**
          * 获取所有与光线碰撞的结果。
          * @param ray
@@ -420,17 +439,6 @@ declare namespace hanyeah.optical.geom {
         clone(): Segment;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-    }
-}
-/**
- * Created by hanyeah on 2019/8/2.
- */
-declare namespace hanyeah.optical.geom {
-    class SimpleIntersectResult {
-        t: number;
-        geom: Geom;
-        shape: Shape;
-        constructor(t: number, geom: Geom, shape?: Shape);
     }
 }
 /**

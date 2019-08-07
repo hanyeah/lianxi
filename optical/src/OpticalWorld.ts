@@ -1,37 +1,39 @@
 /**
  * Created by hanyeah on 2019/7/11.
  */
-namespace hanyeah.optical{
+namespace hanyeah.optical {
   import Shape = hanyeah.optical.geom.Shape;
   import IntersectResult = hanyeah.optical.geom.IntersectResult;
   import Ray = hanyeah.optical.geom.Ray;
-  export class OpticalWorld{
+  import SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
+  export class OpticalWorld {
     public shapes: Array<Shape> = [];
     public rays: Array<Ray> = [];
+
     constructor() {
 
     }
 
-    public addShape(shape: Shape): void{
+    public addShape(shape: Shape): void {
       if (this.shapes.indexOf(shape) === -1) {
         this.shapes.push(shape);
       }
     }
 
-    public removeShape(shape: Shape): void{
+    public removeShape(shape: Shape): void {
       const ind: number = this.shapes.indexOf(shape);
       if (ind !== -1) {
         this.shapes.splice(ind, 1);
       }
     }
 
-    public addRay(ray: Ray): void{
-      if(this.rays.indexOf(ray) === - 1) {
+    public addRay(ray: Ray): void {
+      if (this.rays.indexOf(ray) === -1) {
         this.rays.push(ray);
       }
     }
 
-    public removeRay(ray: Ray): void{
+    public removeRay(ray: Ray): void {
       const ind: number = this.rays.indexOf(ray);
       if (ind !== -1) {
         this.rays.splice(ind, 1);
@@ -47,7 +49,7 @@ namespace hanyeah.optical{
       let result: IntersectResult = IntersectResult.noHit;
       const len: number = this.shapes.length;
       let shape: Shape;
-      for(let i = 0; i < len; i++ ) {
+      for (let i = 0; i < len; i++) {
         shape = this.shapes[i];
         const r0: IntersectResult = shape.intersect(ray);
         if (r0.distance < result.distance) {
@@ -55,6 +57,17 @@ namespace hanyeah.optical{
         }
       }
       return result;
+    }
+
+    public rayCast2(ray: Ray, result: IntersectResult): void {
+      const len: number = this.shapes.length;
+      const simpleResult: SimpleIntersectResult = new SimpleIntersectResult();
+      for (let i: number = 0; i < len; i++) {
+        this.shapes[i].intersect2(ray, simpleResult);
+      }
+      if (simpleResult.t !== Infinity) {
+        simpleResult.geom.getGlobalIntersectResult2(ray, simpleResult.localRay, simpleResult.t, result);
+      }
     }
 
     /**

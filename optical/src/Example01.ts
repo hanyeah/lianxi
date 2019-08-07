@@ -24,6 +24,7 @@ namespace hanyeah.optical {
     public ctx: CanvasRenderingContext2D;
     private mouseP: Point = new Point();
     private world: OpticalWorld = new OpticalWorld();
+
     constructor(ctx: CanvasRenderingContext2D) {
       console.log(ctx);
       this.ctx = ctx;
@@ -34,7 +35,7 @@ namespace hanyeah.optical {
         this.world.addRay(ray);
       }
 
-      for(let i: number = 0; i < 100; i++) {
+      for (let i: number = 0; i < 100; i++) {
         const ang: number = Math.PI * i / 50;
         const vvlens: VVLens = new VVLens();
         vvlens.setPosition(400 + 100 * Math.cos(ang), 300 + 100 * Math.sin(ang));
@@ -69,22 +70,27 @@ namespace hanyeah.optical {
 
       let ray: Ray;
       let shape: Shape;
-      for(let i = 0; i < rayLen; i++) {
+      /*for (let i = 0; i < rayLen; i++) {
         ray = this.world.rays[i];
         let result: IntersectResult = this.world.rayCast(ray);
-        const d: number = result.distance === Infinity ?  1000 : result.distance;
-        ray.distance = d;
+        ray.distance = result.distance === Infinity ? 2000 : result.distance;
+      }*/
+      const result: IntersectResult = new IntersectResult();
+      for (let i = 0; i < rayLen; i++) {
+        result.distance = Infinity;
+        ray = this.world.rays[i];
+        this.world.rayCast2(ray, result);
+        ray.distance = result.distance === Infinity ? 2000 : result.distance;
       }
 
       // console.timeEnd("计算用时：");
-
       // console.time("渲染用时：");
-      for(let i = 0; i < rayLen; i++) {
+      for (let i = 0; i < rayLen; i++) {
         ray = this.world.rays[i];
         this.drawLine(ctx, ray.sp, ray.getPoint(ray.distance));
       }
 
-      for(let i = 0; i < shapeLen; i++){
+      for (let i = 0; i < shapeLen; i++) {
         shape = this.world.shapes[i];
         if (shape instanceof VVLens) {
           // a
@@ -96,7 +102,7 @@ namespace hanyeah.optical {
           ctx.beginPath();
           ctx.fillStyle = "red";
           ctx.arc(vvlens.circleL.x, vvlens.circleL.y, vvlens.circleL.r, 0, 2 * Math.PI);
-          ctx.clip('nonzero'); // 'nonzero', 'evenodd'
+          ctx.clip("nonzero"); // 'nonzero', 'evenodd'
           ctx.arc(vvlens.circleR.x, vvlens.circleR.y, vvlens.circleR.r, 0, 2 * Math.PI);
           ctx.stroke(); // 用于绘制线条
           ctx.closePath();
