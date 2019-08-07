@@ -264,6 +264,14 @@ var hanyeah;
                     result.normal = this.deltaLocalToGlobal(normal);
                     return result;
                 };
+                Geom.prototype.getGlobalIntersectResult2 = function (ray, lacalRay, t, result) {
+                    result.geom = this;
+                    result.distance = t;
+                    result.position = ray.getPoint(result.distance);
+                    var normal = this.getNormal(lacalRay.getPoint(result.distance));
+                    normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
+                    result.normal = this.deltaLocalToGlobal(normal);
+                };
                 return Geom;
             }(geom_1.Space));
             geom_1.Geom = Geom;
@@ -301,6 +309,10 @@ var hanyeah;
                 };
                 Ray.prototype.getPoint = function (t) {
                     return new geom.Point(this.sp.x + t * this._dir.x, this.sp.y + t * this._dir.y);
+                };
+                Ray.prototype.getPoint2 = function (t, p) {
+                    p.x = this.sp.x + t * this._dir.x;
+                    p.y = this.sp.y + t * this._dir.y;
                 };
                 Ray.prototype.intersectT = function (ray) {
                     var result = [];
@@ -723,7 +735,10 @@ var hanyeah;
                     var _this = _super.call(this) || this;
                     _this.rayL = new Ray(new Point(1, 0), new Point(1, 0));
                     _this.rayR = new Ray(new Point(1, 0), new Point(1, 0));
-                    _this.arr = [];
+                    _this.tArr1 = [];
+                    _this.tArr2 = [];
+                    _this.p = new Point(0, 0);
+                    _this.result = new IntersectResult();
                     _this.circleL = new Circle(30);
                     _this.circleR = new Circle(30);
                     _this.circleL.x = -5;
@@ -738,38 +753,96 @@ var hanyeah;
                     this.circleR.r = r;
                 };
                 VVLens.prototype.intersect = function (ray) {
-                    var result = IntersectResult.noHit;
+                    this.result.distance = Infinity;
                     this.circleL.globalRayToLocalRay2(ray, this.rayL);
                     this.circleR.globalRayToLocalRay2(ray, this.rayR);
-                    this.circleL.intersectSimpleResult2(this.rayL, this.arr);
-                    this.circleR.intersectSimpleResult2(this.rayR, this.arr);
-                    this.arr.sort(function (a, b) {
-                        return a.t - b.t;
-                    });
-                    var len = this.arr.length;
-                    var temp;
-                    for (var j = 1; j < len; j++) {
-                        var i = j;
-                        temp = this.arr[j];
-                        while (i > 0) {
-                            this.arr[i + 1] = this.arr[i];
-                            i--;
+                    this.tArr1 = this.circleL.intersectT(this.rayL);
+                    this.tArr2 = this.circleR.intersectT(this.rayR);
+                    var i = 0, j = 0, len1 = this.tArr1.length, len2 = this.tArr2.length;
+                    var len = len1 + len2;
+                    var n = 0;
+                    var t = 0, type = 0;
+                    while (n < len) {
+                        if (i >= len1) {
+                            type = 2;
                         }
+                        else if (j >= len2) {
+                            type = 1;
+                        }
+                        else {
+                            if (this.tArr1[i] < this.tArr2[j]) {
+                                type = 1;
+                            }
+                            else {
+                                type = 2;
+                            }
+                        }
+                        if (type == 1) {
+                            t = this.tArr1[i];
+                            i++;
+                            this.rayR.getPoint2(t, this.p);
+                            if (Geom.In(this.circleR, this.p)) {
+                                this.circleR.getGlobalIntersectResult2(ray, this.rayL, t, this.result);
+                                break;
+                            }
+                        }
+                        else {
+                            t = this.tArr2[j];
+                            j++;
+                            this.rayL.getPoint2(t, this.p);
+                            if (Geom.In(this.circleL, this.p)) {
+                                this.circleL.getGlobalIntersectResult2(ray, this.rayR, t, this.result);
+                                break;
+                            }
+                        }
+                        n++;
                     }
-                    var r;
-                    for (var i = 0; i < len; i++) {
-                        r = this.arr[i];
-                        if (r.geom === this.circleL && Geom.In(this.circleR, this.rayR.getPoint(r.t))) {
-                            result = this.circleR.getGlobalIntersectResult(ray, this.rayL, r.t);
-                            break;
+                    return this.result;
+                };
+                VVLens.prototype.intersect2 = function (ray, result) {
+                    this.circleL.globalRayToLocalRay2(ray, this.rayL);
+                    this.circleR.globalRayToLocalRay2(ray, this.rayR);
+                    this.tArr1 = this.circleL.intersectT(this.rayL);
+                    this.tArr2 = this.circleR.intersectT(this.rayR);
+                    var i = 0, j = 0, len1 = this.tArr1.length, len2 = this.tArr2.length;
+                    var len = len1 + len2;
+                    var n = 0;
+                    var t = 0, type = 0;
+                    while (n < len) {
+                        if (i >= len1) {
+                            type = 2;
                         }
-                        else if (r.geom === this.circleR && Geom.In(this.circleL, this.rayL.getPoint(r.t))) {
-                            result = this.circleL.getGlobalIntersectResult(ray, this.rayR, r.t);
-                            break;
+                        else if (j >= len2) {
+                            type = 1;
                         }
+                        else {
+                            if (this.tArr1[i] < this.tArr2[j]) {
+                                type = 1;
+                            }
+                            else {
+                                type = 2;
+                            }
+                        }
+                        if (type == 1) {
+                            t = this.tArr1[i];
+                            i++;
+                            this.rayR.getPoint2(t, this.p);
+                            if (Geom.In(this.circleR, this.p)) {
+                                this.circleR.getGlobalIntersectResult2(ray, this.rayL, t, this.result);
+                                break;
+                            }
+                        }
+                        else {
+                            t = this.tArr2[j];
+                            j++;
+                            this.rayL.getPoint2(t, this.p);
+                            if (Geom.In(this.circleL, this.p)) {
+                                this.circleL.getGlobalIntersectResult2(ray, this.rayR, t, this.result);
+                                break;
+                            }
+                        }
+                        n++;
                     }
-                    this.arr = [];
-                    return result;
                 };
                 return VVLens;
             }(lens.Lens));
@@ -825,23 +898,29 @@ var hanyeah;
                 });
             };
             Example01.prototype.loop = function () {
-                var _this = this;
                 var ctx = this.ctx;
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 ctx.canvas.style.backgroundColor = "#cccccc";
                 // const result: IntersectResult = this.circle.intersect(this.ray);
                 // console.time("计算用时：");
-                this.world.rays.forEach(function (ray) {
-                    var result = _this.world.rayCast(ray);
+                var rayLen = this.world.rays.length;
+                var shapeLen = this.world.shapes.length;
+                var ray;
+                var shape;
+                for (var i = 0; i < rayLen; i++) {
+                    ray = this.world.rays[i];
+                    var result = this.world.rayCast(ray);
                     var d = result.distance === Infinity ? 1000 : result.distance;
                     ray.distance = d;
-                });
+                }
                 // console.timeEnd("计算用时：");
                 // console.time("渲染用时：");
-                this.world.rays.forEach(function (ray) {
-                    _this.drawLine(ctx, ray.sp, ray.getPoint(ray.distance));
-                });
-                this.world.shapes.forEach(function (shape) {
+                for (var i = 0; i < rayLen; i++) {
+                    ray = this.world.rays[i];
+                    this.drawLine(ctx, ray.sp, ray.getPoint(ray.distance));
+                }
+                for (var i = 0; i < shapeLen; i++) {
+                    shape = this.world.shapes[i];
                     if (shape instanceof VVLens) {
                         // a
                         var vvlens = shape;
@@ -857,7 +936,7 @@ var hanyeah;
                         ctx.closePath();
                         ctx.restore();
                     }
-                });
+                }
                 // console.timeEnd("渲染用时：");
             };
             Example01.prototype.drawEllipse = function (ctx, x, y, a, b, w, co) {
@@ -1353,9 +1432,11 @@ var hanyeah;
         var geom;
         (function (geom_3) {
             var SimpleIntersectResult = (function () {
-                function SimpleIntersectResult(t, geom) {
+                function SimpleIntersectResult(t, geom, shape) {
+                    if (shape === void 0) { shape = void 0; }
                     this.t = t;
                     this.geom = geom;
+                    this.shape = shape;
                 }
                 return SimpleIntersectResult;
             }());

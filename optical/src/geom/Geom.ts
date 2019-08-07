@@ -182,5 +182,15 @@ namespace hanyeah.optical.geom {
       return result;
     }
 
+    public getGlobalIntersectResult2(ray: Ray, lacalRay: Ray, t: number, result: IntersectResult): void {
+      result.geom = this;
+      result.distance = t;
+      result.position = ray.getPoint(result.distance);
+
+      const normal: Point = this.getNormal(lacalRay.getPoint(result.distance));
+      normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
+      result.normal = this.deltaLocalToGlobal(normal);
+    }
+
   }
 }

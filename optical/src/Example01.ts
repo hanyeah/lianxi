@@ -63,19 +63,29 @@ namespace hanyeah.optical {
 
       // const result: IntersectResult = this.circle.intersect(this.ray);
       // console.time("计算用时：");
-      this.world.rays.forEach((ray: Ray) => {
+
+      const rayLen: number = this.world.rays.length;
+      const shapeLen: number = this.world.shapes.length;
+
+      let ray: Ray;
+      let shape: Shape;
+      for(let i = 0; i < rayLen; i++) {
+        ray = this.world.rays[i];
         let result: IntersectResult = this.world.rayCast(ray);
         const d: number = result.distance === Infinity ?  1000 : result.distance;
         ray.distance = d;
-      });
+      }
+
       // console.timeEnd("计算用时：");
 
       // console.time("渲染用时：");
-      this.world.rays.forEach((ray: Ray) => {
+      for(let i = 0; i < rayLen; i++) {
+        ray = this.world.rays[i];
         this.drawLine(ctx, ray.sp, ray.getPoint(ray.distance));
-      });
+      }
 
-      this.world.shapes.forEach((shape: Shape) => {
+      for(let i = 0; i < shapeLen; i++){
+        shape = this.world.shapes[i];
         if (shape instanceof VVLens) {
           // a
           const vvlens: VVLens = shape as VVLens;
@@ -93,7 +103,8 @@ namespace hanyeah.optical {
 
           ctx.restore();
         }
-      });
+      }
+
       // console.timeEnd("渲染用时：");
     }
 

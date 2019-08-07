@@ -104,6 +104,7 @@ declare namespace hanyeah.optical.geom {
          * @returns {IntersectResult}
          */
         getGlobalIntersectResult(ray: Ray, lacalRay: Ray, t: number): IntersectResult;
+        getGlobalIntersectResult2(ray: Ray, lacalRay: Ray, t: number, result: IntersectResult): void;
     }
 }
 /**
@@ -118,6 +119,7 @@ declare namespace hanyeah.optical.geom {
         dir: Point;
         clone(): Ray;
         getPoint(t: number): Point;
+        getPoint2(t: number, p: Point): void;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
     }
@@ -254,10 +256,14 @@ declare namespace hanyeah.optical.lens {
         circleR: Circle;
         private rayL;
         private rayR;
-        private arr;
         constructor();
         update(): void;
+        private tArr1;
+        private tArr2;
+        private p;
+        result: IntersectResult;
         intersect(ray: Ray): IntersectResult;
+        intersect2(ray: Ray, result: IntersectResult): void;
     }
 }
 /**
@@ -423,7 +429,8 @@ declare namespace hanyeah.optical.geom {
     class SimpleIntersectResult {
         t: number;
         geom: Geom;
-        constructor(t: number, geom: Geom);
+        shape: Shape;
+        constructor(t: number, geom: Geom, shape?: Shape);
     }
 }
 /**

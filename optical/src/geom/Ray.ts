@@ -30,6 +30,11 @@ namespace hanyeah.optical.geom {
       return new Point(this.sp.x + t * this._dir.x, this.sp.y + t * this._dir.y);
     }
 
+    public getPoint2(t: number, p: Point): void {
+      p.x = this.sp.x + t * this._dir.x;
+      p.y = this.sp.y + t * this._dir.y;
+    }
+
     public intersectT(ray: Ray): number[] {
       const result: number[] = [];
       const d12: number = this.dir.cross(ray.dir);
