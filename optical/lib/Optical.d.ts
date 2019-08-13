@@ -1,4 +1,84 @@
 /**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class Point {
+        x: number;
+        y: number;
+        static add(p1: Point, p2: Point): Point;
+        static sub(p1: Point, p2: Point): Point;
+        static dot(p1: Point, p2: Point): number;
+        static cross(p1: Point, p2: Point): number;
+        static rot90(p: Point): Point;
+        static rotNeg90(p: Point): Point;
+        static interpolate(p1: Point, p2: Point, f: number): Point;
+        static getFactor(p1: Point, p2: Point, p: Point): number;
+        static distance(p1: Point, p2: Point): number;
+        static sqrDistance(p1: Point, p2: Point): number;
+        constructor(x?: number, y?: number);
+        clone(): Point;
+        length(): number;
+        sqrLength(): number;
+        normalize(value?: number): void;
+        negate(): void;
+        multiplay(f: any): void;
+        divide(f: any): void;
+        add(p: Point): void;
+        sub(p: Point): void;
+        rot90(): void;
+        rotNeg90(): void;
+        dot(p: Point): number;
+        cross(p: Point): number;
+        setXY(x: number, y: number): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class Ray {
+        sp: Point;
+        distance: number;
+        private _dir;
+        constructor(sp: Point, dir: Point);
+        dir: Point;
+        clone(): Ray;
+        getPoint(t: number): Point;
+        getPoint2(t: number, p: Point): void;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ */
+declare namespace hanyeah.optical.geom {
+    class Matrix {
+        a: number;
+        b: number;
+        c: number;
+        d: number;
+        tx: number;
+        ty: number;
+        constructor(a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number);
+        clone(): Matrix;
+        setMatrix(m: Matrix): void;
+        identity(): void;
+        rotate(angle: number): void;
+        scale(sx: number, sy: number): void;
+        translate(dx: number, dy: number): void;
+        transformPoint(p: Point): Point;
+        transformPoint2(p: Point, p2: Point): void;
+        deltaTransformPoint(p: Point): Point;
+        deltaTransformPoint2(p: Point, p2: Point): void;
+        createBox(sx: number, sy: number, rotation: number, tx: number, ty: number): void;
+        concat(m: Matrix): void;
+        invert(): void;
+        toString(): string;
+        toJsonString(): string;
+    }
+}
+/**
  * Created by hanyeah on 2019/7/29.
  */
 declare namespace hanyeah.optical.geom {
@@ -26,6 +106,60 @@ declare namespace hanyeah.optical.geom {
         localRayToGlobal(ray: Ray): Ray;
         setPosition(x: number, y: number): void;
         updateTransform(gMatrix?: Matrix): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class IntersectResult {
+        static noHit: IntersectResult;
+        shape: Shape;
+        geom: Geom;
+        distance: number;
+        position: Point;
+        normal: Point;
+        constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/2.
+ */
+declare namespace hanyeah.optical.geom {
+    class SimpleIntersectResult {
+        t: number;
+        geom: Geom;
+        shape: Shape;
+        localRay: Ray;
+        constructor(t?: number, geom?: Geom, shape?: Shape, localRay?: Ray);
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/31.
+ */
+declare namespace hanyeah.optical.geom {
+    class Shape extends Space {
+        protected geoms: Array<Geom>;
+        constructor();
+        destroy(): void;
+        addGeom(geom: Geom): void;
+        removeGeom(geom: Geom): void;
+        removeAllGeoms(): void;
+        intersect(ray: Ray): IntersectResult;
+        intersect2(ray: Ray, result: SimpleIntersectResult): void;
+        updateTransform(gMatrix?: Matrix): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    interface IGeom {
+        clone(): IGeom;
+        intersect(ray: Ray): IntersectResult;
+        getNormal(p: Point, normalize: boolean): Point;
+        intersectT(ray: Ray): number[];
+        containsPoint(p: Point): number;
     }
 }
 declare namespace hanyeah.optical.geom {
@@ -108,54 +242,21 @@ declare namespace hanyeah.optical.geom {
     }
 }
 /**
- * Created by hanyeah on 2019/7/11.
+ * Created by hanyeah on 2019/7/15.
  */
-declare namespace hanyeah.optical.geom {
-    class Ray {
-        sp: Point;
-        distance: number;
-        private _dir;
-        constructor(sp: Point, dir: Point);
-        dir: Point;
-        clone(): Ray;
-        getPoint(t: number): Point;
-        getPoint2(t: number, p: Point): void;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
+declare namespace hanyeah.optical.lens {
+    interface ILens {
     }
 }
 /**
- * Created by hanyeah on 2019/7/11.
+ * Created by hanyeah on 2019/7/15.
  */
-declare namespace hanyeah.optical.geom {
-    class Point {
-        x: number;
-        y: number;
-        static add(p1: Point, p2: Point): Point;
-        static sub(p1: Point, p2: Point): Point;
-        static dot(p1: Point, p2: Point): number;
-        static cross(p1: Point, p2: Point): number;
-        static rot90(p: Point): Point;
-        static rotNeg90(p: Point): Point;
-        static interpolate(p1: Point, p2: Point, f: number): Point;
-        static getFactor(p1: Point, p2: Point, p: Point): number;
-        static distance(p1: Point, p2: Point): number;
-        static sqrDistance(p1: Point, p2: Point): number;
-        constructor(x?: number, y?: number);
-        clone(): Point;
-        length(): number;
-        sqrLength(): number;
-        normalize(value?: number): void;
-        negate(): void;
-        multiplay(f: any): void;
-        divide(f: any): void;
-        add(p: Point): void;
-        sub(p: Point): void;
-        rot90(): void;
-        rotNeg90(): void;
-        dot(p: Point): number;
-        cross(p: Point): number;
-        setXY(x: number, y: number): void;
+declare namespace hanyeah.optical.lens {
+    import Shape = hanyeah.optical.geom.Shape;
+    class Lens extends Shape implements ILens {
+        f: number;
+        n: number;
+        constructor();
     }
 }
 /**
@@ -172,133 +273,6 @@ declare namespace hanyeah.optical.geom {
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
         containsPoint(p: Point): number;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    class Circle2 extends Geom {
-        cp: Point;
-        r: number;
-        constructor(cp: Point, r: number);
-        clone(): Circle2;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): number;
-    }
-}
-declare namespace hanyeah.optical.geom {
-    /**
-     * 椭圆
-     */
-    class Ellipse extends Geom {
-        a: number;
-        b: number;
-        private c;
-        constructor(a: number, b: number);
-        getC(): number;
-        clone(): Ellipse;
-        setAB(a: number, b: number): void;
-        calcC(): void;
-        intersectT(ray: Ray): number[];
-        getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): number;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    class IntersectResult {
-        static noHit: IntersectResult;
-        shape: Shape;
-        geom: Geom;
-        distance: number;
-        position: Point;
-        normal: Point;
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/31.
- */
-declare namespace hanyeah.optical.geom {
-    class Shape extends Space {
-        protected geoms: Array<Geom>;
-        constructor();
-        destroy(): void;
-        addGeom(geom: Geom): void;
-        removeGeom(geom: Geom): void;
-        removeAllGeoms(): void;
-        intersect(ray: Ray): IntersectResult;
-        intersect2(ray: Ray, result: SimpleIntersectResult): void;
-        updateTransform(gMatrix?: Matrix): void;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- */
-declare namespace hanyeah.optical.lens {
-    import Shape = hanyeah.optical.geom.Shape;
-    class Lens extends Shape implements ILens {
-        f: number;
-        n: number;
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/8/2.
- */
-declare namespace hanyeah.optical.geom {
-    class SimpleIntersectResult {
-        t: number;
-        geom: Geom;
-        shape: Shape;
-        localRay: Ray;
-        constructor(t?: number, geom?: Geom, shape?: Shape, localRay?: Ray);
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 凸凸透镜
- */
-declare namespace hanyeah.optical.lens {
-    import Circle = hanyeah.optical.geom.Circle;
-    import Ray = hanyeah.optical.geom.Ray;
-    import IntersectResult = hanyeah.optical.geom.IntersectResult;
-    import SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
-    class VVLens extends Lens {
-        circleL: Circle;
-        circleR: Circle;
-        result: IntersectResult;
-        private rayL;
-        private rayR;
-        private tArr1;
-        private tArr2;
-        private p;
-        constructor();
-        update(): void;
-        intersect(ray: Ray): IntersectResult;
-        intersect2(ray: Ray, result: SimpleIntersectResult): void;
-        intersect0(ray: Ray): IntersectResult;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/17.
- */
-declare namespace hanyeah.optical {
-    import Point = hanyeah.optical.geom.Point;
-    class Example01 {
-        ctx: CanvasRenderingContext2D;
-        private mouseP;
-        private world;
-        constructor(ctx: CanvasRenderingContext2D);
-        onMouseMove(e: MouseEvent): void;
-        loop(): void;
-        drawEllipse(ctx: CanvasRenderingContext2D, x: number, y: number, a: number, b: number, w?: number, co?: string): void;
-        drawLine(ctx: CanvasRenderingContext2D, p0: Point, p1: Point, w?: number, co?: string): void;
-        drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, w?: number, co?: string): void;
     }
 }
 /**
@@ -333,6 +307,125 @@ declare namespace hanyeah.optical {
     }
 }
 /**
+ * Created by hanyeah on 2019/7/15.
+ * 凸凸透镜
+ */
+declare namespace hanyeah.optical.lens {
+    import Circle = hanyeah.optical.geom.Circle;
+    import Ray = hanyeah.optical.geom.Ray;
+    import IntersectResult = hanyeah.optical.geom.IntersectResult;
+    import SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
+    class VVLens extends Lens {
+        circleL: Circle;
+        circleR: Circle;
+        result: IntersectResult;
+        private rayL;
+        private rayR;
+        private tArr1;
+        private tArr2;
+        private p;
+        constructor();
+        update(): void;
+        intersect(ray: Ray): IntersectResult;
+        intersect2(ray: Ray, result: SimpleIntersectResult): void;
+        intersect0(ray: Ray): IntersectResult;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹凹透镜
+ */
+declare namespace hanyeah.optical.lens {
+    class CCLens extends Lens {
+        constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹平透镜
+ */
+declare namespace hanyeah.optical.lens {
+    class CFLens extends Lens {
+        constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+declare namespace hanyeah.optical.geom {
+    class Circle2 extends Geom {
+        cp: Point;
+        r: number;
+        constructor(cp: Point, r: number);
+        clone(): Circle2;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+        containsPoint(p: Point): number;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹凸透镜
+ */
+declare namespace hanyeah.optical.lens {
+    class CVLens extends Lens {
+        constructor();
+    }
+}
+declare namespace hanyeah.optical.geom {
+    /**
+     * 椭圆
+     */
+    class Ellipse extends Geom {
+        a: number;
+        b: number;
+        private c;
+        constructor(a: number, b: number);
+        getC(): number;
+        clone(): Ellipse;
+        setAB(a: number, b: number): void;
+        calcC(): void;
+        intersectT(ray: Ray): number[];
+        getNormal(p: Point, normalize?: boolean): Point;
+        containsPoint(p: Point): number;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/17.
+ */
+declare namespace hanyeah.optical {
+    import Point = hanyeah.optical.geom.Point;
+    class Example01 {
+        ctx: CanvasRenderingContext2D;
+        private mouseP;
+        private world;
+        constructor(ctx: CanvasRenderingContext2D);
+        onMouseMove(e: MouseEvent): void;
+        loop(): void;
+        drawEllipse(ctx: CanvasRenderingContext2D, x: number, y: number, a: number, b: number, w?: number, co?: string): void;
+        drawLine(ctx: CanvasRenderingContext2D, p0: Point, p1: Point, w?: number, co?: string): void;
+        drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, w?: number, co?: string): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 平凹透镜
+ */
+declare namespace hanyeah.optical.lens {
+    class FCLens extends Lens {
+        constructor();
+    }
+}
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 平凸透镜
+ */
+declare namespace hanyeah.optical.lens {
+    class FVLens extends Lens {
+        constructor();
+    }
+}
+/**
  * Created by hanyeah on 2019/7/12.
  */
 declare namespace hanyeah.optical.geom {
@@ -351,18 +444,6 @@ declare namespace hanyeah.optical.geom {
         calcC(): void;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-        containsPoint(p: Point): number;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/11.
- */
-declare namespace hanyeah.optical.geom {
-    interface IGeom {
-        clone(): IGeom;
-        intersect(ray: Ray): IntersectResult;
-        getNormal(p: Point, normalize: boolean): Point;
-        intersectT(ray: Ray): number[];
         containsPoint(p: Point): number;
     }
 }
@@ -389,35 +470,6 @@ declare namespace hanyeah.optical.geom {
         getNormal(p: Point, normalize?: boolean): Point;
     }
 }
-/**
- * Created by hanyeah on 2019/7/15.
- */
-declare namespace hanyeah.optical.geom {
-    class Matrix {
-        a: number;
-        b: number;
-        c: number;
-        d: number;
-        tx: number;
-        ty: number;
-        constructor(a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number);
-        clone(): Matrix;
-        setMatrix(m: Matrix): void;
-        identity(): void;
-        rotate(angle: number): void;
-        scale(sx: number, sy: number): void;
-        translate(dx: number, dy: number): void;
-        transformPoint(p: Point): Point;
-        transformPoint2(p: Point, p2: Point): void;
-        deltaTransformPoint(p: Point): Point;
-        deltaTransformPoint2(p: Point, p2: Point): void;
-        createBox(sx: number, sy: number, rotation: number, tx: number, ty: number): void;
-        concat(m: Matrix): void;
-        invert(): void;
-        toString(): string;
-        toJsonString(): string;
-    }
-}
 declare namespace hanyeah.optical.geom {
     class Parabola extends Geom {
         p: number;
@@ -439,58 +491,6 @@ declare namespace hanyeah.optical.geom {
         clone(): Segment;
         intersectT(ray: Ray): number[];
         getNormal(p: Point, normalize?: boolean): Point;
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 凹凹透镜
- */
-declare namespace hanyeah.optical.lens {
-    class CCLens extends Lens {
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 凹平透镜
- */
-declare namespace hanyeah.optical.lens {
-    class CFLens extends Lens {
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 凹凸透镜
- */
-declare namespace hanyeah.optical.lens {
-    class CVLens extends Lens {
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 平凹透镜
- */
-declare namespace hanyeah.optical.lens {
-    class FCLens extends Lens {
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- * 平凸透镜
- */
-declare namespace hanyeah.optical.lens {
-    class FVLens extends Lens {
-        constructor();
-    }
-}
-/**
- * Created by hanyeah on 2019/7/15.
- */
-declare namespace hanyeah.optical.lens {
-    interface ILens {
     }
 }
 /**

@@ -6,6 +6,7 @@ namespace hanyeah.electricity {
   import Edge = hanyeah.electricity.graph.Edge;
   import Vertex = hanyeah.electricity.graph.Vertex;
   import DTerminal = hanyeah.electricity.elecData.DTerminal;
+
   export class ElectricityCalculater {
     constructor() {
 
@@ -16,6 +17,12 @@ namespace hanyeah.electricity {
       let ele: DTwoTerminalElement;
       let terminal0: DTerminal;
       let terminal1: DTerminal;
+      // -------------root2-------------
+      for (let i: number = 0; i < len; i++) {
+        ele = elements[i];
+        ele.terminal0.root2 = ele.terminal0.root;
+        ele.terminal1.root2 = ele.terminal1.root;
+      }
       // ------------顶点合并-----------
       for (let i: number = 0; i < len; i++) {
         ele = elements[i];
@@ -54,8 +61,8 @@ namespace hanyeah.electricity {
         }
       }
 
-      console.log(vertexMap);
-      console.log(edgeMap);
+      // console.log(vertexMap);
+      // console.log(edgeMap);
     }
 
   }

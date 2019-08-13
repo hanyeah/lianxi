@@ -67,13 +67,12 @@ var hanyeah;
                 Object.defineProperty(DTerminal.prototype, "root", {
                     get: function () {
                         if (this._root._root !== this._root) {
-                            var son = this._root;
                             var root = this._root;
                             var temp = void 0;
                             while (root !== root._root) {
                                 root = root._root;
                             }
-                            this._root = root;
+                            var son = this;
                             while (son !== root) {
                                 temp = son._root;
                                 son._root = root;
@@ -91,13 +90,12 @@ var hanyeah;
                 Object.defineProperty(DTerminal.prototype, "root2", {
                     get: function () {
                         if (this._root2._root2 !== this._root2) {
-                            var son = this._root2;
                             var root = this._root2;
                             var temp = void 0;
                             while (root !== root._root2) {
                                 root = root._root2;
                             }
-                            this._root2 = root;
+                            var son = this;
                             while (son !== root) {
                                 temp = son._root2;
                                 son._root2 = root;
@@ -129,7 +127,6 @@ var hanyeah;
                         terminal.next = next1;
                         next1.prev = terminal;
                         this.root.root = terminal.root;
-                        this.root2.root2 = terminal.root2;
                     }
                 };
                 DTerminal.prototype.disConnect = function () {
@@ -137,12 +134,10 @@ var hanyeah;
                         var nextV = this.next;
                         while (nextV !== this) {
                             nextV.root = this.next;
-                            nextV.root2 = this.next;
                             nextV = nextV.next;
                         }
                     }
                     this.root = this;
-                    this.root2 = this;
                     var next = this.next;
                     var prev = this.prev;
                     prev.next = next;
@@ -274,6 +269,12 @@ var hanyeah;
                 var ele;
                 var terminal0;
                 var terminal1;
+                // -------------root2-------------
+                for (var i = 0; i < len; i++) {
+                    ele = elements[i];
+                    ele.terminal0.root2 = ele.terminal0.root;
+                    ele.terminal1.root2 = ele.terminal1.root;
+                }
                 // ------------顶点合并-----------
                 for (var i = 0; i < len; i++) {
                     ele = elements[i];
@@ -311,8 +312,8 @@ var hanyeah;
                         edgeMap[ele.UID] = new Edge();
                     }
                 }
-                console.log(vertexMap);
-                console.log(edgeMap);
+                // console.log(vertexMap);
+                // console.log(edgeMap);
             };
             return ElectricityCalculater;
         }());
@@ -370,15 +371,21 @@ var hanyeah;
                 function Example01(ctx) {
                     var elecWorld = new electricity.ElectricityWorld();
                     var arr = [];
-                    for (var i = 0; i < 3; i++) {
+                    for (var i = 0; i < 10000; i++) {
                         var ele = new DTwoTerminalElement();
                         elecWorld.addElement(ele);
                         arr.push(ele);
                     }
                     arr[0].terminal0.connect(arr[1].terminal0);
                     arr[0].terminal0.connect(arr[2].terminal0);
-                    console.log(arr);
-                    elecWorld.calculate();
+                    arr[0].terminal1.connect(arr[1].terminal1);
+                    arr[0].terminal1.connect(arr[2].terminal1);
+                    // console.log(arr);
+                    var loop = function () {
+                        elecWorld.calculate();
+                        requestAnimationFrame(loop);
+                    };
+                    requestAnimationFrame(loop);
                 }
                 return Example01;
             }());

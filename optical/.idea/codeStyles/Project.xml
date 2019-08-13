@@ -1,6 +1,9 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <option name="AUTODETECT_INDENTS" value="false" />
+    <MarkdownNavigatorCodeStyleSettings>
+      <option name="RIGHT_MARGIN" value="72" />
+    </MarkdownNavigatorCodeStyleSettings>
     <TypeScriptCodeStyleSettings>
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="USE_DOUBLE_QUOTES" value="false" />

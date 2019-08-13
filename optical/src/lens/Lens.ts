@@ -1,7 +1,6 @@
 /**
  * Created by hanyeah on 2019/7/15.
  */
-/// <reference path="../geom/Shape.ts"/>
 namespace hanyeah.optical.lens {
   import Shape = hanyeah.optical.geom.Shape;
   export class Lens extends Shape implements ILens {

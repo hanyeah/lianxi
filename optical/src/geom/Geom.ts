@@ -1,4 +1,3 @@
-/// <reference path="Space.ts"/>
 namespace hanyeah.optical.geom {
   /**
    * 几何图形基类。

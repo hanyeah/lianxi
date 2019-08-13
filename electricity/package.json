@@ -6,8 +6,8 @@
   "typings": "index.d.ts",
   "author": "hanyeah <hanlidong@yeah.net> (http://hanyeah.com)",
   "scripts":{
-    "start": "tsc-x --sortFiles && npm run server",
+    "start": "concurrently \"npm run build\" \"npm run server\"",
     "build": "tsc-x --sortFiles --w",
-    "server": "live-server"
+    "server": "cd ./lib && live-server"
   }
 }

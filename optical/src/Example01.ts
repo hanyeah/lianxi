@@ -1,23 +1,11 @@
 /**
  * Created by hanyeah on 2019/7/17.
  */
-
-/// <reference path="geom/Ray.ts"/>
-/// <reference path="geom/Point.ts"/>
-/// <reference path="geom/Circle.ts"/>
-/// <reference path="geom/Circle2.ts"/>
-/// <reference path="geom/Ellipse.ts"/>
-/// <reference path="geom/IntersectResult.ts"/>
-/// <reference path="lens/VVLens.ts"/>
 namespace hanyeah.optical {
-  import IGeom = hanyeah.optical.geom.IGeom;
   import Ray = hanyeah.optical.geom.Ray;
   import Point = hanyeah.optical.geom.Point;
-  import Circle = hanyeah.optical.geom.Circle;
   import IntersectResult = hanyeah.optical.geom.IntersectResult;
-  import Ellipse = hanyeah.optical.geom.Ellipse;
   import VVLens = hanyeah.optical.lens.VVLens;
-  import Lens = hanyeah.optical.lens.Lens;
   import Shape = hanyeah.optical.geom.Shape;
 
   export class Example01 {

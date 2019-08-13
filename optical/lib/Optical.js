@@ -8,349 +8,43 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-/**
- * Created by hanyeah on 2019/7/29.
- */
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Space = (function () {
-                function Space() {
-                    this.UID = 1;
-                    this.x = 0;
-                    this.y = 0;
-                    this.rotation = 0;
-                    this.matrix = new geom.Matrix();
-                    this.invMatrix = new geom.Matrix();
-                    this.gMatrix = new geom.Matrix();
-                    this.gInvMatrix = new geom.Matrix();
-                    this.UID = Space.COUNTING++;
-                }
-                Space.prototype.destroy = function () {
-                };
-                Space.prototype.clone = function () {
-                    return new Space();
-                };
-                Space.prototype.globalToLocal = function (p) {
-                    return this.gInvMatrix.transformPoint(p);
-                };
-                Space.prototype.deltaGlobalToLocal = function (p) {
-                    return this.gInvMatrix.deltaTransformPoint(p);
-                };
-                Space.prototype.globalRayToLocalRay = function (ray) {
-                    var result = ray.clone();
-                    result.sp = this.globalToLocal(result.sp);
-                    result.dir = this.deltaGlobalToLocal(result.dir);
-                    return result;
-                };
-                Space.prototype.globalToLocal2 = function (p, lp) {
-                    this.gInvMatrix.transformPoint2(p, lp);
-                };
-                Space.prototype.deltaGlobalToLocal2 = function (p, lp) {
-                    this.gInvMatrix.deltaTransformPoint2(p, lp);
-                };
-                Space.prototype.globalRayToLocalRay2 = function (ray, localRay) {
-                    this.gInvMatrix.transformPoint2(ray.sp, localRay.sp);
-                    this.gInvMatrix.deltaTransformPoint2(ray.dir, localRay.dir);
-                };
-                Space.prototype.localToGlobal = function (p) {
-                    return this.gMatrix.transformPoint(p);
-                };
-                Space.prototype.deltaLocalToGlobal = function (p) {
-                    return this.gMatrix.deltaTransformPoint(p);
-                };
-                Space.prototype.localRayToGlobal = function (ray) {
-                    var result = ray.clone();
-                    result.sp = this.localToGlobal(result.sp);
-                    result.dir = this.deltaLocalToGlobal(result.dir);
-                    return result;
-                };
-                Space.prototype.setPosition = function (x, y) {
-                    this.x = x;
-                    this.y = y;
-                };
-                Space.prototype.updateTransform = function (gMatrix) {
-                    if (gMatrix === void 0) { gMatrix = null; }
-                    this.matrix.createBox(1, 1, this.rotation, this.x, this.y);
-                    this.invMatrix.createBox(1, 1, -this.rotation, -this.x, -this.y);
-                    this.gMatrix = this.matrix.clone();
-                    if (gMatrix) {
-                        this.gMatrix.concat(gMatrix);
-                    }
-                    this.gInvMatrix = this.gMatrix.clone();
-                    this.gInvMatrix.invert();
-                };
-                return Space;
-            }());
-            Space.COUNTING = 1;
-            geom.Space = Space;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/// <reference path="Space.ts"/>
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom_1) {
-            /**
-             * 几何图形基类。
-             */
-            var Geom = (function (_super) {
-                __extends(Geom, _super);
-                function Geom() {
-                    return _super.call(this) || this;
-                }
-                /**
-                 * 求一元二次方程的根。
-                 * @param result
-                 * @param a
-                 * @param b
-                 * @param c
-                 */
-                Geom.getTbyAbc = function (result, a, b, c) {
-                    var n = 0;
-                    var t;
-                    if (a === 0) {
-                        t = -c / b;
-                        if (t > 0) {
-                            result[n] = t;
-                            n++;
-                            // result.push(t);
-                        }
-                    }
-                    else {
-                        var delta = b * b - 4 * a * c;
-                        if (delta >= 0) {
-                            a = 1 / (2 * a);
-                            var sqrDelta = Math.sqrt(delta);
-                            var sa = sqrDelta * a;
-                            var ba = -b * a;
-                            t = ba - sa; // (-b - sqrDelta) * a;
-                            if (t > 0) {
-                                result[n] = t;
-                                n++;
-                                // result.push(t);
-                            }
-                            t = ba + sa; // (-b + sqrDelta) * a;
-                            if (t > 0) {
-                                result[n] = t;
-                                n++;
-                                // result.push(t);
-                            }
-                        }
-                    }
-                };
-                Geom.getSign = function (value) {
-                    return value > 0 ? 1 : value < 0 ? -1 : 0;
-                };
-                Geom.In = function (geom, p) {
-                    return geom.containsPoint(p) === 1;
-                };
-                Geom.Out = function (geom, p) {
-                    return geom.containsPoint(p) === -1;
-                };
-                Geom.NotIn = function (geom, p) {
-                    return geom.containsPoint(p) !== 1;
-                };
-                Geom.NotOut = function (geom, p) {
-                    return geom.containsPoint(p) !== -1;
-                };
-                Geom.On = function (geom, p) {
-                    return geom.containsPoint(p) === 0;
-                };
-                /**
-                 * 克隆。
-                 * @returns {Geom}
-                 */
-                Geom.prototype.clone = function () {
-                    return new Geom();
-                };
-                /**
-                 * 计算和射线相交的所有点的t值，射线的表达式为r(t) = o + t*d，t>=0。
-                 * @param ray
-                 * @returns {Array}
-                 */
-                Geom.prototype.intersectT = function (ray) {
-                    return [];
-                };
-                /**
-                 *  封装的intersectT。
-                 * @param ray
-                 */
-                Geom.prototype.intersectSimpleResult = function (ray) {
-                    var _this = this;
-                    var tArr = this.intersectT(ray);
-                    var result = [];
-                    tArr.forEach(function (t) {
-                        result.push(new geom_1.SimpleIntersectResult(t, _this));
-                    });
-                    return result;
-                };
-                Geom.prototype.intersectSimpleResult2 = function (ray, arr) {
-                    var _this = this;
-                    var tArr = this.intersectT(ray);
-                    tArr.forEach(function (t) {
-                        arr.push(new geom_1.SimpleIntersectResult(t, _this));
-                    });
-                };
-                /**
-                 * 计算与射线相交的最近的点。
-                 * @param ray
-                 * @returns {IntersectResult}
-                 */
-                Geom.prototype.intersect = function (ray) {
-                    var tArr = this.intersectT(ray);
-                    if (tArr.length) {
-                        var t = tArr[0];
-                        return this.getIntersectResult(ray, t);
-                    }
-                    return geom_1.IntersectResult.noHit;
-                };
-                /**
-                 * 计算所有与射线交互的点。
-                 * @param ray
-                 */
-                Geom.prototype.intersects = function (ray) {
-                    var _this = this;
-                    var tArr = this.intersectT(ray);
-                    var result = [];
-                    tArr.forEach(function (t) {
-                        result.push(_this.getIntersectResult(ray, t));
-                    });
-                    return result;
-                };
-                /**
-                 * 获取法线
-                 * @param p 图形上的点
-                 * @param normalize 是否归一化，默认不归一化。
-                 * @returns {Point} 法线
-                 */
-                Geom.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    return new geom_1.Point();
-                };
-                /**
-                 * 点与图形的关系
-                 * @param p
-                 * @returns {number} 1：点在图形内，0：点在图形上，-1：点在图形外。
-                 */
-                Geom.prototype.containsPoint = function (p) {
-                    return -1;
-                };
-                /**
-                 * 封装与射线相交的结果。
-                 * @param ray
-                 * @param t
-                 * @returns {IntersectResult}
-                 */
-                Geom.prototype.getIntersectResult = function (ray, t) {
-                    var result = new geom_1.IntersectResult();
-                    result.geom = this;
-                    result.distance = t;
-                    result.position = ray.getPoint(result.distance);
-                    result.normal = this.getNormal(result.position);
-                    result.normal.normalize(ray.dir.dot(result.normal) > 0 ? -1 : 1);
-                    return result;
-                };
-                /**
-                 * 封装与射线相交的结果，转换到全局坐标。
-                 * @param ray
-                 * @param lacalRay
-                 * @param t
-                 * @returns {IntersectResult}
-                 */
-                Geom.prototype.getGlobalIntersectResult = function (ray, lacalRay, t) {
-                    var result = new geom_1.IntersectResult();
-                    result.geom = this;
-                    result.distance = t;
-                    result.position = ray.getPoint(result.distance);
-                    var normal = this.getNormal(lacalRay.getPoint(result.distance));
-                    normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
-                    result.normal = this.deltaLocalToGlobal(normal);
-                    return result;
-                };
-                Geom.prototype.getGlobalIntersectResult2 = function (ray, lacalRay, t, result) {
-                    result.geom = this;
-                    result.distance = t;
-                    result.position = ray.getPoint(result.distance);
-                    var normal = this.getNormal(lacalRay.getPoint(result.distance));
-                    normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
-                    result.normal = this.deltaLocalToGlobal(normal);
-                };
-                return Geom;
-            }(geom_1.Space));
-            geom_1.Geom = Geom;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/11.
- */
-/// <reference path="Geom.ts"/>
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Ray = (function () {
-                function Ray(sp, dir) {
-                    this.sp = sp.clone();
-                    this.dir = dir;
-                }
-                Object.defineProperty(Ray.prototype, "dir", {
-                    get: function () {
-                        return this._dir;
-                    },
-                    set: function (value) {
-                        this._dir = value.clone();
-                        this._dir.normalize();
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Ray.prototype.clone = function () {
-                    return new Ray(this.sp, this.dir);
-                };
-                Ray.prototype.getPoint = function (t) {
-                    return new geom.Point(this.sp.x + t * this._dir.x, this.sp.y + t * this._dir.y);
-                };
-                Ray.prototype.getPoint2 = function (t, p) {
-                    p.x = this.sp.x + t * this._dir.x;
-                    p.y = this.sp.y + t * this._dir.y;
-                };
-                Ray.prototype.intersectT = function (ray) {
-                    var result = [];
-                    var d12 = this.dir.cross(ray.dir);
-                    if (d12 !== 0) {
-                        var o = geom.Point.sub(ray.sp, this.sp);
-                        var dco = this.dir.cross(o);
-                        var t = dco / d12;
-                        if (t > 0) {
-                            result.push(t);
-                        }
-                    }
-                    return result;
-                };
-                Ray.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    var normal = geom.Point.rotNeg90(this.dir);
-                    if (normalize) {
-                        normal.normalize(1);
-                    }
-                    return normal;
-                };
-                return Ray;
-            }());
-            geom.Ray = Ray;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
+//##################################################################
+//说明：该文件由typescript-box编译器自动生成，请不要手工修改
+//This file is generated by the compiler. Please do not modify it manually.
+//安装：(How to install) npm install -g typescript-box
+//##################################################################
+//项目库文件:Project library file
+//项目类文件:Project classed file
+///<reference path="../src/geom/Point.ts" />
+///<reference path="../src/geom/Ray.ts" />
+///<reference path="../src/geom/Matrix.ts" />
+///<reference path="../src/geom/Space.ts" />
+///<reference path="../src/geom/IntersectResult.ts" />
+///<reference path="../src/geom/SimpleIntersectResult.ts" />
+///<reference path="../src/geom/Shape.ts" />
+///<reference path="../src/geom/IGeom.ts" />
+///<reference path="../src/geom/Geom.ts" />
+///<reference path="../src/lens/ILens.ts" />
+///<reference path="../src/lens/Lens.ts" />
+///<reference path="../src/geom/Circle.ts" />
+///<reference path="../src/OpticalWorld.ts" />
+///<reference path="../src/lens/VVLens.ts" />
+///<reference path="../src/lens/CCLens.ts" />
+///<reference path="../src/lens/CFLens.ts" />
+///<reference path="../src/geom/Circle2.ts" />
+///<reference path="../src/lens/CVLens.ts" />
+///<reference path="../src/geom/Ellipse.ts" />
+///<reference path="../src/Example01.ts" />
+///<reference path="../src/lens/FCLens.ts" />
+///<reference path="../src/lens/FVLens.ts" />
+///<reference path="../src/geom/Hyperbola.ts" />
+///<reference path="../src/geom/Line.ts" />
+///<reference path="../src/geom/Line2.ts" />
+///<reference path="../src/geom/Parabola.ts" />
+///<reference path="../src/geom/Segment.ts" />
+///<reference path="../src/lens/VCLens.ts" />
+///<reference path="../src/lens/VFLens.ts" />
+//files count:29	(v20180720 . by Sunnyboxs (ts-version:2.9.2))
 /**
  * Created by hanyeah on 2019/7/11.
  */
@@ -360,7 +54,7 @@ var hanyeah;
     (function (optical) {
         var geom;
         (function (geom) {
-            var Point = (function () {
+            var Point = /** @class */ (function () {
                 function Point(x, y) {
                     if (x === void 0) { x = 0.0; }
                     if (y === void 0) { y = 0.0; }
@@ -465,182 +159,186 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * Created by hanyeah on 2019/7/11.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Ray = /** @class */ (function () {
+                function Ray(sp, dir) {
+                    this.sp = sp.clone();
+                    this.dir = dir;
+                }
+                Object.defineProperty(Ray.prototype, "dir", {
+                    get: function () {
+                        return this._dir;
+                    },
+                    set: function (value) {
+                        this._dir = value.clone();
+                        this._dir.normalize();
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Ray.prototype.clone = function () {
+                    return new Ray(this.sp, this.dir);
+                };
+                Ray.prototype.getPoint = function (t) {
+                    return new geom.Point(this.sp.x + t * this._dir.x, this.sp.y + t * this._dir.y);
+                };
+                Ray.prototype.getPoint2 = function (t, p) {
+                    p.x = this.sp.x + t * this._dir.x;
+                    p.y = this.sp.y + t * this._dir.y;
+                };
+                Ray.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var d12 = this.dir.cross(ray.dir);
+                    if (d12 !== 0) {
+                        var o = geom.Point.sub(ray.sp, this.sp);
+                        var dco = this.dir.cross(o);
+                        var t = dco / d12;
+                        if (t > 0) {
+                            result.push(t);
+                        }
+                    }
+                    return result;
+                };
+                Ray.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var normal = geom.Point.rotNeg90(this.dir);
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                return Ray;
+            }());
+            geom.Ray = Ray;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/7/15.
  */
-/// <reference path="Geom.ts"/>
 var hanyeah;
 (function (hanyeah) {
     var optical;
     (function (optical) {
         var geom;
         (function (geom) {
-            var Circle = (function (_super) {
-                __extends(Circle, _super);
-                function Circle(r) {
-                    var _this = _super.call(this) || this;
-                    _this.r = r;
-                    return _this;
+            var Matrix = /** @class */ (function () {
+                function Matrix(a, b, c, d, tx, ty) {
+                    if (a === void 0) { a = 1.0; }
+                    if (b === void 0) { b = 0.0; }
+                    if (c === void 0) { c = 0.0; }
+                    if (d === void 0) { d = 1.0; }
+                    if (tx === void 0) { tx = 0.0; }
+                    if (ty === void 0) { ty = 0.0; }
+                    this.a = a;
+                    this.b = b;
+                    this.c = c;
+                    this.d = d;
+                    this.tx = tx;
+                    this.ty = ty;
                 }
-                Object.defineProperty(Circle.prototype, "r", {
-                    get: function () {
-                        return this._r;
-                    },
-                    set: function (v) {
-                        this._r = v;
-                        this._r2 = v * v;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(Circle.prototype, "r2", {
-                    get: function () {
-                        return this._r2;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Circle.prototype.clone = function () {
-                    return new Circle(this.r);
+                Matrix.prototype.clone = function () {
+                    return new Matrix(this.a, this.b, this.c, this.d, this.tx, this.ty);
                 };
-                Circle.prototype.intersectT = function (ray) {
-                    var result = [];
-                    var c = ray.sp.sqrLength() - this.r2;
-                    var b = 2 * ray.dir.dot(ray.sp);
-                    geom.Geom.getTbyAbc(result, 1, b, c);
-                    return result;
+                Matrix.prototype.setMatrix = function (m) {
+                    this.a = m.a;
+                    this.b = m.b;
+                    this.c = m.c;
+                    this.d = m.d;
+                    this.tx = m.tx;
+                    this.ty = m.ty;
                 };
-                Circle.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    var normal = p.clone();
-                    if (normalize) {
-                        normal.normalize(1);
-                    }
-                    return normal;
+                Matrix.prototype.identity = function () {
+                    this.a = 1.0;
+                    this.b = 0.0;
+                    this.c = 0.0;
+                    this.d = 1.0;
+                    this.tx = 0.0;
+                    this.ty = 0.0;
                 };
-                Circle.prototype.containsPoint = function (p) {
-                    return geom.Geom.getSign(this.r2 - p.sqrLength());
+                Matrix.prototype.rotate = function (angle) {
+                    var sin = Math.sin(angle);
+                    var cos = Math.cos(angle);
+                    var m = new Matrix(cos, sin, -sin, cos, 0.0, 0.0);
+                    this.concat(m);
                 };
-                return Circle;
-            }(geom.Geom));
-            geom.Circle = Circle;
+                Matrix.prototype.scale = function (sx, sy) {
+                    var m = new Matrix(sx, 0.0, 0.0, sy, 0.0, 0.0);
+                    this.concat(m);
+                };
+                Matrix.prototype.translate = function (dx, dy) {
+                    this.tx += dx;
+                    this.ty += dy;
+                };
+                Matrix.prototype.transformPoint = function (p) {
+                    return new geom.Point(this.a * p.x + this.b * p.y + this.tx, this.c * p.x + this.d * p.y + this.ty);
+                };
+                Matrix.prototype.transformPoint2 = function (p, p2) {
+                    p2.x = this.a * p.x + this.b * p.y + this.tx;
+                    p2.y = this.c * p.x + this.d * p.y + this.ty;
+                };
+                Matrix.prototype.deltaTransformPoint = function (p) {
+                    return new geom.Point(this.a * p.x + this.b * p.y, this.c * p.x + this.d * p.y);
+                };
+                Matrix.prototype.deltaTransformPoint2 = function (p, p2) {
+                    p2.x = this.a * p.x + this.b * p.y;
+                    p2.y = this.c * p.x + this.d * p.y;
+                };
+                Matrix.prototype.createBox = function (sx, sy, rotation, tx, ty) {
+                    this.identity();
+                    this.rotate(rotation);
+                    this.scale(sx, sy);
+                    this.translate(tx, ty);
+                };
+                Matrix.prototype.concat = function (m) {
+                    var a0 = this.a * m.a + this.b * m.c;
+                    var b0 = this.a * m.b + this.b * m.d;
+                    var c0 = this.c * m.a + this.d * m.c;
+                    var d0 = this.c * m.b + this.d * m.d;
+                    var tx0 = this.a * m.tx + this.b * m.ty + this.tx;
+                    var ty0 = this.c * m.tx + this.d * m.ty + this.ty;
+                    this.a = a0;
+                    this.b = b0;
+                    this.c = c0;
+                    this.d = d0;
+                    this.tx = tx0;
+                    this.ty = ty0;
+                };
+                Matrix.prototype.invert = function () {
+                    var c0 = this.c / (this.b * this.c - this.a * this.d);
+                    var a0 = this.d / (this.a * this.d - this.b * this.c);
+                    var d0 = this.a / (this.a * this.d - this.b * this.c);
+                    var b0 = this.b / (this.b * this.c - this.a * this.d);
+                    var tx0 = (this.b * this.ty - this.d * this.tx) / (this.a * this.d - this.b * this.c);
+                    var ty0 = (this.a * this.ty - this.c * this.tx) / (this.b * this.c - this.a * this.d);
+                    this.a = a0;
+                    this.b = b0;
+                    this.c = c0;
+                    this.d = d0;
+                    this.tx = tx0;
+                    this.ty = ty0;
+                };
+                Matrix.prototype.toString = function () {
+                    return "( a=" + this.a + ", b=" + this.b + " ,c=" + this.c + " ,d=" + this.d + " ,tx=" + this.tx + " ,ty=" + this.ty + " )";
+                };
+                Matrix.prototype.toJsonString = function () {
+                    return "{a: " + this.a + ", b: " + this.b + ", c: " + this.c + ", d: " + this.d + ", tx: " + this.tx + ", ty: " + this.ty;
+                };
+                return Matrix;
+            }());
+            geom.Matrix = Matrix;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
- * Created by hanyeah on 2019/7/11.
- */
-/// <reference path="Geom.ts"/>
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Circle2 = (function (_super) {
-                __extends(Circle2, _super);
-                function Circle2(cp, r) {
-                    var _this = _super.call(this) || this;
-                    _this.cp = cp.clone();
-                    _this.r = r;
-                    return _this;
-                }
-                Circle2.prototype.clone = function () {
-                    return new Circle2(this.cp, this.r);
-                };
-                Circle2.prototype.intersectT = function (ray) {
-                    var result = [];
-                    var v = geom.Point.sub(ray.sp, this.cp);
-                    var c = v.sqrLength() - this.r * this.r;
-                    var b = 2 * ray.dir.dot(v);
-                    geom.Geom.getTbyAbc(result, 1, b, c);
-                    return result;
-                };
-                Circle2.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    var normal = geom.Point.sub(p, this.cp);
-                    if (normalize) {
-                        normal.normalize(1);
-                    }
-                    return normal;
-                };
-                Circle2.prototype.containsPoint = function (p) {
-                    return geom.Geom.getSign(this.r * this.r - geom.Point.sqrDistance(p, this.cp));
-                };
-                return Circle2;
-            }(geom.Geom));
-            geom.Circle2 = Circle2;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            /**
-             * 椭圆
-             */
-            var Ellipse = (function (_super) {
-                __extends(Ellipse, _super);
-                function Ellipse(a, b) {
-                    var _this = _super.call(this) || this;
-                    _this.setAB(a, b);
-                    return _this;
-                }
-                Ellipse.prototype.getC = function () {
-                    return this.c;
-                };
-                Ellipse.prototype.clone = function () {
-                    return new Ellipse(this.a, this.b);
-                };
-                Ellipse.prototype.setAB = function (a, b) {
-                    this.a = Math.abs(a);
-                    this.b = Math.abs(b);
-                    this.calcC();
-                };
-                Ellipse.prototype.calcC = function () {
-                    this.c = Math.sqrt(this.a * this.a - this.b * this.b);
-                };
-                Ellipse.prototype.intersectT = function (ray) {
-                    var result = [];
-                    var ta2 = this.a * this.a;
-                    var tb2 = this.b * this.b;
-                    var a = ray.dir.x * ray.dir.x * tb2 + ray.dir.y * ray.dir.y * ta2;
-                    var b = 2 * (ray.sp.x * ray.dir.x * tb2 + ray.sp.y * ray.dir.y * ta2);
-                    var c = ray.sp.x * ray.sp.x * tb2 + ray.sp.y * ray.sp.y * ta2 - ta2 * tb2;
-                    geom.Geom.getTbyAbc(result, a, b, c);
-                    return result;
-                };
-                Ellipse.prototype.getNormal = function (p, normalize) {
-                    if (normalize === void 0) { normalize = false; }
-                    var normal;
-                    if (this.c === 0) {
-                        normal = p.clone();
-                    }
-                    else {
-                        var pc1 = geom.Point.sub(p, new geom.Point(-this.c, 0));
-                        var pc2 = geom.Point.sub(p, new geom.Point(this.c, 0));
-                        pc1.normalize(1);
-                        pc2.normalize(1);
-                        normal = geom.Point.add(pc1, pc2);
-                    }
-                    if (normalize) {
-                        normal.normalize(1);
-                    }
-                    return normal;
-                };
-                Ellipse.prototype.containsPoint = function (p) {
-                    return geom.Geom.getSign(2 * this.a - (geom.Point.distance(p, new geom.Point(this.c, 0)) + geom.Point.distance(p, new geom.Point(-this.c, 0))));
-                };
-                return Ellipse;
-            }(geom.Geom));
-            geom.Ellipse = Ellipse;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/11.
+ * Created by hanyeah on 2019/7/29.
  */
 var hanyeah;
 (function (hanyeah) {
@@ -648,14 +346,122 @@ var hanyeah;
     (function (optical) {
         var geom;
         (function (geom) {
-            var IntersectResult = (function () {
+            var Space = /** @class */ (function () {
+                function Space() {
+                    this.UID = 1;
+                    this.x = 0;
+                    this.y = 0;
+                    this.rotation = 0;
+                    this.matrix = new geom.Matrix();
+                    this.invMatrix = new geom.Matrix();
+                    this.gMatrix = new geom.Matrix();
+                    this.gInvMatrix = new geom.Matrix();
+                    this.UID = Space.COUNTING++;
+                }
+                Space.prototype.destroy = function () {
+                };
+                Space.prototype.clone = function () {
+                    return new Space();
+                };
+                Space.prototype.globalToLocal = function (p) {
+                    return this.gInvMatrix.transformPoint(p);
+                };
+                Space.prototype.deltaGlobalToLocal = function (p) {
+                    return this.gInvMatrix.deltaTransformPoint(p);
+                };
+                Space.prototype.globalRayToLocalRay = function (ray) {
+                    var result = ray.clone();
+                    result.sp = this.globalToLocal(result.sp);
+                    result.dir = this.deltaGlobalToLocal(result.dir);
+                    return result;
+                };
+                Space.prototype.globalToLocal2 = function (p, lp) {
+                    this.gInvMatrix.transformPoint2(p, lp);
+                };
+                Space.prototype.deltaGlobalToLocal2 = function (p, lp) {
+                    this.gInvMatrix.deltaTransformPoint2(p, lp);
+                };
+                Space.prototype.globalRayToLocalRay2 = function (ray, localRay) {
+                    this.gInvMatrix.transformPoint2(ray.sp, localRay.sp);
+                    this.gInvMatrix.deltaTransformPoint2(ray.dir, localRay.dir);
+                };
+                Space.prototype.localToGlobal = function (p) {
+                    return this.gMatrix.transformPoint(p);
+                };
+                Space.prototype.deltaLocalToGlobal = function (p) {
+                    return this.gMatrix.deltaTransformPoint(p);
+                };
+                Space.prototype.localRayToGlobal = function (ray) {
+                    var result = ray.clone();
+                    result.sp = this.localToGlobal(result.sp);
+                    result.dir = this.deltaLocalToGlobal(result.dir);
+                    return result;
+                };
+                Space.prototype.setPosition = function (x, y) {
+                    this.x = x;
+                    this.y = y;
+                };
+                Space.prototype.updateTransform = function (gMatrix) {
+                    if (gMatrix === void 0) { gMatrix = null; }
+                    this.matrix.createBox(1, 1, this.rotation, this.x, this.y);
+                    this.invMatrix.createBox(1, 1, -this.rotation, -this.x, -this.y);
+                    this.gMatrix = this.matrix.clone();
+                    if (gMatrix) {
+                        this.gMatrix.concat(gMatrix);
+                    }
+                    this.gInvMatrix = this.gMatrix.clone();
+                    this.gInvMatrix.invert();
+                };
+                Space.COUNTING = 1;
+                return Space;
+            }());
+            geom.Space = Space;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var IntersectResult = /** @class */ (function () {
                 function IntersectResult() {
                     this.distance = Infinity;
                 }
+                IntersectResult.noHit = new IntersectResult();
                 return IntersectResult;
             }());
-            IntersectResult.noHit = new IntersectResult();
             geom.IntersectResult = IntersectResult;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/2.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom_1) {
+            var SimpleIntersectResult = /** @class */ (function () {
+                function SimpleIntersectResult(t, geom, shape, localRay) {
+                    if (t === void 0) { t = Infinity; }
+                    if (geom === void 0) { geom = void 0; }
+                    if (shape === void 0) { shape = void 0; }
+                    if (localRay === void 0) { localRay = void 0; }
+                    this.t = t;
+                    this.geom = geom;
+                    this.shape = shape;
+                    this.localRay = localRay;
+                }
+                return SimpleIntersectResult;
+            }());
+            geom_1.SimpleIntersectResult = SimpleIntersectResult;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
@@ -668,7 +474,7 @@ var hanyeah;
     (function (optical) {
         var geom;
         (function (geom_2) {
-            var Shape = (function (_super) {
+            var Shape = /** @class */ (function (_super) {
                 __extends(Shape, _super);
                 function Shape() {
                     var _this = _super.call(this) || this;
@@ -732,10 +538,206 @@ var hanyeah;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom_3) {
+            /**
+             * 几何图形基类。
+             */
+            var Geom = /** @class */ (function (_super) {
+                __extends(Geom, _super);
+                function Geom() {
+                    return _super.call(this) || this;
+                }
+                /**
+                 * 求一元二次方程的根。
+                 * @param result
+                 * @param a
+                 * @param b
+                 * @param c
+                 */
+                Geom.getTbyAbc = function (result, a, b, c) {
+                    var n = 0;
+                    var t;
+                    if (a === 0) {
+                        t = -c / b;
+                        if (t > 0) {
+                            result[n] = t;
+                            n++;
+                            // result.push(t);
+                        }
+                    }
+                    else {
+                        var delta = b * b - 4 * a * c;
+                        if (delta >= 0) {
+                            a = 1 / (2 * a);
+                            var sqrDelta = Math.sqrt(delta);
+                            var sa = sqrDelta * a;
+                            var ba = -b * a;
+                            t = ba - sa; // (-b - sqrDelta) * a;
+                            if (t > 0) {
+                                result[n] = t;
+                                n++;
+                                // result.push(t);
+                            }
+                            t = ba + sa; // (-b + sqrDelta) * a;
+                            if (t > 0) {
+                                result[n] = t;
+                                n++;
+                                // result.push(t);
+                            }
+                        }
+                    }
+                };
+                Geom.getSign = function (value) {
+                    return value > 0 ? 1 : value < 0 ? -1 : 0;
+                };
+                Geom.In = function (geom, p) {
+                    return geom.containsPoint(p) === 1;
+                };
+                Geom.Out = function (geom, p) {
+                    return geom.containsPoint(p) === -1;
+                };
+                Geom.NotIn = function (geom, p) {
+                    return geom.containsPoint(p) !== 1;
+                };
+                Geom.NotOut = function (geom, p) {
+                    return geom.containsPoint(p) !== -1;
+                };
+                Geom.On = function (geom, p) {
+                    return geom.containsPoint(p) === 0;
+                };
+                /**
+                 * 克隆。
+                 * @returns {Geom}
+                 */
+                Geom.prototype.clone = function () {
+                    return new Geom();
+                };
+                /**
+                 * 计算和射线相交的所有点的t值，射线的表达式为r(t) = o + t*d，t>=0。
+                 * @param ray
+                 * @returns {Array}
+                 */
+                Geom.prototype.intersectT = function (ray) {
+                    return [];
+                };
+                /**
+                 *  封装的intersectT。
+                 * @param ray
+                 */
+                Geom.prototype.intersectSimpleResult = function (ray) {
+                    var _this = this;
+                    var tArr = this.intersectT(ray);
+                    var result = [];
+                    tArr.forEach(function (t) {
+                        result.push(new geom_3.SimpleIntersectResult(t, _this));
+                    });
+                    return result;
+                };
+                Geom.prototype.intersectSimpleResult2 = function (ray, arr) {
+                    var _this = this;
+                    var tArr = this.intersectT(ray);
+                    tArr.forEach(function (t) {
+                        arr.push(new geom_3.SimpleIntersectResult(t, _this));
+                    });
+                };
+                /**
+                 * 计算与射线相交的最近的点。
+                 * @param ray
+                 * @returns {IntersectResult}
+                 */
+                Geom.prototype.intersect = function (ray) {
+                    var tArr = this.intersectT(ray);
+                    if (tArr.length) {
+                        var t = tArr[0];
+                        return this.getIntersectResult(ray, t);
+                    }
+                    return geom_3.IntersectResult.noHit;
+                };
+                /**
+                 * 计算所有与射线交互的点。
+                 * @param ray
+                 */
+                Geom.prototype.intersects = function (ray) {
+                    var _this = this;
+                    var tArr = this.intersectT(ray);
+                    var result = [];
+                    tArr.forEach(function (t) {
+                        result.push(_this.getIntersectResult(ray, t));
+                    });
+                    return result;
+                };
+                /**
+                 * 获取法线
+                 * @param p 图形上的点
+                 * @param normalize 是否归一化，默认不归一化。
+                 * @returns {Point} 法线
+                 */
+                Geom.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    return new geom_3.Point();
+                };
+                /**
+                 * 点与图形的关系
+                 * @param p
+                 * @returns {number} 1：点在图形内，0：点在图形上，-1：点在图形外。
+                 */
+                Geom.prototype.containsPoint = function (p) {
+                    return -1;
+                };
+                /**
+                 * 封装与射线相交的结果。
+                 * @param ray
+                 * @param t
+                 * @returns {IntersectResult}
+                 */
+                Geom.prototype.getIntersectResult = function (ray, t) {
+                    var result = new geom_3.IntersectResult();
+                    result.geom = this;
+                    result.distance = t;
+                    result.position = ray.getPoint(result.distance);
+                    result.normal = this.getNormal(result.position);
+                    result.normal.normalize(ray.dir.dot(result.normal) > 0 ? -1 : 1);
+                    return result;
+                };
+                /**
+                 * 封装与射线相交的结果，转换到全局坐标。
+                 * @param ray
+                 * @param lacalRay
+                 * @param t
+                 * @returns {IntersectResult}
+                 */
+                Geom.prototype.getGlobalIntersectResult = function (ray, lacalRay, t) {
+                    var result = new geom_3.IntersectResult();
+                    result.geom = this;
+                    result.distance = t;
+                    result.position = ray.getPoint(result.distance);
+                    var normal = this.getNormal(lacalRay.getPoint(result.distance));
+                    normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
+                    result.normal = this.deltaLocalToGlobal(normal);
+                    return result;
+                };
+                Geom.prototype.getGlobalIntersectResult2 = function (ray, lacalRay, t, result) {
+                    result.geom = this;
+                    result.distance = t;
+                    result.position = ray.getPoint(result.distance);
+                    var normal = this.getNormal(lacalRay.getPoint(result.distance));
+                    normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
+                    result.normal = this.deltaLocalToGlobal(normal);
+                };
+                return Geom;
+            }(geom_3.Space));
+            geom_3.Geom = Geom;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
 /**
  * Created by hanyeah on 2019/7/15.
  */
-/// <reference path="../geom/Shape.ts"/>
 var hanyeah;
 (function (hanyeah) {
     var optical;
@@ -743,7 +745,7 @@ var hanyeah;
         var lens;
         (function (lens) {
             var Shape = hanyeah.optical.geom.Shape;
-            var Lens = (function (_super) {
+            var Lens = /** @class */ (function (_super) {
                 __extends(Lens, _super);
                 function Lens() {
                     var _this = _super.call(this) || this;
@@ -758,37 +760,159 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
- * Created by hanyeah on 2019/8/2.
+ * Created by hanyeah on 2019/7/15.
  */
 var hanyeah;
 (function (hanyeah) {
     var optical;
     (function (optical) {
         var geom;
-        (function (geom_3) {
-            var SimpleIntersectResult = (function () {
-                function SimpleIntersectResult(t, geom, shape, localRay) {
-                    if (t === void 0) { t = Infinity; }
-                    if (geom === void 0) { geom = void 0; }
-                    if (shape === void 0) { shape = void 0; }
-                    if (localRay === void 0) { localRay = void 0; }
-                    this.t = t;
-                    this.geom = geom;
-                    this.shape = shape;
-                    this.localRay = localRay;
+        (function (geom) {
+            var Circle = /** @class */ (function (_super) {
+                __extends(Circle, _super);
+                function Circle(r) {
+                    var _this = _super.call(this) || this;
+                    _this.r = r;
+                    return _this;
                 }
-                return SimpleIntersectResult;
-            }());
-            geom_3.SimpleIntersectResult = SimpleIntersectResult;
+                Object.defineProperty(Circle.prototype, "r", {
+                    get: function () {
+                        return this._r;
+                    },
+                    set: function (v) {
+                        this._r = v;
+                        this._r2 = v * v;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(Circle.prototype, "r2", {
+                    get: function () {
+                        return this._r2;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Circle.prototype.clone = function () {
+                    return new Circle(this.r);
+                };
+                Circle.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var c = ray.sp.sqrLength() - this.r2;
+                    var b = 2 * ray.dir.dot(ray.sp);
+                    geom.Geom.getTbyAbc(result, 1, b, c);
+                    return result;
+                };
+                Circle.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var normal = p.clone();
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                Circle.prototype.containsPoint = function (p) {
+                    return geom.Geom.getSign(this.r2 - p.sqrLength());
+                };
+                return Circle;
+            }(geom.Geom));
+            geom.Circle = Circle;
         })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var IntersectResult = hanyeah.optical.geom.IntersectResult;
+        var SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
+        var OpticalWorld = /** @class */ (function () {
+            function OpticalWorld() {
+                this.shapes = [];
+                this.rays = [];
+            }
+            OpticalWorld.prototype.addShape = function (shape) {
+                if (this.shapes.indexOf(shape) === -1) {
+                    this.shapes.push(shape);
+                }
+            };
+            OpticalWorld.prototype.removeShape = function (shape) {
+                var ind = this.shapes.indexOf(shape);
+                if (ind !== -1) {
+                    this.shapes.splice(ind, 1);
+                }
+            };
+            OpticalWorld.prototype.addRay = function (ray) {
+                if (this.rays.indexOf(ray) === -1) {
+                    this.rays.push(ray);
+                }
+            };
+            OpticalWorld.prototype.removeRay = function (ray) {
+                var ind = this.rays.indexOf(ray);
+                if (ind !== -1) {
+                    this.rays.splice(ind, 1);
+                }
+            };
+            /**
+             * 获取与光线碰撞的结果。
+             * @param ray
+             * @returns {IntersectResult}
+             */
+            OpticalWorld.prototype.rayCast = function (ray) {
+                var result = IntersectResult.noHit;
+                var len = this.shapes.length;
+                var shape;
+                for (var i = 0; i < len; i++) {
+                    shape = this.shapes[i];
+                    var r0 = shape.intersect(ray);
+                    if (r0.distance < result.distance) {
+                        result = r0;
+                    }
+                }
+                return result;
+            };
+            OpticalWorld.prototype.rayCast2 = function (ray, result) {
+                var len = this.shapes.length;
+                var simpleResult = new SimpleIntersectResult();
+                for (var i = 0; i < len; i++) {
+                    this.shapes[i].intersect2(ray, simpleResult);
+                }
+                if (simpleResult.t !== Infinity) {
+                    simpleResult.geom.getGlobalIntersectResult2(ray, simpleResult.localRay, simpleResult.t, result);
+                }
+            };
+            /**
+             * 获取所有与光线碰撞的结果。
+             * @param ray
+             * @param sort
+             * @returns {IntersectResult[]}
+             */
+            OpticalWorld.prototype.rayMultiCast = function (ray, sort) {
+                if (sort === void 0) { sort = true; }
+                var result = [];
+                this.shapes.forEach(function (shape) {
+                    var r0 = shape.intersect(ray);
+                    result.push(r0);
+                });
+                if (sort) {
+                    result.sort(function (a, b) {
+                        return a.distance - b.distance;
+                    });
+                }
+                return result;
+            };
+            return OpticalWorld;
+        }());
+        optical.OpticalWorld = OpticalWorld;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
  * Created by hanyeah on 2019/7/15.
  * 凸凸透镜
  */
-/// <reference path="Lens.ts"/>
-/// <reference path="../geom/SimpleIntersectResult.ts"/>
 var hanyeah;
 (function (hanyeah) {
     var optical;
@@ -800,7 +924,7 @@ var hanyeah;
             var IntersectResult = hanyeah.optical.geom.IntersectResult;
             var Geom = hanyeah.optical.geom.Geom;
             var Point = hanyeah.optical.geom.Point;
-            var VVLens = (function (_super) {
+            var VVLens = /** @class */ (function (_super) {
                 __extends(VVLens, _super);
                 function VVLens() {
                     var _this = _super.call(this) || this;
@@ -965,15 +1089,183 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * Created by hanyeah on 2019/7/15.
+ * 凹凹透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var CCLens = /** @class */ (function (_super) {
+                __extends(CCLens, _super);
+                function CCLens() {
+                    return _super.call(this) || this;
+                }
+                return CCLens;
+            }(lens.Lens));
+            lens.CCLens = CCLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹平透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var CFLens = /** @class */ (function (_super) {
+                __extends(CFLens, _super);
+                function CFLens() {
+                    return _super.call(this) || this;
+                }
+                return CFLens;
+            }(lens.Lens));
+            lens.CFLens = CFLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/11.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            var Circle2 = /** @class */ (function (_super) {
+                __extends(Circle2, _super);
+                function Circle2(cp, r) {
+                    var _this = _super.call(this) || this;
+                    _this.cp = cp.clone();
+                    _this.r = r;
+                    return _this;
+                }
+                Circle2.prototype.clone = function () {
+                    return new Circle2(this.cp, this.r);
+                };
+                Circle2.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var v = geom.Point.sub(ray.sp, this.cp);
+                    var c = v.sqrLength() - this.r * this.r;
+                    var b = 2 * ray.dir.dot(v);
+                    geom.Geom.getTbyAbc(result, 1, b, c);
+                    return result;
+                };
+                Circle2.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var normal = geom.Point.sub(p, this.cp);
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                Circle2.prototype.containsPoint = function (p) {
+                    return geom.Geom.getSign(this.r * this.r - geom.Point.sqrDistance(p, this.cp));
+                };
+                return Circle2;
+            }(geom.Geom));
+            geom.Circle2 = Circle2;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 凹凸透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var CVLens = /** @class */ (function (_super) {
+                __extends(CVLens, _super);
+                function CVLens() {
+                    return _super.call(this) || this;
+                }
+                return CVLens;
+            }(lens.Lens));
+            lens.CVLens = CVLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var geom;
+        (function (geom) {
+            /**
+             * 椭圆
+             */
+            var Ellipse = /** @class */ (function (_super) {
+                __extends(Ellipse, _super);
+                function Ellipse(a, b) {
+                    var _this = _super.call(this) || this;
+                    _this.setAB(a, b);
+                    return _this;
+                }
+                Ellipse.prototype.getC = function () {
+                    return this.c;
+                };
+                Ellipse.prototype.clone = function () {
+                    return new Ellipse(this.a, this.b);
+                };
+                Ellipse.prototype.setAB = function (a, b) {
+                    this.a = Math.abs(a);
+                    this.b = Math.abs(b);
+                    this.calcC();
+                };
+                Ellipse.prototype.calcC = function () {
+                    this.c = Math.sqrt(this.a * this.a - this.b * this.b);
+                };
+                Ellipse.prototype.intersectT = function (ray) {
+                    var result = [];
+                    var ta2 = this.a * this.a;
+                    var tb2 = this.b * this.b;
+                    var a = ray.dir.x * ray.dir.x * tb2 + ray.dir.y * ray.dir.y * ta2;
+                    var b = 2 * (ray.sp.x * ray.dir.x * tb2 + ray.sp.y * ray.dir.y * ta2);
+                    var c = ray.sp.x * ray.sp.x * tb2 + ray.sp.y * ray.sp.y * ta2 - ta2 * tb2;
+                    geom.Geom.getTbyAbc(result, a, b, c);
+                    return result;
+                };
+                Ellipse.prototype.getNormal = function (p, normalize) {
+                    if (normalize === void 0) { normalize = false; }
+                    var normal;
+                    if (this.c === 0) {
+                        normal = p.clone();
+                    }
+                    else {
+                        var pc1 = geom.Point.sub(p, new geom.Point(-this.c, 0));
+                        var pc2 = geom.Point.sub(p, new geom.Point(this.c, 0));
+                        pc1.normalize(1);
+                        pc2.normalize(1);
+                        normal = geom.Point.add(pc1, pc2);
+                    }
+                    if (normalize) {
+                        normal.normalize(1);
+                    }
+                    return normal;
+                };
+                Ellipse.prototype.containsPoint = function (p) {
+                    return geom.Geom.getSign(2 * this.a - (geom.Point.distance(p, new geom.Point(this.c, 0)) + geom.Point.distance(p, new geom.Point(-this.c, 0))));
+                };
+                return Ellipse;
+            }(geom.Geom));
+            geom.Ellipse = Ellipse;
+        })(geom = optical.geom || (optical.geom = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/7/17.
  */
-/// <reference path="geom/Ray.ts"/>
-/// <reference path="geom/Point.ts"/>
-/// <reference path="geom/Circle.ts"/>
-/// <reference path="geom/Circle2.ts"/>
-/// <reference path="geom/Ellipse.ts"/>
-/// <reference path="geom/IntersectResult.ts"/>
-/// <reference path="lens/VVLens.ts"/>
 var hanyeah;
 (function (hanyeah) {
     var optical;
@@ -982,7 +1274,7 @@ var hanyeah;
         var Point = hanyeah.optical.geom.Point;
         var IntersectResult = hanyeah.optical.geom.IntersectResult;
         var VVLens = hanyeah.optical.lens.VVLens;
-        var Example01 = (function () {
+        var Example01 = /** @class */ (function () {
             function Example01(ctx) {
                 this.mouseP = new Point();
                 this.world = new optical.OpticalWorld();
@@ -1097,92 +1389,45 @@ var hanyeah;
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
- * Created by hanyeah on 2019/7/11.
+ * Created by hanyeah on 2019/7/15.
+ * 平凹透镜
  */
 var hanyeah;
 (function (hanyeah) {
     var optical;
     (function (optical) {
-        var IntersectResult = hanyeah.optical.geom.IntersectResult;
-        var SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
-        var OpticalWorld = (function () {
-            function OpticalWorld() {
-                this.shapes = [];
-                this.rays = [];
-            }
-            OpticalWorld.prototype.addShape = function (shape) {
-                if (this.shapes.indexOf(shape) === -1) {
-                    this.shapes.push(shape);
+        var lens;
+        (function (lens) {
+            var FCLens = /** @class */ (function (_super) {
+                __extends(FCLens, _super);
+                function FCLens() {
+                    return _super.call(this) || this;
                 }
-            };
-            OpticalWorld.prototype.removeShape = function (shape) {
-                var ind = this.shapes.indexOf(shape);
-                if (ind !== -1) {
-                    this.shapes.splice(ind, 1);
+                return FCLens;
+            }(lens.Lens));
+            lens.FCLens = FCLens;
+        })(lens = optical.lens || (optical.lens = {}));
+    })(optical = hanyeah.optical || (hanyeah.optical = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/7/15.
+ * 平凸透镜
+ */
+var hanyeah;
+(function (hanyeah) {
+    var optical;
+    (function (optical) {
+        var lens;
+        (function (lens) {
+            var FVLens = /** @class */ (function (_super) {
+                __extends(FVLens, _super);
+                function FVLens() {
+                    return _super.call(this) || this;
                 }
-            };
-            OpticalWorld.prototype.addRay = function (ray) {
-                if (this.rays.indexOf(ray) === -1) {
-                    this.rays.push(ray);
-                }
-            };
-            OpticalWorld.prototype.removeRay = function (ray) {
-                var ind = this.rays.indexOf(ray);
-                if (ind !== -1) {
-                    this.rays.splice(ind, 1);
-                }
-            };
-            /**
-             * 获取与光线碰撞的结果。
-             * @param ray
-             * @returns {IntersectResult}
-             */
-            OpticalWorld.prototype.rayCast = function (ray) {
-                var result = IntersectResult.noHit;
-                var len = this.shapes.length;
-                var shape;
-                for (var i = 0; i < len; i++) {
-                    shape = this.shapes[i];
-                    var r0 = shape.intersect(ray);
-                    if (r0.distance < result.distance) {
-                        result = r0;
-                    }
-                }
-                return result;
-            };
-            OpticalWorld.prototype.rayCast2 = function (ray, result) {
-                var len = this.shapes.length;
-                var simpleResult = new SimpleIntersectResult();
-                for (var i = 0; i < len; i++) {
-                    this.shapes[i].intersect2(ray, simpleResult);
-                }
-                if (simpleResult.t !== Infinity) {
-                    simpleResult.geom.getGlobalIntersectResult2(ray, simpleResult.localRay, simpleResult.t, result);
-                }
-            };
-            /**
-             * 获取所有与光线碰撞的结果。
-             * @param ray
-             * @param sort
-             * @returns {IntersectResult[]}
-             */
-            OpticalWorld.prototype.rayMultiCast = function (ray, sort) {
-                if (sort === void 0) { sort = true; }
-                var result = [];
-                this.shapes.forEach(function (shape) {
-                    var r0 = shape.intersect(ray);
-                    result.push(r0);
-                });
-                if (sort) {
-                    result.sort(function (a, b) {
-                        return a.distance - b.distance;
-                    });
-                }
-                return result;
-            };
-            return OpticalWorld;
-        }());
-        optical.OpticalWorld = OpticalWorld;
+                return FVLens;
+            }(lens.Lens));
+            lens.FVLens = FVLens;
+        })(lens = optical.lens || (optical.lens = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
 /**
@@ -1198,7 +1443,7 @@ var hanyeah;
              * 双曲线。
              * x^2 / a^2 - y^2 / b^2 = 1
              */
-            var Hyperbola = (function (_super) {
+            var Hyperbola = /** @class */ (function (_super) {
                 __extends(Hyperbola, _super);
                 function Hyperbola(a, b) {
                     var _this = _super.call(this) || this;
@@ -1255,7 +1500,7 @@ var hanyeah;
     (function (optical) {
         var geom;
         (function (geom) {
-            var Line = (function (_super) {
+            var Line = /** @class */ (function (_super) {
                 __extends(Line, _super);
                 function Line(x0) {
                     var _this = _super.call(this) || this;
@@ -1297,7 +1542,7 @@ var hanyeah;
     (function (optical) {
         var geom;
         (function (geom) {
-            var Line2 = (function (_super) {
+            var Line2 = /** @class */ (function (_super) {
                 __extends(Line2, _super);
                 function Line2(p1, p2) {
                     var _this = _super.call(this) || this;
@@ -1337,130 +1582,13 @@ var hanyeah;
         })(geom = optical.geom || (optical.geom = {}));
     })(optical = hanyeah.optical || (hanyeah.optical = {}));
 })(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/15.
- */
 var hanyeah;
 (function (hanyeah) {
     var optical;
     (function (optical) {
         var geom;
         (function (geom) {
-            var Matrix = (function () {
-                function Matrix(a, b, c, d, tx, ty) {
-                    if (a === void 0) { a = 1.0; }
-                    if (b === void 0) { b = 0.0; }
-                    if (c === void 0) { c = 0.0; }
-                    if (d === void 0) { d = 1.0; }
-                    if (tx === void 0) { tx = 0.0; }
-                    if (ty === void 0) { ty = 0.0; }
-                    this.a = a;
-                    this.b = b;
-                    this.c = c;
-                    this.d = d;
-                    this.tx = tx;
-                    this.ty = ty;
-                }
-                Matrix.prototype.clone = function () {
-                    return new Matrix(this.a, this.b, this.c, this.d, this.tx, this.ty);
-                };
-                Matrix.prototype.setMatrix = function (m) {
-                    this.a = m.a;
-                    this.b = m.b;
-                    this.c = m.c;
-                    this.d = m.d;
-                    this.tx = m.tx;
-                    this.ty = m.ty;
-                };
-                Matrix.prototype.identity = function () {
-                    this.a = 1.0;
-                    this.b = 0.0;
-                    this.c = 0.0;
-                    this.d = 1.0;
-                    this.tx = 0.0;
-                    this.ty = 0.0;
-                };
-                Matrix.prototype.rotate = function (angle) {
-                    var sin = Math.sin(angle);
-                    var cos = Math.cos(angle);
-                    var m = new Matrix(cos, sin, -sin, cos, 0.0, 0.0);
-                    this.concat(m);
-                };
-                Matrix.prototype.scale = function (sx, sy) {
-                    var m = new Matrix(sx, 0.0, 0.0, sy, 0.0, 0.0);
-                    this.concat(m);
-                };
-                Matrix.prototype.translate = function (dx, dy) {
-                    this.tx += dx;
-                    this.ty += dy;
-                };
-                Matrix.prototype.transformPoint = function (p) {
-                    return new geom.Point(this.a * p.x + this.b * p.y + this.tx, this.c * p.x + this.d * p.y + this.ty);
-                };
-                Matrix.prototype.transformPoint2 = function (p, p2) {
-                    p2.x = this.a * p.x + this.b * p.y + this.tx;
-                    p2.y = this.c * p.x + this.d * p.y + this.ty;
-                };
-                Matrix.prototype.deltaTransformPoint = function (p) {
-                    return new geom.Point(this.a * p.x + this.b * p.y, this.c * p.x + this.d * p.y);
-                };
-                Matrix.prototype.deltaTransformPoint2 = function (p, p2) {
-                    p2.x = this.a * p.x + this.b * p.y;
-                    p2.y = this.c * p.x + this.d * p.y;
-                };
-                Matrix.prototype.createBox = function (sx, sy, rotation, tx, ty) {
-                    this.identity();
-                    this.rotate(rotation);
-                    this.scale(sx, sy);
-                    this.translate(tx, ty);
-                };
-                Matrix.prototype.concat = function (m) {
-                    var a0 = this.a * m.a + this.b * m.c;
-                    var b0 = this.a * m.b + this.b * m.d;
-                    var c0 = this.c * m.a + this.d * m.c;
-                    var d0 = this.c * m.b + this.d * m.d;
-                    var tx0 = this.a * m.tx + this.b * m.ty + this.tx;
-                    var ty0 = this.c * m.tx + this.d * m.ty + this.ty;
-                    this.a = a0;
-                    this.b = b0;
-                    this.c = c0;
-                    this.d = d0;
-                    this.tx = tx0;
-                    this.ty = ty0;
-                };
-                Matrix.prototype.invert = function () {
-                    var c0 = this.c / (this.b * this.c - this.a * this.d);
-                    var a0 = this.d / (this.a * this.d - this.b * this.c);
-                    var d0 = this.a / (this.a * this.d - this.b * this.c);
-                    var b0 = this.b / (this.b * this.c - this.a * this.d);
-                    var tx0 = (this.b * this.ty - this.d * this.tx) / (this.a * this.d - this.b * this.c);
-                    var ty0 = (this.a * this.ty - this.c * this.tx) / (this.b * this.c - this.a * this.d);
-                    this.a = a0;
-                    this.b = b0;
-                    this.c = c0;
-                    this.d = d0;
-                    this.tx = tx0;
-                    this.ty = ty0;
-                };
-                Matrix.prototype.toString = function () {
-                    return "( a=" + this.a + ", b=" + this.b + " ,c=" + this.c + " ,d=" + this.d + " ,tx=" + this.tx + " ,ty=" + this.ty + " )";
-                };
-                Matrix.prototype.toJsonString = function () {
-                    return "{a: " + this.a + ", b: " + this.b + ", c: " + this.c + ", d: " + this.d + ", tx: " + this.tx + ", ty: " + this.ty;
-                };
-                return Matrix;
-            }());
-            geom.Matrix = Matrix;
-        })(geom = optical.geom || (optical.geom = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var geom;
-        (function (geom) {
-            var Parabola = (function (_super) {
+            var Parabola = /** @class */ (function (_super) {
                 __extends(Parabola, _super);
                 function Parabola(p) {
                     var _this = _super.call(this) || this;
@@ -1510,7 +1638,7 @@ var hanyeah;
     (function (optical) {
         var geom;
         (function (geom) {
-            var Segment = (function (_super) {
+            var Segment = /** @class */ (function (_super) {
                 __extends(Segment, _super);
                 function Segment(p1, p2) {
                     var _this = _super.call(this) || this;
@@ -1556,112 +1684,6 @@ var hanyeah;
 })(hanyeah || (hanyeah = {}));
 /**
  * Created by hanyeah on 2019/7/15.
- * 凹凹透镜
- */
-/// <reference path="Lens.ts"/>
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var lens;
-        (function (lens) {
-            var CCLens = (function (_super) {
-                __extends(CCLens, _super);
-                function CCLens() {
-                    return _super.call(this) || this;
-                }
-                return CCLens;
-            }(lens.Lens));
-            lens.CCLens = CCLens;
-        })(lens = optical.lens || (optical.lens = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/15.
- * 凹平透镜
- */
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var lens;
-        (function (lens) {
-            var CFLens = (function (_super) {
-                __extends(CFLens, _super);
-                function CFLens() {
-                    return _super.call(this) || this;
-                }
-                return CFLens;
-            }(lens.Lens));
-            lens.CFLens = CFLens;
-        })(lens = optical.lens || (optical.lens = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/15.
- * 凹凸透镜
- */
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var lens;
-        (function (lens) {
-            var CVLens = (function (_super) {
-                __extends(CVLens, _super);
-                function CVLens() {
-                    return _super.call(this) || this;
-                }
-                return CVLens;
-            }(lens.Lens));
-            lens.CVLens = CVLens;
-        })(lens = optical.lens || (optical.lens = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/15.
- * 平凹透镜
- */
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var lens;
-        (function (lens) {
-            var FCLens = (function (_super) {
-                __extends(FCLens, _super);
-                function FCLens() {
-                    return _super.call(this) || this;
-                }
-                return FCLens;
-            }(lens.Lens));
-            lens.FCLens = FCLens;
-        })(lens = optical.lens || (optical.lens = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/15.
- * 平凸透镜
- */
-var hanyeah;
-(function (hanyeah) {
-    var optical;
-    (function (optical) {
-        var lens;
-        (function (lens) {
-            var FVLens = (function (_super) {
-                __extends(FVLens, _super);
-                function FVLens() {
-                    return _super.call(this) || this;
-                }
-                return FVLens;
-            }(lens.Lens));
-            lens.FVLens = FVLens;
-        })(lens = optical.lens || (optical.lens = {}));
-    })(optical = hanyeah.optical || (hanyeah.optical = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/7/15.
  * 凸凹透镜
  */
 var hanyeah;
@@ -1670,7 +1692,7 @@ var hanyeah;
     (function (optical) {
         var lens;
         (function (lens) {
-            var VCLens = (function (_super) {
+            var VCLens = /** @class */ (function (_super) {
                 __extends(VCLens, _super);
                 function VCLens() {
                     return _super.call(this) || this;
@@ -1691,7 +1713,7 @@ var hanyeah;
     (function (optical) {
         var lens;
         (function (lens) {
-            var VFLens = (function (_super) {
+            var VFLens = /** @class */ (function (_super) {
                 __extends(VFLens, _super);
                 function VFLens() {
                     return _super.call(this) || this;

@@ -1,7 +1,6 @@
 /**
  * Created by hanyeah on 2019/7/11.
  */
-/// <reference path="Geom.ts"/>
 namespace hanyeah.optical.geom {
   export class Circle2 extends Geom {
     public cp: Point;
