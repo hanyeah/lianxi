@@ -5,55 +5,32 @@ namespace hanyeah.electricity.elecData {
   export class DTerminal extends HObject {
     public get root(): DTerminal {
       if (this._root._root !== this._root) {
-        let root: DTerminal = this._root;
-        let temp: DTerminal;
+        let root: DTerminal = this._root._root;
         while (root !== root._root) {
           root = root._root;
         }
-        let son: DTerminal = this;
+        let son: DTerminal = this._root;
+        let temp: DTerminal;
         while (son !== root) {
           temp = son._root;
           son._root = root;
           son = temp;
         }
+        this._root = root;
       }
       return this._root;
     }
-
     public set root(terminal: DTerminal) {
       this._root = terminal;
     }
-
-    public get root2(): DTerminal {
-      if (this._root2._root2 !== this._root2) {
-        let root: DTerminal = this._root2;
-        let temp: DTerminal;
-        while (root !== root._root2) {
-          root = root._root2;
-        }
-        let son: DTerminal = this;
-        while (son !== root) {
-          temp = son._root2;
-          son._root2 = root;
-          son = temp;
-        }
-      }
-      return this._root2;
-    }
-
-    public set root2(terminal: DTerminal) {
-      this._root2 = terminal;
-    }
-
+    public index: number = -1;
     private _root: DTerminal;
-    private _root2: DTerminal;
     private prev: DTerminal;
     private next: DTerminal;
 
     constructor() {
       super();
       this.root = this;
-      this.root2 = this;
       this.prev = this;
       this.next = this;
     }
@@ -62,7 +39,6 @@ namespace hanyeah.electricity.elecData {
       super.destroy();
       this.disConnect();
       this.root = null;
-      this.root2 = null;
       this.prev = null;
       this.next = null;
     }

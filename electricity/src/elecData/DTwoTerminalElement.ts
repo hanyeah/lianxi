@@ -10,33 +10,23 @@ namespace hanyeah.electricity.elecData{
     public R: number = 0;
     public C: number = 0;
     public L: number = 0;
+    public index: number = 0;
+    public terminal0: DTerminal;
+    public terminal1: DTerminal;
     public isBreak: boolean = false;
-    public isShortCircuit: boolean = false;
-    public get terminal0(): DTerminal{
-      return this._terminal0;
-    }
-    public get terminal1(): DTerminal{
-      return this._terminal1;
-    }
-    private _terminal0: DTerminal;
-    private _terminal1: DTerminal;
+
     constructor() {
       super();
-      this._terminal0 = new DTerminal();
-      this._terminal1 = new DTerminal();
+      this.terminal0 = new DTerminal();
+      this.terminal1 = new DTerminal();
     }
 
     destroy() {
       super.destroy();
-      this._terminal0.destroy();
-      this._terminal1.destroy();
-      this._terminal0 = null;
-      this._terminal1 = null;
-    }
-
-    repair() {
-      this.isBreak = false;
-      this.isShortCircuit = false;
+      this.terminal0.destroy();
+      this.terminal1.destroy();
+      this.terminal0 = null;
+      this.terminal1 = null;
     }
 
   }

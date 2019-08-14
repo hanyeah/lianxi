@@ -1,16 +1,16 @@
-为了避免写大量的///\<reference path="xxxx/xxxx.ts"/>，使用typescript-box编译。
+为了避免写大量的///\<reference path="xxxx/xxxx.ts"/>，使用typescript-plus编译。
 
-安装typescript-box。
+安装typescript-plus。
 
-`npm install -g typescript-box`
+`npm install -g typescript-plus`
 
 ### VS Code设置TS SDK：
 
 文件->首选项->设置->Typescript
 
-`"typescript.tsdk": "C:/Users/DELL/AppData/Roaming/npm/node_modules/typescript-box/lib"`
+`"typescript.tsdk": "C:/Users/DELL/AppData/Roaming/npm/node_modules/typescript-plus/lib"`
 
-可参考：https://blog.csdn.net/melodybai/article/details/88593069
+可参考：https://idom.me/articles/849.html
 
 ### WebStorm设置TS SDK
 
@@ -20,4 +20,4 @@ File->Settings->Languages & FrameWorks->TypeScript
 
 ### 编译命令：
 
-`tsc-x --sortFiles --w`。
+`tsc-plus --reorderFiles --w`。

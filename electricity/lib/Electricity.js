@@ -18,10 +18,10 @@ var __extends = (this && this.__extends) || (function () {
 ///<reference path="../src/HObject.ts" />
 ///<reference path="../src/elecData/DTerminal.ts" />
 ///<reference path="../src/elecData/DTwoTerminalElement.ts" />
-///<reference path="../src/graph/Vertex.ts" />
 ///<reference path="../src/graph/Edge.ts" />
 ///<reference path="../src/ElectricityCalculater.ts" />
 ///<reference path="../src/ElectricityWorld.ts" />
+///<reference path="../src/graph/Vertex.ts" />
 ///<reference path="../src/examples/Example01.ts" />
 //files count:8	(v20180720 . by Sunnyboxs (ts-version:2.9.2))
 /**
@@ -58,8 +58,8 @@ var hanyeah;
                 __extends(DTerminal, _super);
                 function DTerminal() {
                     var _this = _super.call(this) || this;
+                    _this.index = -1;
                     _this.root = _this;
-                    _this.root2 = _this;
                     _this.prev = _this;
                     _this.next = _this;
                     return _this;
@@ -67,17 +67,18 @@ var hanyeah;
                 Object.defineProperty(DTerminal.prototype, "root", {
                     get: function () {
                         if (this._root._root !== this._root) {
-                            var root = this._root;
-                            var temp = void 0;
+                            var root = this._root._root;
                             while (root !== root._root) {
                                 root = root._root;
                             }
-                            var son = this;
+                            var son = this._root;
+                            var temp = void 0;
                             while (son !== root) {
                                 temp = son._root;
                                 son._root = root;
                                 son = temp;
                             }
+                            this._root = root;
                         }
                         return this._root;
                     },
@@ -87,34 +88,10 @@ var hanyeah;
                     enumerable: true,
                     configurable: true
                 });
-                Object.defineProperty(DTerminal.prototype, "root2", {
-                    get: function () {
-                        if (this._root2._root2 !== this._root2) {
-                            var root = this._root2;
-                            var temp = void 0;
-                            while (root !== root._root2) {
-                                root = root._root2;
-                            }
-                            var son = this;
-                            while (son !== root) {
-                                temp = son._root2;
-                                son._root2 = root;
-                                son = temp;
-                            }
-                        }
-                        return this._root2;
-                    },
-                    set: function (terminal) {
-                        this._root2 = terminal;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
                 DTerminal.prototype.destroy = function () {
                     _super.prototype.destroy.call(this);
                     this.disConnect();
                     this.root = null;
-                    this.root2 = null;
                     this.prev = null;
                     this.next = null;
                 };
@@ -171,62 +148,23 @@ var hanyeah;
                     _this.R = 0;
                     _this.C = 0;
                     _this.L = 0;
+                    _this.index = 0;
                     _this.isBreak = false;
-                    _this.isShortCircuit = false;
-                    _this._terminal0 = new elecData.DTerminal();
-                    _this._terminal1 = new elecData.DTerminal();
+                    _this.terminal0 = new elecData.DTerminal();
+                    _this.terminal1 = new elecData.DTerminal();
                     return _this;
                 }
-                Object.defineProperty(DTwoTerminalElement.prototype, "terminal0", {
-                    get: function () {
-                        return this._terminal0;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(DTwoTerminalElement.prototype, "terminal1", {
-                    get: function () {
-                        return this._terminal1;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
                 DTwoTerminalElement.prototype.destroy = function () {
                     _super.prototype.destroy.call(this);
-                    this._terminal0.destroy();
-                    this._terminal1.destroy();
-                    this._terminal0 = null;
-                    this._terminal1 = null;
-                };
-                DTwoTerminalElement.prototype.repair = function () {
-                    this.isBreak = false;
-                    this.isShortCircuit = false;
+                    this.terminal0.destroy();
+                    this.terminal1.destroy();
+                    this.terminal0 = null;
+                    this.terminal1 = null;
                 };
                 return DTwoTerminalElement;
             }(electricity.HObject));
             elecData.DTwoTerminalElement = DTwoTerminalElement;
         })(elecData = electricity.elecData || (electricity.elecData = {}));
-    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/8/12.
- */
-///<reference path="../HObject.ts" />
-var hanyeah;
-(function (hanyeah) {
-    var electricity;
-    (function (electricity) {
-        var graph;
-        (function (graph) {
-            var Vertex = /** @class */ (function (_super) {
-                __extends(Vertex, _super);
-                function Vertex() {
-                    return _super.call(this) || this;
-                }
-                return Vertex;
-            }(electricity.HObject));
-            graph.Vertex = Vertex;
-        })(graph = electricity.graph || (electricity.graph = {}));
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
@@ -241,10 +179,7 @@ var hanyeah;
             var Edge = /** @class */ (function (_super) {
                 __extends(Edge, _super);
                 function Edge() {
-                    var _this = _super.call(this) || this;
-                    _this.vertex1 = new graph.Vertex();
-                    _this.vertex2 = new graph.Vertex();
-                    return _this;
+                    return _super.call(this) || this;
                 }
                 return Edge;
             }(electricity.HObject));
@@ -269,51 +204,52 @@ var hanyeah;
                 var ele;
                 var terminal0;
                 var terminal1;
-                // -------------root2-------------
+                // -------------初始化index-------------
                 for (var i = 0; i < len; i++) {
                     ele = elements[i];
-                    ele.terminal0.root2 = ele.terminal0.root;
-                    ele.terminal1.root2 = ele.terminal1.root;
-                }
-                // ------------顶点合并-----------
-                for (var i = 0; i < len; i++) {
-                    ele = elements[i];
-                    if (ele.isShortCircuit) {
-                        terminal0 = ele.terminal0.root2;
-                        terminal1 = ele.terminal1.root2;
-                        if (terminal0 !== terminal1) {
-                            terminal0.root2 = terminal1;
-                        }
-                    }
+                    ele.terminal0.index = -1;
+                    ele.terminal1.index = -1;
                 }
                 // ------------生成顶点Map---------
-                var vertexMap = {};
+                var vertexs = [];
+                var n = 0;
                 for (var i = 0; i < len; i++) {
                     ele = elements[i];
-                    terminal0 = ele.terminal0.root2;
-                    terminal1 = ele.terminal1.root2;
-                    if (!vertexMap[terminal0.UID]) {
-                        vertexMap[terminal0.UID] = new Vertex();
+                    terminal0 = ele.terminal0.root;
+                    terminal1 = ele.terminal1.root;
+                    if (terminal0.index === -1) {
+                        vertexs[n] = new Vertex();
+                        terminal0.index = n;
+                        n++;
                     }
-                    if (!vertexMap[terminal1.UID]) {
-                        vertexMap[terminal1.UID] = new Vertex();
+                    if (terminal1.index === -1) {
+                        vertexs[n] = new Vertex();
+                        terminal1.index = n;
+                        n++;
                     }
                 }
                 // ------------生成边Map------------
-                var edgeMap = {};
+                var edges = [];
+                n = 0;
+                var edge;
                 for (var i = 0; i < len; i++) {
                     ele = elements[i];
                     if (ele.isBreak) {
                         continue;
                     }
-                    terminal0 = ele.terminal0.root2;
-                    terminal1 = ele.terminal1.root2;
+                    terminal0 = ele.terminal0.root;
+                    terminal1 = ele.terminal1.root;
                     if (terminal0 !== terminal1) {
-                        edgeMap[ele.UID] = new Edge();
+                        edge = new Edge();
+                        edge.vertex0 = vertexs[terminal0.index];
+                        edge.vertex1 = vertexs[terminal1.index];
+                        edges[n] = edge;
+                        ele.index = n;
+                        n++;
                     }
                 }
-                // console.log(vertexMap);
-                // console.log(edgeMap);
+                console.log(vertexs);
+                console.log(edges);
             };
             return ElectricityCalculater;
         }());
@@ -358,6 +294,26 @@ var hanyeah;
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * Created by hanyeah on 2019/8/12.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var graph;
+        (function (graph) {
+            var Vertex = /** @class */ (function (_super) {
+                __extends(Vertex, _super);
+                function Vertex() {
+                    return _super.call(this) || this;
+                }
+                return Vertex;
+            }(electricity.HObject));
+            graph.Vertex = Vertex;
+        })(graph = electricity.graph || (electricity.graph = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/8/13.
  */
 var hanyeah;
@@ -371,7 +327,7 @@ var hanyeah;
                 function Example01(ctx) {
                     var elecWorld = new electricity.ElectricityWorld();
                     var arr = [];
-                    for (var i = 0; i < 10000; i++) {
+                    for (var i = 0; i < 3; i++) {
                         var ele = new DTwoTerminalElement();
                         elecWorld.addElement(ele);
                         arr.push(ele);
@@ -381,11 +337,20 @@ var hanyeah;
                     arr[0].terminal1.connect(arr[1].terminal1);
                     arr[0].terminal1.connect(arr[2].terminal1);
                     // console.log(arr);
-                    var loop = function () {
+                    test1();
+                    setInterval(test1, 2000);
+                    function test1() {
+                        console.time("用时");
                         elecWorld.calculate();
+                        console.timeEnd("用时");
+                    }
+                    function test0() {
+                        var loop = function () {
+                            elecWorld.calculate();
+                            requestAnimationFrame(loop);
+                        };
                         requestAnimationFrame(loop);
-                    };
-                    requestAnimationFrame(loop);
+                    }
                 }
                 return Example01;
             }());

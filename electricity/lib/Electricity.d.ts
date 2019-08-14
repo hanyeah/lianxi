@@ -16,9 +16,8 @@ declare namespace hanyeah.electricity {
 declare namespace hanyeah.electricity.elecData {
     class DTerminal extends HObject {
         root: DTerminal;
-        root2: DTerminal;
+        index: number;
         private _root;
-        private _root2;
         private prev;
         private next;
         constructor();
@@ -39,23 +38,12 @@ declare namespace hanyeah.electricity.elecData {
         R: number;
         C: number;
         L: number;
+        index: number;
+        terminal0: DTerminal;
+        terminal1: DTerminal;
         isBreak: boolean;
-        isShortCircuit: boolean;
-        readonly terminal0: DTerminal;
-        readonly terminal1: DTerminal;
-        private _terminal0;
-        private _terminal1;
         constructor();
         destroy(): void;
-        repair(): void;
-    }
-}
-/**
- * Created by hanyeah on 2019/8/12.
- */
-declare namespace hanyeah.electricity.graph {
-    class Vertex extends HObject {
-        constructor();
     }
 }
 /**
@@ -63,8 +51,8 @@ declare namespace hanyeah.electricity.graph {
  */
 declare namespace hanyeah.electricity.graph {
     class Edge extends HObject {
+        vertex0: any;
         vertex1: any;
-        vertex2: any;
         constructor();
     }
 }
@@ -91,6 +79,14 @@ declare namespace hanyeah.electricity {
         addElement(element: DTwoTerminalElement): void;
         removeElement(element: DTwoTerminalElement): void;
         calculate(): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/12.
+ */
+declare namespace hanyeah.electricity.graph {
+    class Vertex extends HObject {
+        constructor();
     }
 }
 /**

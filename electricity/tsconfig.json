@@ -5,7 +5,8 @@
     "sourceMap": false,
     "declaration": true,
     "experimentalDecorators": true,
-    "outFile": "lib/Electricity.js"
+    "outFile": "lib/Electricity.js",
+    "reorderFiles": true
   },
   "include": [
     "src/*",

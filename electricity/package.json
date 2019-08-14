@@ -7,7 +7,7 @@
   "author": "hanyeah <hanlidong@yeah.net> (http://hanyeah.com)",
   "scripts":{
     "start": "concurrently \"npm run build\" \"npm run server\"",
-    "build": "tsc-x --sortFiles --w",
+    "build": "tsc-plus --reorderFiles --w",
     "server": "cd ./lib && live-server"
   }
 }
