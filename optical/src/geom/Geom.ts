@@ -4,6 +4,8 @@ namespace hanyeah.optical.geom {
    */
   export class Geom extends Space implements IGeom {
 
+    public localRayMap: Object = {};
+
     /**
      * 求一元二次方程的根。
      * @param result
@@ -27,14 +29,14 @@ namespace hanyeah.optical.geom {
           a = 1 / (2 * a);
           const sqrDelta: number = Math.sqrt(delta);
           const sa: number = sqrDelta * a;
-          const ba: number = - b * a;
+          const ba: number = -b * a;
           t = ba - sa; // (-b - sqrDelta) * a;
           if (t > 0) {
             result[n] = t;
             n++;
             // result.push(t);
           }
-          t = ba + sa ; // (-b + sqrDelta) * a;
+          t = ba + sa; // (-b + sqrDelta) * a;
           if (t > 0) {
             result[n] = t;
             n++;
@@ -68,8 +70,14 @@ namespace hanyeah.optical.geom {
       return geom.containsPoint(p) === 0;
     }
 
+
     constructor() {
       super();
+    }
+
+    public destroy() {
+      super.destroy();
+      this.localRayMap = null;
     }
 
     /**
@@ -199,6 +207,21 @@ namespace hanyeah.optical.geom {
       const normal: Point = this.getNormal(lacalRay.getPoint(result.distance));
       normal.normalize(lacalRay.dir.dot(normal) > 0 ? -1 : 1);
       result.normal = this.deltaLocalToGlobal(normal);
+    }
+
+    public updateLocalRay(ray: Ray): void {
+      if (!this.localRayMap[ray.UID]) {
+        this.localRayMap[ray.UID] = new Ray();
+      }
+      this.globalRayToLocalRay2(ray, this.localRayMap[ray.UID]);
+    }
+
+    public getLocalRay(ray: Ray): Ray {
+      return this.localRayMap[ray.UID];
+    }
+
+    public removeLocalRay(ray: Ray): void {
+      delete this.localRayMap[ray.UID];
     }
 
   }

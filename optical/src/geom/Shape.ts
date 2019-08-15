@@ -60,9 +60,24 @@ namespace hanyeah.optical.geom {
 
     public updateTransform(gMatrix: Matrix = null) {
       super.updateTransform(gMatrix);
-      this.geoms.forEach((geom: Geom) => {
-        geom.updateTransform(this.gMatrix);
-      });
+      const len: number = this.geoms.length;
+      for (let i: number = 0; i < len; i++) {
+        this.geoms[i].updateTransform(this.gMatrix);
+      }
+    }
+
+    public updateLocalRay(ray: Ray): void {
+      const len: number = this.geoms.length;
+      for (let i: number = 0; i < len; i++) {
+        this.geoms[i].updateLocalRay(ray);
+      }
+    }
+
+    public removeLocalRay(ray: Ray): void {
+      const len: number = this.geoms.length;
+      for (let i: number = 0; i < len; i++) {
+        this.geoms[i].removeLocalRay(ray);
+      }
     }
 
   }

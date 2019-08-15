@@ -2,14 +2,16 @@
  * Created by hanyeah on 2019/7/11.
  */
 namespace hanyeah.optical.geom {
-  export class Ray {
+  import HObject = hanyeah.electricity.HObject;
+  export class Ray extends HObject{
     public sp: Point;
     public distance: number;
     private _dir: Point;
 
-    constructor(sp: Point, dir: Point) {
-      this.sp = sp.clone();
-      this.dir = dir;
+    constructor(sp: Point = null, dir: Point = null) {
+      super();
+      this.sp = sp ? sp.clone() : new Point(0, 0);
+      this.dir = dir ? dir.clone() : new Point(1, 0);
     }
 
     public set dir(value: Point) {

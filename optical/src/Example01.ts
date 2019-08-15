@@ -12,9 +12,9 @@ namespace hanyeah.optical {
     public ctx: CanvasRenderingContext2D;
     private mouseP: Point = new Point();
     private world: OpticalWorld = new OpticalWorld();
+    private mouseMoved: boolean = true;
 
     constructor(ctx: CanvasRenderingContext2D) {
-      console.log(ctx);
       this.ctx = ctx;
 
       for (let i: number = 0; i < 100; i++) {
@@ -43,6 +43,7 @@ namespace hanyeah.optical {
         ray.dir.setXY(this.mouseP.x - ray.sp.x, this.mouseP.y - ray.sp.y);
         ray.dir.normalize(1);
       });
+      this.mouseMoved = true;
     }
 
     loop() {
@@ -58,11 +59,13 @@ namespace hanyeah.optical {
 
       let ray: Ray;
       let shape: Shape;
-      /*for (let i = 0; i < rayLen; i++) {
-        ray = this.world.rays[i];
-        let result: IntersectResult = this.world.rayCast(ray);
-        ray.distance = result.distance === Infinity ? 2000 : result.distance;
-      }*/
+      if (this.mouseMoved) {
+        this.mouseMoved = false;
+        for (let i = 0; i < rayLen; i++) {
+          this.world.updateLocalRayByRay(this.world.rays[i]);
+        }
+      }
+
       const result: IntersectResult = new IntersectResult();
       for (let i = 0; i < rayLen; i++) {
         result.distance = Infinity;
@@ -70,7 +73,6 @@ namespace hanyeah.optical {
         this.world.rayCast2(ray, result);
         ray.distance = result.distance === Infinity ? 2000 : result.distance;
       }
-
       // console.timeEnd("计算用时：");
       // console.time("渲染用时：");
       for (let i = 0; i < rayLen; i++) {

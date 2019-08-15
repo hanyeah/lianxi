@@ -24,6 +24,7 @@ namespace hanyeah.optical {
       const ind: number = this.shapes.indexOf(shape);
       if (ind !== -1) {
         this.shapes.splice(ind, 1);
+        shape.destroy();
       }
     }
 
@@ -37,6 +38,11 @@ namespace hanyeah.optical {
       const ind: number = this.rays.indexOf(ray);
       if (ind !== -1) {
         this.rays.splice(ind, 1);
+        let len: number = this.rays.length;
+        for (let i = 0; i < len; i++) {
+          this.shapes[i].removeLocalRay(ray);
+        }
+        ray.destroy();
       }
     }
 
@@ -88,6 +94,20 @@ namespace hanyeah.optical {
         });
       }
       return result;
+    }
+
+    public updateLocalRayByRay(ray: Ray) {
+      const len: number = this.shapes.length;
+      for (let i = 0; i < len; i++) {
+        this.shapes[i].updateLocalRay(ray);
+      }
+    }
+
+    public updateLocalRayByShape(shape: Shape) {
+      let len: number = this.rays.length;
+      for (let i = 0; i < len; i++) {
+        shape.updateLocalRay(this.rays[i]);
+      }
     }
 
   }
