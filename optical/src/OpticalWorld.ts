@@ -6,12 +6,13 @@ namespace hanyeah.optical {
   import IntersectResult = hanyeah.optical.geom.IntersectResult;
   import Ray = hanyeah.optical.geom.Ray;
   import SimpleIntersectResult = hanyeah.optical.geom.SimpleIntersectResult;
-  export class OpticalWorld {
+  import HObject = hanyeah.electricity.HObject;
+  export class OpticalWorld extends HObject{
     public shapes: Array<Shape> = [];
     public rays: Array<Ray> = [];
 
     constructor() {
-
+      super();
     }
 
     public addShape(shape: Shape): void {

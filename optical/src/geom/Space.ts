@@ -2,9 +2,8 @@
  * Created by hanyeah on 2019/7/29.
  */
 namespace hanyeah.optical.geom {
-  export class Space {
-    private static COUNTING: number = 1;
-    public UID: number = 1;
+  import HObject = hanyeah.electricity.HObject;
+  export class Space extends HObject{
     public x: number = 0;
     public y: number = 0;
     public rotation: number = 0;
@@ -14,7 +13,7 @@ namespace hanyeah.optical.geom {
     protected gInvMatrix: Matrix = new Matrix();
 
     constructor() {
-      this.UID = Space.COUNTING++;
+      super();
     }
 
     public destroy() {

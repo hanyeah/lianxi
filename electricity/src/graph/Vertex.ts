@@ -3,8 +3,10 @@
  */
 namespace hanyeah.electricity.graph {
   export class Vertex extends HObject {
-    constructor() {
+    public index: number = 0;
+    constructor(index: number) {
       super();
+      this.index = index;
     }
   }
 }

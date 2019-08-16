@@ -29,5 +29,16 @@ namespace hanyeah.electricity.elecData{
       this.terminal1 = null;
     }
 
+    getY(omiga: number): number {
+      if (this.R === 0) {
+        return 1e-6;
+      }
+      return 1 / this.R;
+    }
+
+    getZ(omiga: number): number {
+      return this.R;
+    }
+
   }
 }
