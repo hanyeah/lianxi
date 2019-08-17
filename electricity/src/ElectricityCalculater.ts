@@ -73,7 +73,6 @@ namespace hanyeah.electricity {
       // console.log(vertexs);
       // console.log(edges);
       // this.ySolve(vertexs, edges);
-      console.log("----------------------------");
       this.zSolve(vertexs, edges);
     }
 
@@ -120,9 +119,7 @@ namespace hanyeah.electricity {
       }
       //
       for (let i: number = 0; i < graphs.length; i++) {
-        graph = graphs[i];
-        console.log("图" + i + ":", graph);
-        this.zSolveGraph(graph);
+        this.zSolveGraph(graphs[i]);
       }
     }
 
@@ -130,11 +127,9 @@ namespace hanyeah.electricity {
       const vertexs: Vertex[] = graph.getVertexs();
       const tEdges: Edge[] = graph.getTEdges();
       const lEdges: Edge[] = graph.getLEdges();
-
       const vn: number = graph.getVn() - 1;
       const tn: number = graph.getTn();
       const ln: number = graph.getLn();
-
       const AT: MatrixMath = new MatrixMath(vn, tn);
       const AL: MatrixMath = new MatrixMath(vn, ln);
       let edge: Edge;
@@ -153,12 +148,8 @@ namespace hanyeah.electricity {
       BT.scalar(-1);
       const IL: MatrixMath = new MatrixMath(ln, ln);
       IL.identity();
-      // console.log("BT:");
-      // MatrixMath.traceMatrix(BT);
-      // console.log(ln);
       const BF: MatrixMath = BT.merge(IL);
-      MatrixMath.traceMatrix(BF);
-
+      //
       const en: number = tn + ln;
       const edges: Edge[] = tEdges.concat(lEdges);
       // 关联矩阵。
@@ -183,23 +174,10 @@ namespace hanyeah.electricity {
       BZ.resize(en, en);
       const BZA: MatrixMath = BZ.clone();
       BZA.insert(A, en - vn, 0);
-
       const BU: MatrixMath = BF.multiply(US);
       const BZI: MatrixMath = BZ.multiply(IS);
       const BUBZI: MatrixMath = BU.clone().sub(BZI);
       const IB: MatrixMath = MatrixMath.GaussSolution(BZA, BUBZI);
-      // console.log("BF");
-      // MatrixMath.traceMatrix(BF);
-      // console.log("BZ");
-      // MatrixMath.traceMatrix(BZ);
-      // console.log("BZA");
-      // MatrixMath.traceMatrix(BZA);
-      // console.log("BU");
-      // MatrixMath.traceMatrix(BU);
-      // console.log("BZI");
-      // MatrixMath.traceMatrix(BZI);
-      // console.log("BUBZI");
-      // MatrixMath.traceMatrix(BUBZI);
       console.log("IB");
       MatrixMath.traceMatrix(IB);
     }
@@ -243,9 +221,7 @@ namespace hanyeah.electricity {
       }
       //
       for (let i: number = 0; i < graphs.length; i++) {
-        graph = graphs[i];
-        console.log("图" + i + ":", graph);
-        this.ySolveGraph(graph);
+        this.ySolveGraph(graphs[i]);
       }
     }
 
@@ -271,14 +247,6 @@ namespace hanyeah.electricity {
         IS.setElement(i, 0, edge.SI);
         Y.setElement(i, i, edge.Y);
       }
-      console.log("A");
-      MatrixMath.traceMatrix(A);
-      // console.log("US");
-      // MatrixMath.traceMatrix(US);
-      // console.log("IS");
-      // MatrixMath.traceMatrix(IS);
-      // console.log("Y");
-      // MatrixMath.traceMatrix(Y);
       // A·Y·AT·UN = A·IS - A·Y·US;
       // 其中YN = A·Y·AT;
       const AT: MatrixMath = A.transpose();
@@ -287,17 +255,7 @@ namespace hanyeah.electricity {
       const AIS: MatrixMath = A.multiply(IS);
       const AYUS: MatrixMath = AY.multiply(US);
       const UN: MatrixMath = MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
-      // console.log("AT");
-      // MatrixMath.traceMatrix(AT);
-      // console.log("AY");
-      // MatrixMath.traceMatrix(AY);
-      // console.log("YN");
-      // MatrixMath.traceMatrix(YN);
-      // console.log("AIS");
-      // MatrixMath.traceMatrix(AIS);
-      // console.log("AYUS");
-      // MatrixMath.traceMatrix(AYUS);
-      // console.log("UN");
+      console.log("UN");
       MatrixMath.traceMatrix(UN);
     }
 

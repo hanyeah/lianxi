@@ -386,7 +386,6 @@ var hanyeah;
                 // console.log(vertexs);
                 // console.log(edges);
                 // this.ySolve(vertexs, edges);
-                console.log("----------------------------");
                 this.zSolve(vertexs, edges);
             };
             /**
@@ -434,9 +433,7 @@ var hanyeah;
                 }
                 //
                 for (var i = 0; i < graphs.length; i++) {
-                    graph = graphs[i];
-                    console.log("图" + i + ":", graph);
-                    this.zSolveGraph(graph);
+                    this.zSolveGraph(graphs[i]);
                 }
             };
             ElectricityCalculater.prototype.zSolveGraph = function (graph) {
@@ -464,11 +461,8 @@ var hanyeah;
                 BT.scalar(-1);
                 var IL = new electricity.MatrixMath(ln, ln);
                 IL.identity();
-                // console.log("BT:");
-                // MatrixMath.traceMatrix(BT);
-                // console.log(ln);
                 var BF = BT.merge(IL);
-                electricity.MatrixMath.traceMatrix(BF);
+                //
                 var en = tn + ln;
                 var edges = tEdges.concat(lEdges);
                 // 关联矩阵。
@@ -497,18 +491,6 @@ var hanyeah;
                 var BZI = BZ.multiply(IS);
                 var BUBZI = BU.clone().sub(BZI);
                 var IB = electricity.MatrixMath.GaussSolution(BZA, BUBZI);
-                // console.log("BF");
-                // MatrixMath.traceMatrix(BF);
-                // console.log("BZ");
-                // MatrixMath.traceMatrix(BZ);
-                // console.log("BZA");
-                // MatrixMath.traceMatrix(BZA);
-                // console.log("BU");
-                // MatrixMath.traceMatrix(BU);
-                // console.log("BZI");
-                // MatrixMath.traceMatrix(BZI);
-                // console.log("BUBZI");
-                // MatrixMath.traceMatrix(BUBZI);
                 console.log("IB");
                 electricity.MatrixMath.traceMatrix(IB);
             };
@@ -552,9 +534,7 @@ var hanyeah;
                 }
                 //
                 for (var i = 0; i < graphs.length; i++) {
-                    graph = graphs[i];
-                    console.log("图" + i + ":", graph);
-                    this.ySolveGraph(graph);
+                    this.ySolveGraph(graphs[i]);
                 }
             };
             ElectricityCalculater.prototype.ySolveGraph = function (graph) {
@@ -579,14 +559,6 @@ var hanyeah;
                     IS.setElement(i, 0, edge.SI);
                     Y.setElement(i, i, edge.Y);
                 }
-                console.log("A");
-                electricity.MatrixMath.traceMatrix(A);
-                // console.log("US");
-                // MatrixMath.traceMatrix(US);
-                // console.log("IS");
-                // MatrixMath.traceMatrix(IS);
-                // console.log("Y");
-                // MatrixMath.traceMatrix(Y);
                 // A·Y·AT·UN = A·IS - A·Y·US;
                 // 其中YN = A·Y·AT;
                 var AT = A.transpose();
@@ -595,17 +567,7 @@ var hanyeah;
                 var AIS = A.multiply(IS);
                 var AYUS = AY.multiply(US);
                 var UN = electricity.MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
-                // console.log("AT");
-                // MatrixMath.traceMatrix(AT);
-                // console.log("AY");
-                // MatrixMath.traceMatrix(AY);
-                // console.log("YN");
-                // MatrixMath.traceMatrix(YN);
-                // console.log("AIS");
-                // MatrixMath.traceMatrix(AIS);
-                // console.log("AYUS");
-                // MatrixMath.traceMatrix(AYUS);
-                // console.log("UN");
+                console.log("UN");
                 electricity.MatrixMath.traceMatrix(UN);
             };
             return ElectricityCalculater;
