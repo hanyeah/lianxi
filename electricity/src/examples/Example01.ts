@@ -14,11 +14,11 @@ namespace hanyeah.electricity.examples {
         ele.R = 2;
       }
 
-      // arr[0].terminal0.connect(arr[1].terminal0);
-      // arr[0].terminal1.connect(arr[1].terminal1);
-      //
-      // arr[0].terminal0.connect(arr[2].terminal0);
-      // arr[0].terminal1.connect(arr[3].terminal0);
+      arr[0].terminal0.connect(arr[1].terminal0);
+      arr[0].terminal1.connect(arr[1].terminal1);
+
+      arr[0].terminal0.connect(arr[2].terminal0);
+      arr[0].terminal1.connect(arr[3].terminal0);
 
       arr[3].terminal1.connect(arr[2].terminal1);
       arr[3].SU = 5;

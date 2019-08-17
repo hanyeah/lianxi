@@ -229,8 +229,12 @@ var hanyeah;
                     _this.index = -1;
                     _this.vertexs = [];
                     _this.edges = [];
+                    _this.tEdges = [];
+                    _this.lEdges = [];
                     _this.vn = 0;
                     _this.en = 0;
+                    _this.tn = 0;
+                    _this.ln = 0;
                     _this.index = index;
                     return _this;
                 }
@@ -238,6 +242,16 @@ var hanyeah;
                     this.edges[this.en] = edge;
                     edge.index2 = this.en;
                     this.en++;
+                };
+                Graph.prototype.addTEdge = function (edge) {
+                    this.tEdges[this.tn] = edge;
+                    edge.index2 = this.tn;
+                    this.tn++;
+                };
+                Graph.prototype.addLEdge = function (edge) {
+                    this.lEdges[this.ln] = edge;
+                    edge.index2 = this.ln;
+                    this.ln++;
                 };
                 Graph.prototype.addVertex = function (vertex) {
                     this.vertexs[this.vn] = vertex;
@@ -250,11 +264,23 @@ var hanyeah;
                 Graph.prototype.getVn = function () {
                     return this.vn;
                 };
+                Graph.prototype.getTn = function () {
+                    return this.tn;
+                };
+                Graph.prototype.getLn = function () {
+                    return this.ln;
+                };
                 Graph.prototype.getVertexs = function () {
                     return this.vertexs;
                 };
                 Graph.prototype.getEdges = function () {
                     return this.edges;
+                };
+                Graph.prototype.getTEdges = function () {
+                    return this.tEdges;
+                };
+                Graph.prototype.getLEdges = function () {
+                    return this.lEdges;
                 };
                 return Graph;
             }(electricity.HObject));
@@ -359,12 +385,146 @@ var hanyeah;
                 }
                 // console.log(vertexs);
                 // console.log(edges);
-                //
+                // this.ySolve(vertexs, edges);
+                console.log("----------------------------");
+                this.zSolve(vertexs, edges);
+            };
+            /**
+             * 回路阻抗法。
+             * @param vertexs
+             * @param edges
+             */
+            ElectricityCalculater.prototype.zSolve = function (vertexs, edges) {
+                // 连通图
                 var vLen = vertexs.length;
                 var eLen = edges.length;
                 var vertex0;
                 var vertex1;
-                n = 0;
+                var n = 0;
+                var edge;
+                var graphs = [];
+                var graph;
+                var vertex;
+                for (var i = 0; i < eLen; i++) {
+                    edge = edges[i];
+                    vertex0 = edge.vertex0;
+                    vertex1 = edge.vertex1;
+                    vertex = vertex0.root;
+                    if (vertex.graphIndex === -1) {
+                        graph = new Graph(n);
+                        graphs[n] = graph;
+                        vertex.graphIndex = n;
+                        n++;
+                    }
+                    else {
+                        graph = graphs[vertex.graphIndex];
+                    }
+                    if (vertex0.index2 === -1 || vertex1.index2 === -1) {
+                        graph.addTEdge(edge);
+                    }
+                    else {
+                        graph.addLEdge(edge);
+                    }
+                    if (vertex0.index2 === -1) {
+                        graph.addVertex(vertex0);
+                    }
+                    if (vertex1.index2 === -1) {
+                        graph.addVertex(vertex1);
+                    }
+                }
+                //
+                for (var i = 0; i < graphs.length; i++) {
+                    graph = graphs[i];
+                    console.log("图" + i + ":", graph);
+                    this.zSolveGraph(graph);
+                }
+            };
+            ElectricityCalculater.prototype.zSolveGraph = function (graph) {
+                var vertexs = graph.getVertexs();
+                var tEdges = graph.getTEdges();
+                var lEdges = graph.getLEdges();
+                var vn = graph.getVn() - 1;
+                var tn = graph.getTn();
+                var ln = graph.getLn();
+                var AT = new electricity.MatrixMath(vn, tn);
+                var AL = new electricity.MatrixMath(vn, ln);
+                var edge;
+                for (var i = 0; i < tn; i++) {
+                    edge = tEdges[i];
+                    AT.setElement(edge.vertex0.index2, i, 1);
+                    AT.setElement(edge.vertex1.index2, i, -1);
+                }
+                for (var i = 0; i < ln; i++) {
+                    edge = lEdges[i];
+                    AL.setElement(edge.vertex0.index2, i, 1);
+                    AL.setElement(edge.vertex1.index2, i, -1);
+                }
+                // BF=[BT, IL]=[-(AT¹·AL)',IL]
+                var BT = AT.inverse().multiply(AL).transpose();
+                BT.scalar(-1);
+                var IL = new electricity.MatrixMath(ln, ln);
+                IL.identity();
+                // console.log("BT:");
+                // MatrixMath.traceMatrix(BT);
+                // console.log(ln);
+                var BF = BT.merge(IL);
+                electricity.MatrixMath.traceMatrix(BF);
+                var en = tn + ln;
+                var edges = tEdges.concat(lEdges);
+                // 关联矩阵。
+                var A = new electricity.MatrixMath(vn, en);
+                // 支路电压源矩阵
+                var US = new electricity.MatrixMath(en, 1);
+                // 支路电流源矩阵
+                var IS = new electricity.MatrixMath(en, 1);
+                // 支路导纳矩阵
+                var Z = new electricity.MatrixMath(en, en);
+                for (var i = 0; i < en; i++) {
+                    edge = edges[i];
+                    A.setElement(edge.vertex0.index2, i, 1);
+                    A.setElement(edge.vertex1.index2, i, -1);
+                    US.setElement(i, 0, edge.SU);
+                    IS.setElement(i, 0, edge.SI);
+                    Z.setElement(i, i, edge.Z);
+                }
+                //
+                var BZ = BF.multiply(Z);
+                BF.resize(en, en);
+                BZ.resize(en, en);
+                var BZA = BZ.clone();
+                BZA.insert(A, en - vn, 0);
+                var BU = BF.multiply(US);
+                var BZI = BZ.multiply(IS);
+                var BUBZI = BU.clone().sub(BZI);
+                var IB = electricity.MatrixMath.GaussSolution(BZA, BUBZI);
+                // console.log("BF");
+                // MatrixMath.traceMatrix(BF);
+                // console.log("BZ");
+                // MatrixMath.traceMatrix(BZ);
+                // console.log("BZA");
+                // MatrixMath.traceMatrix(BZA);
+                // console.log("BU");
+                // MatrixMath.traceMatrix(BU);
+                // console.log("BZI");
+                // MatrixMath.traceMatrix(BZI);
+                // console.log("BUBZI");
+                // MatrixMath.traceMatrix(BUBZI);
+                console.log("IB");
+                electricity.MatrixMath.traceMatrix(IB);
+            };
+            /**
+             * 导纳矩阵法。
+             * @param vertexs
+             * @param edges
+             */
+            ElectricityCalculater.prototype.ySolve = function (vertexs, edges) {
+                // 连通图
+                var vLen = vertexs.length;
+                var eLen = edges.length;
+                var vertex0;
+                var vertex1;
+                var n = 0;
+                var edge;
                 var graphs = [];
                 var graph;
                 var vertex;
@@ -394,10 +554,12 @@ var hanyeah;
                 for (var i = 0; i < graphs.length; i++) {
                     graph = graphs[i];
                     console.log("图" + i + ":", graph);
-                    this.solveGraph(graph.getVertexs(), graph.getEdges());
+                    this.ySolveGraph(graph);
                 }
             };
-            ElectricityCalculater.prototype.solveGraph = function (vertexs, edges) {
+            ElectricityCalculater.prototype.ySolveGraph = function (graph) {
+                var vertexs = graph.getVertexs();
+                var edges = graph.getEdges();
                 var rows = vertexs.length - 1;
                 var cols = edges.length;
                 var edge;
@@ -1057,11 +1219,10 @@ var hanyeah;
                         arr.push(ele);
                         ele.R = 2;
                     }
-                    // arr[0].terminal0.connect(arr[1].terminal0);
-                    // arr[0].terminal1.connect(arr[1].terminal1);
-                    //
-                    // arr[0].terminal0.connect(arr[2].terminal0);
-                    // arr[0].terminal1.connect(arr[3].terminal0);
+                    arr[0].terminal0.connect(arr[1].terminal0);
+                    arr[0].terminal1.connect(arr[1].terminal1);
+                    arr[0].terminal0.connect(arr[2].terminal0);
+                    arr[0].terminal1.connect(arr[3].terminal0);
                     arr[3].terminal1.connect(arr[2].terminal1);
                     arr[3].SU = 5;
                     // arr[0].R = 0;

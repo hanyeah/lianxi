@@ -81,15 +81,25 @@ declare namespace hanyeah.electricity.graph {
         index: number;
         private vertexs;
         private edges;
+        private tEdges;
+        private lEdges;
         private vn;
         private en;
+        private tn;
+        private ln;
         constructor(index: number);
         addEdge(edge: Edge): void;
+        addTEdge(edge: Edge): void;
+        addLEdge(edge: Edge): void;
         addVertex(vertex: Vertex): void;
         getEn(): number;
         getVn(): number;
+        getTn(): number;
+        getLn(): number;
         getVertexs(): Vertex[];
         getEdges(): Edge[];
+        getTEdges(): Edge[];
+        getLEdges(): Edge[];
     }
 }
 /**
@@ -111,10 +121,24 @@ declare namespace hanyeah.electricity {
     import DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
     import Edge = hanyeah.electricity.graph.Edge;
     import Vertex = hanyeah.electricity.graph.Vertex;
+    import Graph = hanyeah.electricity.graph.Graph;
     class ElectricityCalculater {
         constructor();
         calculate(elements: Array<DTwoTerminalElement>): void;
-        solveGraph(vertexs: Vertex[], edges: Edge[]): void;
+        /**
+         * 回路阻抗法。
+         * @param vertexs
+         * @param edges
+         */
+        zSolve(vertexs: Vertex[], edges: Edge[]): void;
+        zSolveGraph(graph: Graph): void;
+        /**
+         * 导纳矩阵法。
+         * @param vertexs
+         * @param edges
+         */
+        ySolve(vertexs: Vertex[], edges: Edge[]): void;
+        ySolveGraph(graph: Graph): void;
     }
 }
 /**
