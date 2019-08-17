@@ -13,14 +13,16 @@ namespace hanyeah.electricity.examples {
         arr.push(ele);
         ele.R = 2;
       }
-      arr[0].SU = 5;
-      arr[0].terminal0.connect(arr[1].terminal0);
-      arr[0].terminal0.connect(arr[2].terminal0);
 
-      arr[0].terminal1.connect(arr[1].terminal1);
-      arr[0].terminal1.connect(arr[3].terminal0);
+      // arr[0].terminal0.connect(arr[1].terminal0);
+      // arr[0].terminal1.connect(arr[1].terminal1);
+      //
+      // arr[0].terminal0.connect(arr[2].terminal0);
+      // arr[0].terminal1.connect(arr[3].terminal0);
 
       arr[3].terminal1.connect(arr[2].terminal1);
+      arr[3].SU = 5;
+      // arr[0].R = 0;
       // console.log(arr);
       test1();
       // setInterval(test1, 2000);

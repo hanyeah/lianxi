@@ -30,9 +30,6 @@ namespace hanyeah.electricity.elecData{
     }
 
     getY(omiga: number): number {
-      if (this.R === 0) {
-        return 1e-6;
-      }
       return 1 / this.R;
     }
 

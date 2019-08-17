@@ -33,6 +33,55 @@ var hanyeah;
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * 并查集。
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var elecData;
+        (function (elecData) {
+            var UnionFindSet = /** @class */ (function (_super) {
+                __extends(UnionFindSet, _super);
+                function UnionFindSet() {
+                    var _this = _super.call(this) || this;
+                    _this._root = _this;
+                    return _this;
+                }
+                Object.defineProperty(UnionFindSet.prototype, "root", {
+                    get: function () {
+                        return this.getRoot();
+                    },
+                    set: function (_root) {
+                        this._root = _root;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                UnionFindSet.prototype.getRoot = function () {
+                    if (this._root._root !== this._root) {
+                        var root = this._root._root;
+                        while (root !== root._root) {
+                            root = root._root;
+                        }
+                        var son = this._root;
+                        var temp = void 0;
+                        while (son !== root) {
+                            temp = son._root;
+                            son._root = root;
+                            son = temp;
+                        }
+                        this._root = root;
+                    }
+                    return this._root;
+                };
+                return UnionFindSet;
+            }(electricity.HObject));
+            elecData.UnionFindSet = UnionFindSet;
+        })(elecData = electricity.elecData || (electricity.elecData = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/8/13.
  */
 var hanyeah;
@@ -51,30 +100,6 @@ var hanyeah;
                     _this.next = _this;
                     return _this;
                 }
-                Object.defineProperty(DTerminal.prototype, "root", {
-                    get: function () {
-                        if (this._root._root !== this._root) {
-                            var root = this._root._root;
-                            while (root !== root._root) {
-                                root = root._root;
-                            }
-                            var son = this._root;
-                            var temp = void 0;
-                            while (son !== root) {
-                                temp = son._root;
-                                son._root = root;
-                                son = temp;
-                            }
-                            this._root = root;
-                        }
-                        return this._root;
-                    },
-                    set: function (terminal) {
-                        this._root = terminal;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
                 DTerminal.prototype.destroy = function () {
                     _super.prototype.destroy.call(this);
                     this.disConnect();
@@ -110,7 +135,7 @@ var hanyeah;
                     this.prev = this;
                 };
                 return DTerminal;
-            }(electricity.HObject));
+            }(elecData.UnionFindSet));
             elecData.DTerminal = DTerminal;
         })(elecData = electricity.elecData || (electricity.elecData = {}));
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
@@ -149,9 +174,6 @@ var hanyeah;
                     this.terminal1 = null;
                 };
                 DTwoTerminalElement.prototype.getY = function (omiga) {
-                    if (this.R === 0) {
-                        return 1e-6;
-                    }
                     return 1 / this.R;
                 };
                 DTwoTerminalElement.prototype.getZ = function (omiga) {
@@ -176,7 +198,8 @@ var hanyeah;
                 __extends(Edge, _super);
                 function Edge(index) {
                     var _this = _super.call(this) || this;
-                    _this.index = 0;
+                    _this.index = -1;
+                    _this.index2 = -1;
                     _this.SU = 0;
                     _this.SI = 0;
                     _this.Y = 0;
@@ -191,6 +214,55 @@ var hanyeah;
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * 图。
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var graph;
+        (function (graph) {
+            var Graph = /** @class */ (function (_super) {
+                __extends(Graph, _super);
+                function Graph(index) {
+                    var _this = _super.call(this) || this;
+                    _this.index = -1;
+                    _this.vertexs = [];
+                    _this.edges = [];
+                    _this.vn = 0;
+                    _this.en = 0;
+                    _this.index = index;
+                    return _this;
+                }
+                Graph.prototype.addEdge = function (edge) {
+                    this.edges[this.en] = edge;
+                    edge.index2 = this.en;
+                    this.en++;
+                };
+                Graph.prototype.addVertex = function (vertex) {
+                    this.vertexs[this.vn] = vertex;
+                    vertex.index2 = this.vn;
+                    this.vn++;
+                };
+                Graph.prototype.getEn = function () {
+                    return this.en;
+                };
+                Graph.prototype.getVn = function () {
+                    return this.vn;
+                };
+                Graph.prototype.getVertexs = function () {
+                    return this.vertexs;
+                };
+                Graph.prototype.getEdges = function () {
+                    return this.edges;
+                };
+                return Graph;
+            }(electricity.HObject));
+            graph.Graph = Graph;
+        })(graph = electricity.graph || (electricity.graph = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/8/12.
  */
 var hanyeah;
@@ -199,16 +271,19 @@ var hanyeah;
     (function (electricity) {
         var graph;
         (function (graph) {
+            var UnionFindSet = hanyeah.electricity.elecData.UnionFindSet;
             var Vertex = /** @class */ (function (_super) {
                 __extends(Vertex, _super);
                 function Vertex(index) {
                     var _this = _super.call(this) || this;
-                    _this.index = 0;
+                    _this.index = -1;
+                    _this.index2 = -1;
+                    _this.graphIndex = -1;
                     _this.index = index;
                     return _this;
                 }
                 return Vertex;
-            }(electricity.HObject));
+            }(UnionFindSet));
             graph.Vertex = Vertex;
         })(graph = electricity.graph || (electricity.graph = {}));
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
@@ -222,6 +297,7 @@ var hanyeah;
     (function (electricity) {
         var Edge = hanyeah.electricity.graph.Edge;
         var Vertex = hanyeah.electricity.graph.Vertex;
+        var Graph = hanyeah.electricity.graph.Graph;
         var ElectricityCalculater = /** @class */ (function () {
             function ElectricityCalculater() {
             }
@@ -276,12 +352,55 @@ var hanyeah;
                         edge.Z = ele.getZ(0);
                         ele.index = n;
                         n++;
+                        if (edge.vertex0.root !== edge.vertex1.root) {
+                            edge.vertex0.root.root = edge.vertex1.root;
+                        }
                     }
                 }
-                console.log(vertexs);
-                console.log(edges);
-                var rows = vertexs.length;
+                // console.log(vertexs);
+                // console.log(edges);
+                //
+                var vLen = vertexs.length;
+                var eLen = edges.length;
+                var vertex0;
+                var vertex1;
+                n = 0;
+                var graphs = [];
+                var graph;
+                var vertex;
+                for (var i = 0; i < eLen; i++) {
+                    edge = edges[i];
+                    vertex0 = edge.vertex0;
+                    vertex1 = edge.vertex1;
+                    vertex = vertex0.root;
+                    if (vertex.graphIndex === -1) {
+                        graph = new Graph(n);
+                        graphs[n] = graph;
+                        vertex.graphIndex = n;
+                        n++;
+                    }
+                    else {
+                        graph = graphs[vertex.graphIndex];
+                    }
+                    if (vertex0.index2 === -1) {
+                        graph.addVertex(vertex0);
+                    }
+                    if (vertex1.index2 === -1) {
+                        graph.addVertex(vertex1);
+                    }
+                    graph.addEdge(edge);
+                }
+                //
+                for (var i = 0; i < graphs.length; i++) {
+                    graph = graphs[i];
+                    console.log("图" + i + ":", graph);
+                    this.solveGraph(graph.getVertexs(), graph.getEdges());
+                }
+            };
+            ElectricityCalculater.prototype.solveGraph = function (vertexs, edges) {
+                var rows = vertexs.length - 1;
                 var cols = edges.length;
+                var edge;
                 // 关联矩阵。
                 var A = new electricity.MatrixMath(rows, cols);
                 // 支路电压源矩阵
@@ -292,16 +411,20 @@ var hanyeah;
                 var Y = new electricity.MatrixMath(cols, cols);
                 for (var i = 0; i < cols; i++) {
                     edge = edges[i];
-                    A.setElement(edge.vertex0.index, i, 1);
-                    A.setElement(edge.vertex1.index, i, -1);
+                    A.setElement(edge.vertex0.index2, i, 1);
+                    A.setElement(edge.vertex1.index2, i, -1);
                     US.setElement(i, 0, edge.SU);
                     IS.setElement(i, 0, edge.SI);
                     Y.setElement(i, i, edge.Y);
                 }
+                console.log("A");
                 electricity.MatrixMath.traceMatrix(A);
-                electricity.MatrixMath.traceMatrix(US);
-                electricity.MatrixMath.traceMatrix(IS);
-                electricity.MatrixMath.traceMatrix(Y);
+                // console.log("US");
+                // MatrixMath.traceMatrix(US);
+                // console.log("IS");
+                // MatrixMath.traceMatrix(IS);
+                // console.log("Y");
+                // MatrixMath.traceMatrix(Y);
                 // A·Y·AT·UN = A·IS - A·Y·US;
                 // 其中YN = A·Y·AT;
                 var AT = A.transpose();
@@ -309,9 +432,18 @@ var hanyeah;
                 var YN = AY.multiply(AT);
                 var AIS = A.multiply(IS);
                 var AYUS = AY.multiply(US);
-                var UN = electricity.MatrixMath.GaussSolution(YN, AIS.sub(AYUS));
+                var UN = electricity.MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
+                // console.log("AT");
+                // MatrixMath.traceMatrix(AT);
+                // console.log("AY");
                 // MatrixMath.traceMatrix(AY);
+                // console.log("YN");
                 // MatrixMath.traceMatrix(YN);
+                // console.log("AIS");
+                // MatrixMath.traceMatrix(AIS);
+                // console.log("AYUS");
+                // MatrixMath.traceMatrix(AYUS);
+                // console.log("UN");
                 electricity.MatrixMath.traceMatrix(UN);
             };
             return ElectricityCalculater;
@@ -925,12 +1057,14 @@ var hanyeah;
                         arr.push(ele);
                         ele.R = 2;
                     }
-                    arr[0].SU = 5;
-                    arr[0].terminal0.connect(arr[1].terminal0);
-                    arr[0].terminal0.connect(arr[2].terminal0);
-                    arr[0].terminal1.connect(arr[1].terminal1);
-                    arr[0].terminal1.connect(arr[3].terminal0);
+                    // arr[0].terminal0.connect(arr[1].terminal0);
+                    // arr[0].terminal1.connect(arr[1].terminal1);
+                    //
+                    // arr[0].terminal0.connect(arr[2].terminal0);
+                    // arr[0].terminal1.connect(arr[3].terminal0);
                     arr[3].terminal1.connect(arr[2].terminal1);
+                    arr[3].SU = 5;
+                    // arr[0].R = 0;
                     // console.log(arr);
                     test1();
                     // setInterval(test1, 2000);

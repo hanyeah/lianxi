@@ -2,29 +2,8 @@
  * Created by hanyeah on 2019/8/13.
  */
 namespace hanyeah.electricity.elecData {
-  export class DTerminal extends HObject {
-    public get root(): DTerminal {
-      if (this._root._root !== this._root) {
-        let root: DTerminal = this._root._root;
-        while (root !== root._root) {
-          root = root._root;
-        }
-        let son: DTerminal = this._root;
-        let temp: DTerminal;
-        while (son !== root) {
-          temp = son._root;
-          son._root = root;
-          son = temp;
-        }
-        this._root = root;
-      }
-      return this._root;
-    }
-    public set root(terminal: DTerminal) {
-      this._root = terminal;
-    }
+  export class DTerminal extends UnionFindSet {
     public index: number = -1;
-    private _root: DTerminal;
     private prev: DTerminal;
     private next: DTerminal;
 

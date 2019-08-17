@@ -3,7 +3,8 @@
  */
 namespace hanyeah.electricity.graph {
   export class Edge extends HObject{
-    public index: number = 0;
+    public index: number = -1;
+    public index2: number = -1;
     public vertex0: Vertex;
     public vertex1: Vertex;
     public SU: number = 0;

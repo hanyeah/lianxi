@@ -1,11 +1,13 @@
 /**
  * Created by hanyeah on 2019/8/13.
  */
+
 namespace hanyeah.electricity {
   import DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
   import Edge = hanyeah.electricity.graph.Edge;
   import Vertex = hanyeah.electricity.graph.Vertex;
   import DTerminal = hanyeah.electricity.elecData.DTerminal;
+  import Graph = hanyeah.electricity.graph.Graph;
 
   export class ElectricityCalculater {
     constructor() {
@@ -24,12 +26,12 @@ namespace hanyeah.electricity {
         ele.terminal1.index = -1;
       }
       // ------------生成顶点Map---------
-      const vertexs: Array<Vertex> = [];
+      const vertexs: Vertex[] = [];
       let n: number = 0;
       for (let i: number = 0; i < len; i++) {
         ele = elements[i];
-        terminal0 = ele.terminal0.root;
-        terminal1 = ele.terminal1.root;
+        terminal0 = ele.terminal0.root as DTerminal;
+        terminal1 = ele.terminal1.root as DTerminal;
         if (terminal0.index === -1) {
           vertexs[n] = new Vertex(n);
           terminal0.index = n;
@@ -42,7 +44,7 @@ namespace hanyeah.electricity {
         }
       }
       // ------------生成边Map------------
-      const edges: Array<Edge> = [];
+      const edges: Edge[] = [];
       n = 0;
       let edge: Edge;
       for (let i: number = 0; i < len; i++) {
@@ -50,8 +52,8 @@ namespace hanyeah.electricity {
         if (ele.isBreak) {
           continue;
         }
-        terminal0 = ele.terminal0.root;
-        terminal1 = ele.terminal1.root;
+        terminal0 = ele.terminal0.root as DTerminal;
+        terminal1 = ele.terminal1.root as DTerminal;
         if (terminal0 !== terminal1) {
           edge = new Edge(n);
           edge.vertex0 = vertexs[terminal0.index];
@@ -63,13 +65,55 @@ namespace hanyeah.electricity {
           edge.Z = ele.getZ(0);
           ele.index = n;
           n++;
+          if (edge.vertex0.root !== edge.vertex1.root) {
+            edge.vertex0.root.root = edge.vertex1.root;
+          }
         }
       }
-      console.log(vertexs);
-      console.log(edges);
+      // console.log(vertexs);
+      // console.log(edges);
+      //
+      const vLen: number = vertexs.length;
+      const eLen: number = edges.length;
+      let vertex0: Vertex;
+      let vertex1: Vertex;
+      n = 0;
+      const graphs: Graph[] = [];
+      let graph: Graph;
+      let vertex;
+      for (let i: number = 0; i < eLen; i++) {
+        edge = edges[i];
+        vertex0 = edge.vertex0;
+        vertex1 = edge.vertex1;
+        vertex = vertex0.root as Vertex;
+        if (vertex.graphIndex === -1) {
+          graph = new Graph(n);
+          graphs[n] = graph;
+          vertex.graphIndex = n;
+          n++;
+        } else {
+          graph = graphs[vertex.graphIndex];
+        }
+        if (vertex0.index2 === -1) {
+          graph.addVertex(vertex0);
+        }
+        if (vertex1.index2 === -1) {
+          graph.addVertex(vertex1);
+        }
+        graph.addEdge(edge);
+      }
+      //
+      for (let i: number = 0; i < graphs.length; i++){
+        graph = graphs[i];
+        console.log("图" + i + ":", graph);
+        this.solveGraph(graph.getVertexs(), graph.getEdges());
+      }
+    }
 
-      const rows: number = vertexs.length;
+    solveGraph(vertexs: Vertex[], edges: Edge[]): void {
+      const rows: number = vertexs.length - 1;
       const cols: number = edges.length;
+      let edge: Edge;
       // 关联矩阵。
       const A: MatrixMath = new MatrixMath(rows, cols);
       // 支路电压源矩阵
@@ -80,16 +124,20 @@ namespace hanyeah.electricity {
       const Y: MatrixMath = new MatrixMath(cols, cols);
       for (let i: number = 0; i < cols; i++) {
         edge = edges[i];
-        A.setElement(edge.vertex0.index, i, 1);
-        A.setElement(edge.vertex1.index, i, -1);
+        A.setElement(edge.vertex0.index2, i, 1);
+        A.setElement(edge.vertex1.index2, i, -1);
         US.setElement(i, 0, edge.SU);
         IS.setElement(i, 0, edge.SI);
         Y.setElement(i, i, edge.Y);
       }
+      console.log("A");
       MatrixMath.traceMatrix(A);
-      MatrixMath.traceMatrix(US);
-      MatrixMath.traceMatrix(IS);
-      MatrixMath.traceMatrix(Y);
+      // console.log("US");
+      // MatrixMath.traceMatrix(US);
+      // console.log("IS");
+      // MatrixMath.traceMatrix(IS);
+      // console.log("Y");
+      // MatrixMath.traceMatrix(Y);
       // A·Y·AT·UN = A·IS - A·Y·US;
       // 其中YN = A·Y·AT;
       const AT: MatrixMath = A.transpose();
@@ -97,9 +145,18 @@ namespace hanyeah.electricity {
       const YN: MatrixMath = AY.multiply(AT);
       const AIS: MatrixMath = A.multiply(IS);
       const AYUS: MatrixMath = AY.multiply(US);
-      const UN: MatrixMath = MatrixMath.GaussSolution(YN, AIS.sub(AYUS));
+      const UN: MatrixMath = MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
+      // console.log("AT");
+      // MatrixMath.traceMatrix(AT);
+      // console.log("AY");
       // MatrixMath.traceMatrix(AY);
+      // console.log("YN");
       // MatrixMath.traceMatrix(YN);
+      // console.log("AIS");
+      // MatrixMath.traceMatrix(AIS);
+      // console.log("AYUS");
+      // MatrixMath.traceMatrix(AYUS);
+      // console.log("UN");
       MatrixMath.traceMatrix(UN);
     }
 

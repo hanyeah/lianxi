@@ -11,13 +11,22 @@ declare namespace hanyeah.electricity {
     }
 }
 /**
+ * 并查集。
+ */
+declare namespace hanyeah.electricity.elecData {
+    class UnionFindSet extends HObject {
+        root: UnionFindSet;
+        protected _root: UnionFindSet;
+        constructor();
+        protected getRoot(): UnionFindSet;
+    }
+}
+/**
  * Created by hanyeah on 2019/8/13.
  */
 declare namespace hanyeah.electricity.elecData {
-    class DTerminal extends HObject {
-        root: DTerminal;
+    class DTerminal extends UnionFindSet {
         index: number;
-        private _root;
         private prev;
         private next;
         constructor();
@@ -54,6 +63,7 @@ declare namespace hanyeah.electricity.elecData {
 declare namespace hanyeah.electricity.graph {
     class Edge extends HObject {
         index: number;
+        index2: number;
         vertex0: Vertex;
         vertex1: Vertex;
         SU: number;
@@ -64,11 +74,33 @@ declare namespace hanyeah.electricity.graph {
     }
 }
 /**
+ * 图。
+ */
+declare namespace hanyeah.electricity.graph {
+    class Graph extends HObject {
+        index: number;
+        private vertexs;
+        private edges;
+        private vn;
+        private en;
+        constructor(index: number);
+        addEdge(edge: Edge): void;
+        addVertex(vertex: Vertex): void;
+        getEn(): number;
+        getVn(): number;
+        getVertexs(): Vertex[];
+        getEdges(): Edge[];
+    }
+}
+/**
  * Created by hanyeah on 2019/8/12.
  */
 declare namespace hanyeah.electricity.graph {
-    class Vertex extends HObject {
+    import UnionFindSet = hanyeah.electricity.elecData.UnionFindSet;
+    class Vertex extends UnionFindSet {
         index: number;
+        index2: number;
+        graphIndex: number;
         constructor(index: number);
     }
 }
@@ -77,9 +109,12 @@ declare namespace hanyeah.electricity.graph {
  */
 declare namespace hanyeah.electricity {
     import DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
+    import Edge = hanyeah.electricity.graph.Edge;
+    import Vertex = hanyeah.electricity.graph.Vertex;
     class ElectricityCalculater {
         constructor();
         calculate(elements: Array<DTwoTerminalElement>): void;
+        solveGraph(vertexs: Vertex[], edges: Edge[]): void;
     }
 }
 /**
