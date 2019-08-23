@@ -11,6 +11,10 @@ namespace hanyeah.electricity.graph {
     public SI: number = 0;
     public Y: number = 0;
     public Z: number = 0;
+    public R: number = 0;
+    public FKK: number = 0;
+    public HKK: number = 0;
+
     constructor(index: number) {
       super();
       this.index = index;
