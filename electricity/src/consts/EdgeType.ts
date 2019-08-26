@@ -10,6 +10,8 @@ namespace hanyeah.electricity.consts{
     CCVS, // 电流控制电压源
     CCCS, // 电流控制电流源
     M,    // 互感
-    N     // 理想变压器
+    N,    // 理想变压器
+    U,    // 独立电压源
+    I,    // 独立电流源
   }
 }
