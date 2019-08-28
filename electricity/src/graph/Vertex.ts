@@ -9,6 +9,7 @@ namespace hanyeah.electricity.graph {
     public index: number = -1;
     public index2: number = -1;
     public graphIndex: number = -1;
+    public U: number = 0;
     constructor(index: number) {
       super();
       this.index = index;

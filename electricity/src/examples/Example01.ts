@@ -30,7 +30,12 @@ namespace hanyeah.electricity.examples {
       traceUI();
       function traceUI(){
         for (let i = 0; i < arr.length; i++) {
-          console.log(i + ":\t" + arr[i].U.toPrecision(2) + ",\t" + arr[i].I.toPrecision(2));
+          console.log([i + ":",
+            arr[i].U.toPrecision(2),
+            arr[i].I.toPrecision(2),
+            arr[i].terminal0.U.toPrecision(2),
+            arr[i].terminal1.U.toPrecision(2)
+          ].join("\t"));
         }
       }
 

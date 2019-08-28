@@ -64,6 +64,17 @@ namespace hanyeah.electricity.calculaters {
       const X: MatrixMath = MatrixMath.GaussSolution(M, Y);
       console.log("x:");
       MatrixMath.traceMatrix(X);
+      // 给边和节点设置计算好的电流电压。
+      let vertex: Vertex;
+      for (let i: number = 0; i <= rows; i++) {
+        vertex = vertexs[i];
+        vertex.U = X.getElement(vertex.index2, 0);
+      }
+      for (let i: number = 0; i < cols; i++) {
+        edge = edges[i];
+        edge.U = X.getElement(rows + i, 0);
+        edge.I = X.getElement(n0 + i, 0);
+      }
     }
   }
 }

@@ -198,6 +198,8 @@ var hanyeah;
                     _this.index2 = -1;
                     _this.SU = 0;
                     _this.SI = 0;
+                    _this.U = 0;
+                    _this.I = 0;
                     _this.R = 0;
                     _this.index = index;
                     return _this;
@@ -225,6 +227,7 @@ var hanyeah;
                     _this.index = -1;
                     _this.index2 = -1;
                     _this.graphIndex = -1;
+                    _this.U = 0;
                     _this.index = index;
                     return _this;
                 }
@@ -371,6 +374,17 @@ var hanyeah;
                     var X = electricity.MatrixMath.GaussSolution(M, Y);
                     console.log("x:");
                     electricity.MatrixMath.traceMatrix(X);
+                    // 给边和节点设置计算好的电流电压。
+                    var vertex;
+                    for (var i = 0; i <= rows; i++) {
+                        vertex = vertexs[i];
+                        vertex.U = X.getElement(vertex.index2, 0);
+                    }
+                    for (var i = 0; i < cols; i++) {
+                        edge = edges[i];
+                        edge.U = X.getElement(rows + i, 0);
+                        edge.I = X.getElement(n0 + i, 0);
+                    }
                 };
                 return ListMethod;
             }(calculaters.MethodBase));
@@ -520,6 +534,7 @@ var hanyeah;
                 function DTerminal() {
                     var _this = _super.call(this) || this;
                     _this.index = -1;
+                    _this.U = 0;
                     _this.root = _this;
                     _this.prev = _this;
                     _this.next = _this;
@@ -733,7 +748,12 @@ var hanyeah;
                     traceUI();
                     function traceUI() {
                         for (var i = 0; i < arr.length; i++) {
-                            console.log(i + ":\t" + arr[i].U.toPrecision(2) + ",\t" + arr[i].I.toPrecision(2));
+                            console.log([i + ":",
+                                arr[i].U.toPrecision(2),
+                                arr[i].I.toPrecision(2),
+                                arr[i].terminal0.U.toPrecision(2),
+                                arr[i].terminal1.U.toPrecision(2)
+                            ].join("\t"));
                         }
                     }
                     function test2() {
@@ -1335,6 +1355,10 @@ var hanyeah;
                     ele = elements[i];
                     ele.terminal0.index = -1;
                     ele.terminal1.index = -1;
+                    ele.U = 0;
+                    ele.I = 0;
+                    ele.terminal0.U = 0;
+                    ele.terminal1.U = 0;
                 }
                 // ------------生成顶点Map---------
                 var vertexs = [];
@@ -1388,6 +1412,27 @@ var hanyeah;
                 // method.solve(vertexs, edges);
                 var method = new ListMethod();
                 method.solve(vertexs, edges);
+                //
+                var rootTerminal;
+                for (var i = 0; i < len; i++) {
+                    ele = elements[i];
+                    terminal0 = ele.terminal0;
+                    rootTerminal = terminal0.root;
+                    if (rootTerminal.index !== -1) {
+                        terminal0.U = vertexs[rootTerminal.index].U;
+                    }
+                    terminal1 = ele.terminal1;
+                    rootTerminal = terminal1.root;
+                    if (rootTerminal.index !== -1) {
+                        terminal1.U = vertexs[rootTerminal.index].U;
+                    }
+                    if (ele.isBreak) {
+                        continue;
+                    }
+                    edge = edges[ele.index];
+                    ele.U = edge.U;
+                    ele.I = edge.I;
+                }
             };
             return ElectricityCalculater;
         }());

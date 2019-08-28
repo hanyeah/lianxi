@@ -115,6 +115,13 @@ namespace hanyeah.electricity.calculaters {
       const IB: MatrixMath = MatrixMath.GaussSolution(BZA, BUBZI);
       console.log("IB");
       MatrixMath.traceMatrix(IB);
+      // 给边和节点设置计算好的电流电压。
+      for (let i: number = 0; i < en; i++) {
+        edge = edges[i];
+        edge.I = IB.getElement(i, 0);
+        edge.U = edge.R * edge.I;
+      }
+      // 不知道结点电压
     }
   }
 }

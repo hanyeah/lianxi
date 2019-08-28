@@ -78,6 +78,8 @@ declare namespace hanyeah.electricity.graph {
         vertex1: Vertex;
         SU: number;
         SI: number;
+        U: number;
+        I: number;
         R: number;
         constructor(index: number);
     }
@@ -91,6 +93,7 @@ declare namespace hanyeah.electricity.graph {
         index: number;
         index2: number;
         graphIndex: number;
+        U: number;
         constructor(index: number);
     }
 }
@@ -148,6 +151,7 @@ declare namespace hanyeah.electricity.calculaters {
 declare namespace hanyeah.electricity.elecData {
     class DTerminal extends UnionFindSet {
         index: number;
+        U: number;
         private prev;
         private next;
         constructor();

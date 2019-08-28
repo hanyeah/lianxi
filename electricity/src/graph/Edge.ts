@@ -10,6 +10,8 @@ namespace hanyeah.electricity.graph {
     public vertex1: Vertex;
     public SU: number = 0;
     public SI: number = 0;
+    public U: number = 0;
+    public I: number = 0;
     public R: number = 0;
 
     constructor(index: number) {

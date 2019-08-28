@@ -4,6 +4,7 @@
 namespace hanyeah.electricity.elecData {
   export class DTerminal extends UnionFindSet {
     public index: number = -1;
+    public U: number = 0;
     private prev: DTerminal;
     private next: DTerminal;
 

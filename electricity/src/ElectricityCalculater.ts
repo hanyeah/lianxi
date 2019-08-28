@@ -28,6 +28,10 @@ namespace hanyeah.electricity {
         ele = elements[i];
         ele.terminal0.index = -1;
         ele.terminal1.index = -1;
+        ele.U = 0;
+        ele.I = 0;
+        ele.terminal0.U = 0;
+        ele.terminal1.U = 0;
       }
       // ------------生成顶点Map---------
       const vertexs: Vertex[] = [];
@@ -83,6 +87,27 @@ namespace hanyeah.electricity {
       // method.solve(vertexs, edges);
       const method: MethodBase = new ListMethod();
       method.solve(vertexs, edges);
+      //
+      let rootTerminal;
+      for (let i: number = 0; i < len; i++) {
+        ele = elements[i];
+        terminal0 = ele.terminal0;
+        rootTerminal = terminal0.root as DTerminal;
+        if (rootTerminal.index !== - 1) {
+          terminal0.U = vertexs[rootTerminal.index].U;
+        }
+        terminal1 = ele.terminal1;
+        rootTerminal = terminal1.root as DTerminal;
+        if (rootTerminal.index !== - 1) {
+          terminal1.U = vertexs[rootTerminal.index].U;
+        }
+        if (ele.isBreak) {
+          continue;
+        }
+        edge = edges[ele.index];
+        ele.U = edge.U;
+        ele.I = edge.I;
+      }
     }
   }
 }
