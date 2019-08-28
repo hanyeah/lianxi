@@ -8,8 +8,6 @@ namespace hanyeah.electricity.elecData{
     public U: number = 0;
     public I: number = 0;
     public R: number = 0;
-    public C: number = 0;
-    public L: number = 0;
     public index: number = 0;
     public terminal0: DTerminal;
     public terminal1: DTerminal;

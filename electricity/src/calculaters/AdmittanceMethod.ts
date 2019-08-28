@@ -31,7 +31,7 @@ namespace hanyeah.electricity.calculaters {
         A.setElement(edge.vertex1.index2, i, -1);
         US.setElement(i, 0, edge.SU);
         IS.setElement(i, 0, edge.SI);
-        Y.setElement(i, i, edge.Y);
+        Y.setElement(i, i, edge.R === 0 ? 1e6 : 1 / edge.R);
       }
       // A·Y·AT·UN = A·IS - A·Y·US;
       // 其中YN = A·Y·AT;

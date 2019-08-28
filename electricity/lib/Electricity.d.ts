@@ -11,6 +11,23 @@ declare namespace hanyeah.electricity {
     }
 }
 /**
+ * Created by hanyeah on 2019/8/23.
+ */
+declare namespace hanyeah.electricity.consts {
+    enum EdgeType {
+        C = 0,
+        L = 1,
+        VCVS = 2,
+        VCCS = 3,
+        CCVS = 4,
+        CCCS = 5,
+        M = 6,
+        N = 7,
+        U = 8,
+        I = 9
+    }
+}
+/**
  * 并查集。
  */
 declare namespace hanyeah.electricity.elecData {
@@ -19,58 +36,6 @@ declare namespace hanyeah.electricity.elecData {
         protected _root: UnionFindSet;
         constructor();
         protected getRoot(): UnionFindSet;
-    }
-}
-/**
- * Created by hanyeah on 2019/8/13.
- */
-declare namespace hanyeah.electricity.elecData {
-    class DTerminal extends UnionFindSet {
-        index: number;
-        private prev;
-        private next;
-        constructor();
-        destroy(): void;
-        connect(terminal: DTerminal): void;
-        disConnect(): void;
-    }
-}
-/**
- * Created by hanyeah on 2019/8/13.
- */
-declare namespace hanyeah.electricity.elecData {
-    class DTwoTerminalElement extends HObject {
-        SI: number;
-        SU: number;
-        U: number;
-        I: number;
-        R: number;
-        C: number;
-        L: number;
-        index: number;
-        terminal0: DTerminal;
-        terminal1: DTerminal;
-        isBreak: boolean;
-        constructor();
-        destroy(): void;
-        getY(omiga: number): number;
-        getZ(omiga: number): number;
-    }
-}
-/**
- * Created by hanyeah on 2019/8/12.
- */
-declare namespace hanyeah.electricity.graph {
-    class Edge extends HObject {
-        index: number;
-        index2: number;
-        vertex0: Vertex;
-        vertex1: Vertex;
-        SU: number;
-        SI: number;
-        Y: number;
-        Z: number;
-        constructor(index: number);
     }
 }
 /**
@@ -106,6 +71,21 @@ declare namespace hanyeah.electricity.graph {
  * Created by hanyeah on 2019/8/12.
  */
 declare namespace hanyeah.electricity.graph {
+    class Edge extends HObject {
+        index: number;
+        index2: number;
+        vertex0: Vertex;
+        vertex1: Vertex;
+        SU: number;
+        SI: number;
+        R: number;
+        constructor(index: number);
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/12.
+ */
+declare namespace hanyeah.electricity.graph {
     import UnionFindSet = hanyeah.electricity.elecData.UnionFindSet;
     class Vertex extends UnionFindSet {
         index: number;
@@ -115,30 +95,96 @@ declare namespace hanyeah.electricity.graph {
     }
 }
 /**
+ * Created by hanyeah on 2019/8/22.
+ */
+declare namespace hanyeah.electricity.calculaters {
+    import Vertex = hanyeah.electricity.graph.Vertex;
+    import Edge = hanyeah.electricity.graph.Edge;
+    import Graph = hanyeah.electricity.graph.Graph;
+    class MethodBase extends HObject {
+        constructor();
+        /**
+         *
+         * @param vertexs
+         * @param edges
+         */
+        solve(vertexs: Vertex[], edges: Edge[]): void;
+        solveGraph(graph: Graph): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/22.
+ * 列表法。
+ */
+declare namespace hanyeah.electricity.calculaters {
+    import Graph = hanyeah.electricity.graph.Graph;
+    class ListMethod extends MethodBase {
+        constructor();
+        solveGraph(graph: Graph): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/22.
+ * 回路阻抗法。
+ */
+declare namespace hanyeah.electricity.calculaters {
+    import Vertex = hanyeah.electricity.graph.Vertex;
+    import Edge = hanyeah.electricity.graph.Edge;
+    import Graph = hanyeah.electricity.graph.Graph;
+    class ImpedanceMethod extends MethodBase {
+        constructor();
+        /**
+         *
+         * @param vertexs
+         * @param edges
+         */
+        solve(vertexs: Vertex[], edges: Edge[]): void;
+        solveGraph(graph: Graph): void;
+    }
+}
+/**
  * Created by hanyeah on 2019/8/13.
  */
-declare namespace hanyeah.electricity {
-    import DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
-    import Edge = hanyeah.electricity.graph.Edge;
-    import Vertex = hanyeah.electricity.graph.Vertex;
-    import Graph = hanyeah.electricity.graph.Graph;
-    class ElectricityCalculater {
+declare namespace hanyeah.electricity.elecData {
+    class DTerminal extends UnionFindSet {
+        index: number;
+        private prev;
+        private next;
         constructor();
-        calculate(elements: Array<DTwoTerminalElement>): void;
-        /**
-         * 回路阻抗法。
-         * @param vertexs
-         * @param edges
-         */
-        zSolve(vertexs: Vertex[], edges: Edge[]): void;
-        zSolveGraph(graph: Graph): void;
-        /**
-         * 导纳矩阵法。
-         * @param vertexs
-         * @param edges
-         */
-        ySolve(vertexs: Vertex[], edges: Edge[]): void;
-        ySolveGraph(graph: Graph): void;
+        destroy(): void;
+        connect(terminal: DTerminal): void;
+        disConnect(): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/13.
+ */
+declare namespace hanyeah.electricity.elecData {
+    class DTwoTerminalElement extends HObject {
+        SI: number;
+        SU: number;
+        U: number;
+        I: number;
+        R: number;
+        index: number;
+        terminal0: DTerminal;
+        terminal1: DTerminal;
+        isBreak: boolean;
+        constructor();
+        destroy(): void;
+        getY(omiga: number): number;
+        getZ(omiga: number): number;
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/22.
+ * 导纳矩阵法。
+ */
+declare namespace hanyeah.electricity.calculaters {
+    import Graph = hanyeah.electricity.graph.Graph;
+    class AdmittanceMethod extends MethodBase {
+        constructor();
+        solveGraph(graph: Graph): void;
     }
 }
 /**
@@ -154,6 +200,14 @@ declare namespace hanyeah.electricity {
         addElement(element: DTwoTerminalElement): void;
         removeElement(element: DTwoTerminalElement): void;
         calculate(): void;
+    }
+}
+/**
+ * Created by hanyeah on 2019/8/13.
+ */
+declare namespace hanyeah.electricity.examples {
+    class Example01 {
+        constructor(ctx: CanvasRenderingContext2D);
     }
 }
 /**
@@ -293,8 +347,10 @@ declare namespace hanyeah.electricity {
 /**
  * Created by hanyeah on 2019/8/13.
  */
-declare namespace hanyeah.electricity.examples {
-    class Example01 {
-        constructor(ctx: CanvasRenderingContext2D);
+declare namespace hanyeah.electricity {
+    import DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
+    class ElectricityCalculater {
+        constructor();
+        calculate(elements: Array<DTwoTerminalElement>): void;
     }
 }

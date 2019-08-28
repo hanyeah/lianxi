@@ -33,6 +33,31 @@ var hanyeah;
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * Created by hanyeah on 2019/8/23.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var consts;
+        (function (consts) {
+            var EdgeType;
+            (function (EdgeType) {
+                EdgeType[EdgeType["C"] = 0] = "C";
+                EdgeType[EdgeType["L"] = 1] = "L";
+                EdgeType[EdgeType["VCVS"] = 2] = "VCVS";
+                EdgeType[EdgeType["VCCS"] = 3] = "VCCS";
+                EdgeType[EdgeType["CCVS"] = 4] = "CCVS";
+                EdgeType[EdgeType["CCCS"] = 5] = "CCCS";
+                EdgeType[EdgeType["M"] = 6] = "M";
+                EdgeType[EdgeType["N"] = 7] = "N";
+                EdgeType[EdgeType["U"] = 8] = "U";
+                EdgeType[EdgeType["I"] = 9] = "I";
+            })(EdgeType = consts.EdgeType || (consts.EdgeType = {}));
+        })(consts = electricity.consts || (electricity.consts = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * 并查集。
  */
 var hanyeah;
@@ -79,138 +104,6 @@ var hanyeah;
             }(electricity.HObject));
             elecData.UnionFindSet = UnionFindSet;
         })(elecData = electricity.elecData || (electricity.elecData = {}));
-    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/8/13.
- */
-var hanyeah;
-(function (hanyeah) {
-    var electricity;
-    (function (electricity) {
-        var elecData;
-        (function (elecData) {
-            var DTerminal = /** @class */ (function (_super) {
-                __extends(DTerminal, _super);
-                function DTerminal() {
-                    var _this = _super.call(this) || this;
-                    _this.index = -1;
-                    _this.root = _this;
-                    _this.prev = _this;
-                    _this.next = _this;
-                    return _this;
-                }
-                DTerminal.prototype.destroy = function () {
-                    _super.prototype.destroy.call(this);
-                    this.disConnect();
-                    this.root = null;
-                    this.prev = null;
-                    this.next = null;
-                };
-                DTerminal.prototype.connect = function (terminal) {
-                    if (this.root !== terminal.root) {
-                        var next1 = this.next;
-                        var next2 = terminal.next;
-                        this.next = next2;
-                        next2.prev = this;
-                        terminal.next = next1;
-                        next1.prev = terminal;
-                        this.root.root = terminal.root;
-                    }
-                };
-                DTerminal.prototype.disConnect = function () {
-                    if (this.root === this) {
-                        var nextV = this.next;
-                        while (nextV !== this) {
-                            nextV.root = this.next;
-                            nextV = nextV.next;
-                        }
-                    }
-                    this.root = this;
-                    var next = this.next;
-                    var prev = this.prev;
-                    prev.next = next;
-                    next.prev = prev;
-                    this.next = this;
-                    this.prev = this;
-                };
-                return DTerminal;
-            }(elecData.UnionFindSet));
-            elecData.DTerminal = DTerminal;
-        })(elecData = electricity.elecData || (electricity.elecData = {}));
-    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/8/13.
- */
-var hanyeah;
-(function (hanyeah) {
-    var electricity;
-    (function (electricity) {
-        var elecData;
-        (function (elecData) {
-            var DTwoTerminalElement = /** @class */ (function (_super) {
-                __extends(DTwoTerminalElement, _super);
-                function DTwoTerminalElement() {
-                    var _this = _super.call(this) || this;
-                    _this.SI = 0;
-                    _this.SU = 0;
-                    _this.U = 0;
-                    _this.I = 0;
-                    _this.R = 0;
-                    _this.C = 0;
-                    _this.L = 0;
-                    _this.index = 0;
-                    _this.isBreak = false;
-                    _this.terminal0 = new elecData.DTerminal();
-                    _this.terminal1 = new elecData.DTerminal();
-                    return _this;
-                }
-                DTwoTerminalElement.prototype.destroy = function () {
-                    _super.prototype.destroy.call(this);
-                    this.terminal0.destroy();
-                    this.terminal1.destroy();
-                    this.terminal0 = null;
-                    this.terminal1 = null;
-                };
-                DTwoTerminalElement.prototype.getY = function (omiga) {
-                    return 1 / this.R;
-                };
-                DTwoTerminalElement.prototype.getZ = function (omiga) {
-                    return this.R;
-                };
-                return DTwoTerminalElement;
-            }(electricity.HObject));
-            elecData.DTwoTerminalElement = DTwoTerminalElement;
-        })(elecData = electricity.elecData || (electricity.elecData = {}));
-    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
-})(hanyeah || (hanyeah = {}));
-/**
- * Created by hanyeah on 2019/8/12.
- */
-var hanyeah;
-(function (hanyeah) {
-    var electricity;
-    (function (electricity) {
-        var graph;
-        (function (graph) {
-            var Edge = /** @class */ (function (_super) {
-                __extends(Edge, _super);
-                function Edge(index) {
-                    var _this = _super.call(this) || this;
-                    _this.index = -1;
-                    _this.index2 = -1;
-                    _this.SU = 0;
-                    _this.SI = 0;
-                    _this.Y = 0;
-                    _this.Z = 0;
-                    _this.index = index;
-                    return _this;
-                }
-                return Edge;
-            }(electricity.HObject));
-            graph.Edge = Edge;
-        })(graph = electricity.graph || (electricity.graph = {}));
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
@@ -297,6 +190,33 @@ var hanyeah;
     (function (electricity) {
         var graph;
         (function (graph) {
+            var Edge = /** @class */ (function (_super) {
+                __extends(Edge, _super);
+                function Edge(index) {
+                    var _this = _super.call(this) || this;
+                    _this.index = -1;
+                    _this.index2 = -1;
+                    _this.SU = 0;
+                    _this.SI = 0;
+                    _this.R = 0;
+                    _this.index = index;
+                    return _this;
+                }
+                return Edge;
+            }(electricity.HObject));
+            graph.Edge = Edge;
+        })(graph = electricity.graph || (electricity.graph = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/12.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var graph;
+        (function (graph) {
             var UnionFindSet = hanyeah.electricity.elecData.UnionFindSet;
             var Vertex = /** @class */ (function (_super) {
                 __extends(Vertex, _super);
@@ -315,264 +235,431 @@ var hanyeah;
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
+ * Created by hanyeah on 2019/8/22.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var calculaters;
+        (function (calculaters) {
+            var Graph = hanyeah.electricity.graph.Graph;
+            var MethodBase = /** @class */ (function (_super) {
+                __extends(MethodBase, _super);
+                function MethodBase() {
+                    return _super.call(this) || this;
+                }
+                /**
+                 *
+                 * @param vertexs
+                 * @param edges
+                 */
+                MethodBase.prototype.solve = function (vertexs, edges) {
+                    // 连通图
+                    var vLen = vertexs.length;
+                    var eLen = edges.length;
+                    var vertex0;
+                    var vertex1;
+                    var n = 0;
+                    var edge;
+                    var graphs = [];
+                    var graph;
+                    var vertex;
+                    for (var i = 0; i < eLen; i++) {
+                        edge = edges[i];
+                        vertex0 = edge.vertex0;
+                        vertex1 = edge.vertex1;
+                        vertex = vertex0.root;
+                        if (vertex.graphIndex === -1) {
+                            graph = new Graph(n);
+                            graphs[n] = graph;
+                            vertex.graphIndex = n;
+                            n++;
+                        }
+                        else {
+                            graph = graphs[vertex.graphIndex];
+                        }
+                        if (vertex0.index2 === -1) {
+                            graph.addVertex(vertex0);
+                        }
+                        if (vertex1.index2 === -1) {
+                            graph.addVertex(vertex1);
+                        }
+                        graph.addEdge(edge);
+                    }
+                    //
+                    for (var i = 0; i < graphs.length; i++) {
+                        this.solveGraph(graphs[i]);
+                    }
+                };
+                MethodBase.prototype.solveGraph = function (graph) {
+                    //
+                };
+                return MethodBase;
+            }(electricity.HObject));
+            calculaters.MethodBase = MethodBase;
+        })(calculaters = electricity.calculaters || (electricity.calculaters = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/22.
+ * 列表法。
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var calculaters;
+        (function (calculaters) {
+            var ListMethod = /** @class */ (function (_super) {
+                __extends(ListMethod, _super);
+                function ListMethod() {
+                    return _super.call(this) || this;
+                }
+                ListMethod.prototype.solveGraph = function (graph) {
+                    var vertexs = graph.getVertexs();
+                    var edges = graph.getEdges();
+                    var rows = vertexs.length - 1;
+                    var cols = edges.length;
+                    var edge;
+                    var n0 = rows + cols;
+                    var n = n0 + cols;
+                    var M = new electricity.MatrixMath(n, n);
+                    var Y = new electricity.MatrixMath(n, 1);
+                    var r0;
+                    var r1;
+                    var ri;
+                    var ni;
+                    for (var i = 0; i < cols; i++) {
+                        edge = edges[i];
+                        r0 = edge.vertex0.index2;
+                        r1 = edge.vertex1.index2;
+                        ri = rows + i;
+                        ni = n0 + i;
+                        // A
+                        M.setElement(r0, ni, 1);
+                        M.setElement(r1, ni, -1);
+                        // -AT
+                        M.setElement(ri, r0, -1);
+                        M.setElement(ri, r1, 1);
+                        // I
+                        M.setElement(ri, ri, 1);
+                        // F
+                        if (edge.SU) {
+                            M.setElement(ni, ri, 1);
+                            M.setElement(ni, ni, 0);
+                        }
+                        else if (edge.SI) {
+                            M.setElement(ni, ri, 0);
+                            M.setElement(ni, ni, 1);
+                        }
+                        else if (edge.R === 0) {
+                            M.setElement(ni, ri, -1);
+                            M.setElement(ni, ni, edge.R);
+                        }
+                        else {
+                            M.setElement(ni, ri, 1 / edge.R);
+                            M.setElement(ni, ni, -1);
+                        }
+                        // Us + Is
+                        Y.setElement(ni, 0, edge.SU + edge.SI);
+                    }
+                    console.log("M:");
+                    electricity.MatrixMath.traceMatrix(M);
+                    console.log("Y:");
+                    electricity.MatrixMath.traceMatrix(Y);
+                    var X = electricity.MatrixMath.GaussSolution(M, Y);
+                    console.log("x:");
+                    electricity.MatrixMath.traceMatrix(X);
+                };
+                return ListMethod;
+            }(calculaters.MethodBase));
+            calculaters.ListMethod = ListMethod;
+        })(calculaters = electricity.calculaters || (electricity.calculaters = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/22.
+ * 回路阻抗法。
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var calculaters;
+        (function (calculaters) {
+            var Graph = hanyeah.electricity.graph.Graph;
+            var ImpedanceMethod = /** @class */ (function (_super) {
+                __extends(ImpedanceMethod, _super);
+                function ImpedanceMethod() {
+                    return _super.call(this) || this;
+                }
+                /**
+                 *
+                 * @param vertexs
+                 * @param edges
+                 */
+                ImpedanceMethod.prototype.solve = function (vertexs, edges) {
+                    // 连通图
+                    var vLen = vertexs.length;
+                    var eLen = edges.length;
+                    var vertex0;
+                    var vertex1;
+                    var n = 0;
+                    var edge;
+                    var graphs = [];
+                    var graph;
+                    var vertex;
+                    for (var i = 0; i < eLen; i++) {
+                        edge = edges[i];
+                        vertex0 = edge.vertex0;
+                        vertex1 = edge.vertex1;
+                        vertex = vertex0.root;
+                        if (vertex.graphIndex === -1) {
+                            graph = new Graph(n);
+                            graphs[n] = graph;
+                            vertex.graphIndex = n;
+                            n++;
+                        }
+                        else {
+                            graph = graphs[vertex.graphIndex];
+                        }
+                        if (vertex0.index2 === -1 || vertex1.index2 === -1) {
+                            graph.addTEdge(edge);
+                        }
+                        else {
+                            graph.addLEdge(edge);
+                        }
+                        if (vertex0.index2 === -1) {
+                            graph.addVertex(vertex0);
+                        }
+                        if (vertex1.index2 === -1) {
+                            graph.addVertex(vertex1);
+                        }
+                    }
+                    //
+                    for (var i = 0; i < graphs.length; i++) {
+                        this.solveGraph(graphs[i]);
+                    }
+                };
+                ImpedanceMethod.prototype.solveGraph = function (graph) {
+                    var vertexs = graph.getVertexs();
+                    var tEdges = graph.getTEdges();
+                    var lEdges = graph.getLEdges();
+                    var vn = graph.getVn() - 1;
+                    var tn = graph.getTn();
+                    var ln = graph.getLn();
+                    var AT = new electricity.MatrixMath(vn, tn);
+                    var AL = new electricity.MatrixMath(vn, ln);
+                    var edge;
+                    for (var i = 0; i < tn; i++) {
+                        edge = tEdges[i];
+                        AT.setElement(edge.vertex0.index2, i, 1);
+                        AT.setElement(edge.vertex1.index2, i, -1);
+                    }
+                    for (var i = 0; i < ln; i++) {
+                        edge = lEdges[i];
+                        AL.setElement(edge.vertex0.index2, i, 1);
+                        AL.setElement(edge.vertex1.index2, i, -1);
+                    }
+                    // BF=[BT, IL]=[-(AT¹·AL)',IL]
+                    var BT = AT.inverse().multiply(AL).transpose();
+                    BT.scalar(-1);
+                    var IL = new electricity.MatrixMath(ln, ln);
+                    IL.identity();
+                    var BF = BT.merge(IL);
+                    //
+                    var en = tn + ln;
+                    var edges = tEdges.concat(lEdges);
+                    // 关联矩阵。
+                    var A = new electricity.MatrixMath(vn, en);
+                    // 支路电压源矩阵
+                    var US = new electricity.MatrixMath(en, 1);
+                    // 支路电流源矩阵
+                    var IS = new electricity.MatrixMath(en, 1);
+                    // 支路导纳矩阵
+                    var Z = new electricity.MatrixMath(en, en);
+                    for (var i = 0; i < en; i++) {
+                        edge = edges[i];
+                        A.setElement(edge.vertex0.index2, i, 1);
+                        A.setElement(edge.vertex1.index2, i, -1);
+                        US.setElement(i, 0, edge.SU);
+                        IS.setElement(i, 0, edge.SI);
+                        Z.setElement(i, i, edge.R);
+                    }
+                    //
+                    var BZ = BF.multiply(Z);
+                    BF.resize(en, en);
+                    BZ.resize(en, en);
+                    var BZA = BZ.clone();
+                    BZA.insert(A, en - vn, 0);
+                    var BU = BF.multiply(US);
+                    var BZI = BZ.multiply(IS);
+                    var BUBZI = BU.clone().sub(BZI);
+                    var IB = electricity.MatrixMath.GaussSolution(BZA, BUBZI);
+                    console.log("IB");
+                    electricity.MatrixMath.traceMatrix(IB);
+                };
+                return ImpedanceMethod;
+            }(calculaters.MethodBase));
+            calculaters.ImpedanceMethod = ImpedanceMethod;
+        })(calculaters = electricity.calculaters || (electricity.calculaters = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
  * Created by hanyeah on 2019/8/13.
  */
 var hanyeah;
 (function (hanyeah) {
     var electricity;
     (function (electricity) {
-        var Edge = hanyeah.electricity.graph.Edge;
-        var Vertex = hanyeah.electricity.graph.Vertex;
-        var Graph = hanyeah.electricity.graph.Graph;
-        var ElectricityCalculater = /** @class */ (function () {
-            function ElectricityCalculater() {
-            }
-            ElectricityCalculater.prototype.calculate = function (elements) {
-                var len = elements.length;
-                var ele;
-                var terminal0;
-                var terminal1;
-                // -------------初始化index-------------
-                for (var i = 0; i < len; i++) {
-                    ele = elements[i];
-                    ele.terminal0.index = -1;
-                    ele.terminal1.index = -1;
+        var elecData;
+        (function (elecData) {
+            var DTerminal = /** @class */ (function (_super) {
+                __extends(DTerminal, _super);
+                function DTerminal() {
+                    var _this = _super.call(this) || this;
+                    _this.index = -1;
+                    _this.root = _this;
+                    _this.prev = _this;
+                    _this.next = _this;
+                    return _this;
                 }
-                // ------------生成顶点Map---------
-                var vertexs = [];
-                var n = 0;
-                for (var i = 0; i < len; i++) {
-                    ele = elements[i];
-                    terminal0 = ele.terminal0.root;
-                    terminal1 = ele.terminal1.root;
-                    if (terminal0.index === -1) {
-                        vertexs[n] = new Vertex(n);
-                        terminal0.index = n;
-                        n++;
+                DTerminal.prototype.destroy = function () {
+                    _super.prototype.destroy.call(this);
+                    this.disConnect();
+                    this.root = null;
+                    this.prev = null;
+                    this.next = null;
+                };
+                DTerminal.prototype.connect = function (terminal) {
+                    if (this.root !== terminal.root) {
+                        var next1 = this.next;
+                        var next2 = terminal.next;
+                        this.next = next2;
+                        next2.prev = this;
+                        terminal.next = next1;
+                        next1.prev = terminal;
+                        this.root.root = terminal.root;
                     }
-                    if (terminal1.index === -1) {
-                        vertexs[n] = new Vertex(n);
-                        terminal1.index = n;
-                        n++;
-                    }
-                }
-                // ------------生成边Map------------
-                var edges = [];
-                n = 0;
-                var edge;
-                for (var i = 0; i < len; i++) {
-                    ele = elements[i];
-                    if (ele.isBreak) {
-                        continue;
-                    }
-                    terminal0 = ele.terminal0.root;
-                    terminal1 = ele.terminal1.root;
-                    if (terminal0 !== terminal1) {
-                        edge = new Edge(n);
-                        edge.vertex0 = vertexs[terminal0.index];
-                        edge.vertex1 = vertexs[terminal1.index];
-                        edges[n] = edge;
-                        edge.SU = ele.SU;
-                        edge.SI = ele.SI;
-                        edge.Y = ele.getY(0);
-                        edge.Z = ele.getZ(0);
-                        ele.index = n;
-                        n++;
-                        if (edge.vertex0.root !== edge.vertex1.root) {
-                            edge.vertex0.root.root = edge.vertex1.root;
+                };
+                DTerminal.prototype.disConnect = function () {
+                    if (this.root === this) {
+                        var nextV = this.next;
+                        while (nextV !== this) {
+                            nextV.root = this.next;
+                            nextV = nextV.next;
                         }
                     }
+                    this.root = this;
+                    var next = this.next;
+                    var prev = this.prev;
+                    prev.next = next;
+                    next.prev = prev;
+                    this.next = this;
+                    this.prev = this;
+                };
+                return DTerminal;
+            }(elecData.UnionFindSet));
+            elecData.DTerminal = DTerminal;
+        })(elecData = electricity.elecData || (electricity.elecData = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/13.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var elecData;
+        (function (elecData) {
+            var DTwoTerminalElement = /** @class */ (function (_super) {
+                __extends(DTwoTerminalElement, _super);
+                function DTwoTerminalElement() {
+                    var _this = _super.call(this) || this;
+                    _this.SI = 0;
+                    _this.SU = 0;
+                    _this.U = 0;
+                    _this.I = 0;
+                    _this.R = 0;
+                    _this.index = 0;
+                    _this.isBreak = false;
+                    _this.terminal0 = new elecData.DTerminal();
+                    _this.terminal1 = new elecData.DTerminal();
+                    return _this;
                 }
-                // console.log(vertexs);
-                // console.log(edges);
-                // this.ySolve(vertexs, edges);
-                this.zSolve(vertexs, edges);
-            };
-            /**
-             * 回路阻抗法。
-             * @param vertexs
-             * @param edges
-             */
-            ElectricityCalculater.prototype.zSolve = function (vertexs, edges) {
-                // 连通图
-                var vLen = vertexs.length;
-                var eLen = edges.length;
-                var vertex0;
-                var vertex1;
-                var n = 0;
-                var edge;
-                var graphs = [];
-                var graph;
-                var vertex;
-                for (var i = 0; i < eLen; i++) {
-                    edge = edges[i];
-                    vertex0 = edge.vertex0;
-                    vertex1 = edge.vertex1;
-                    vertex = vertex0.root;
-                    if (vertex.graphIndex === -1) {
-                        graph = new Graph(n);
-                        graphs[n] = graph;
-                        vertex.graphIndex = n;
-                        n++;
-                    }
-                    else {
-                        graph = graphs[vertex.graphIndex];
-                    }
-                    if (vertex0.index2 === -1 || vertex1.index2 === -1) {
-                        graph.addTEdge(edge);
-                    }
-                    else {
-                        graph.addLEdge(edge);
-                    }
-                    if (vertex0.index2 === -1) {
-                        graph.addVertex(vertex0);
-                    }
-                    if (vertex1.index2 === -1) {
-                        graph.addVertex(vertex1);
-                    }
+                DTwoTerminalElement.prototype.destroy = function () {
+                    _super.prototype.destroy.call(this);
+                    this.terminal0.destroy();
+                    this.terminal1.destroy();
+                    this.terminal0 = null;
+                    this.terminal1 = null;
+                };
+                DTwoTerminalElement.prototype.getY = function (omiga) {
+                    return 1 / this.R;
+                };
+                DTwoTerminalElement.prototype.getZ = function (omiga) {
+                    return this.R;
+                };
+                return DTwoTerminalElement;
+            }(electricity.HObject));
+            elecData.DTwoTerminalElement = DTwoTerminalElement;
+        })(elecData = electricity.elecData || (electricity.elecData = {}));
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/22.
+ * 导纳矩阵法。
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var calculaters;
+        (function (calculaters) {
+            var AdmittanceMethod = /** @class */ (function (_super) {
+                __extends(AdmittanceMethod, _super);
+                function AdmittanceMethod() {
+                    return _super.call(this) || this;
                 }
-                //
-                for (var i = 0; i < graphs.length; i++) {
-                    this.zSolveGraph(graphs[i]);
-                }
-            };
-            ElectricityCalculater.prototype.zSolveGraph = function (graph) {
-                var vertexs = graph.getVertexs();
-                var tEdges = graph.getTEdges();
-                var lEdges = graph.getLEdges();
-                var vn = graph.getVn() - 1;
-                var tn = graph.getTn();
-                var ln = graph.getLn();
-                var AT = new electricity.MatrixMath(vn, tn);
-                var AL = new electricity.MatrixMath(vn, ln);
-                var edge;
-                for (var i = 0; i < tn; i++) {
-                    edge = tEdges[i];
-                    AT.setElement(edge.vertex0.index2, i, 1);
-                    AT.setElement(edge.vertex1.index2, i, -1);
-                }
-                for (var i = 0; i < ln; i++) {
-                    edge = lEdges[i];
-                    AL.setElement(edge.vertex0.index2, i, 1);
-                    AL.setElement(edge.vertex1.index2, i, -1);
-                }
-                // BF=[BT, IL]=[-(AT¹·AL)',IL]
-                var BT = AT.inverse().multiply(AL).transpose();
-                BT.scalar(-1);
-                var IL = new electricity.MatrixMath(ln, ln);
-                IL.identity();
-                var BF = BT.merge(IL);
-                //
-                var en = tn + ln;
-                var edges = tEdges.concat(lEdges);
-                // 关联矩阵。
-                var A = new electricity.MatrixMath(vn, en);
-                // 支路电压源矩阵
-                var US = new electricity.MatrixMath(en, 1);
-                // 支路电流源矩阵
-                var IS = new electricity.MatrixMath(en, 1);
-                // 支路导纳矩阵
-                var Z = new electricity.MatrixMath(en, en);
-                for (var i = 0; i < en; i++) {
-                    edge = edges[i];
-                    A.setElement(edge.vertex0.index2, i, 1);
-                    A.setElement(edge.vertex1.index2, i, -1);
-                    US.setElement(i, 0, edge.SU);
-                    IS.setElement(i, 0, edge.SI);
-                    Z.setElement(i, i, edge.Z);
-                }
-                //
-                var BZ = BF.multiply(Z);
-                BF.resize(en, en);
-                BZ.resize(en, en);
-                var BZA = BZ.clone();
-                BZA.insert(A, en - vn, 0);
-                var BU = BF.multiply(US);
-                var BZI = BZ.multiply(IS);
-                var BUBZI = BU.clone().sub(BZI);
-                var IB = electricity.MatrixMath.GaussSolution(BZA, BUBZI);
-                console.log("IB");
-                electricity.MatrixMath.traceMatrix(IB);
-            };
-            /**
-             * 导纳矩阵法。
-             * @param vertexs
-             * @param edges
-             */
-            ElectricityCalculater.prototype.ySolve = function (vertexs, edges) {
-                // 连通图
-                var vLen = vertexs.length;
-                var eLen = edges.length;
-                var vertex0;
-                var vertex1;
-                var n = 0;
-                var edge;
-                var graphs = [];
-                var graph;
-                var vertex;
-                for (var i = 0; i < eLen; i++) {
-                    edge = edges[i];
-                    vertex0 = edge.vertex0;
-                    vertex1 = edge.vertex1;
-                    vertex = vertex0.root;
-                    if (vertex.graphIndex === -1) {
-                        graph = new Graph(n);
-                        graphs[n] = graph;
-                        vertex.graphIndex = n;
-                        n++;
+                AdmittanceMethod.prototype.solveGraph = function (graph) {
+                    var vertexs = graph.getVertexs();
+                    var edges = graph.getEdges();
+                    var rows = vertexs.length - 1;
+                    var cols = edges.length;
+                    var edge;
+                    // 关联矩阵。
+                    var A = new electricity.MatrixMath(rows, cols);
+                    // 支路电压源矩阵
+                    var US = new electricity.MatrixMath(cols, 1);
+                    // 支路电流源矩阵
+                    var IS = new electricity.MatrixMath(cols, 1);
+                    // 支路导纳矩阵
+                    var Y = new electricity.MatrixMath(cols, cols);
+                    for (var i = 0; i < cols; i++) {
+                        edge = edges[i];
+                        A.setElement(edge.vertex0.index2, i, 1);
+                        A.setElement(edge.vertex1.index2, i, -1);
+                        US.setElement(i, 0, edge.SU);
+                        IS.setElement(i, 0, edge.SI);
+                        Y.setElement(i, i, edge.R === 0 ? 1e6 : 1 / edge.R);
                     }
-                    else {
-                        graph = graphs[vertex.graphIndex];
-                    }
-                    if (vertex0.index2 === -1) {
-                        graph.addVertex(vertex0);
-                    }
-                    if (vertex1.index2 === -1) {
-                        graph.addVertex(vertex1);
-                    }
-                    graph.addEdge(edge);
-                }
-                //
-                for (var i = 0; i < graphs.length; i++) {
-                    this.ySolveGraph(graphs[i]);
-                }
-            };
-            ElectricityCalculater.prototype.ySolveGraph = function (graph) {
-                var vertexs = graph.getVertexs();
-                var edges = graph.getEdges();
-                var rows = vertexs.length - 1;
-                var cols = edges.length;
-                var edge;
-                // 关联矩阵。
-                var A = new electricity.MatrixMath(rows, cols);
-                // 支路电压源矩阵
-                var US = new electricity.MatrixMath(cols, 1);
-                // 支路电流源矩阵
-                var IS = new electricity.MatrixMath(cols, 1);
-                // 支路导纳矩阵
-                var Y = new electricity.MatrixMath(cols, cols);
-                for (var i = 0; i < cols; i++) {
-                    edge = edges[i];
-                    A.setElement(edge.vertex0.index2, i, 1);
-                    A.setElement(edge.vertex1.index2, i, -1);
-                    US.setElement(i, 0, edge.SU);
-                    IS.setElement(i, 0, edge.SI);
-                    Y.setElement(i, i, edge.Y);
-                }
-                // A·Y·AT·UN = A·IS - A·Y·US;
-                // 其中YN = A·Y·AT;
-                var AT = A.transpose();
-                var AY = A.multiply(Y);
-                var YN = AY.multiply(AT);
-                var AIS = A.multiply(IS);
-                var AYUS = AY.multiply(US);
-                var UN = electricity.MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
-                console.log("UN");
-                electricity.MatrixMath.traceMatrix(UN);
-            };
-            return ElectricityCalculater;
-        }());
-        electricity.ElectricityCalculater = ElectricityCalculater;
+                    // A·Y·AT·UN = A·IS - A·Y·US;
+                    // 其中YN = A·Y·AT;
+                    var AT = A.transpose();
+                    var AY = A.multiply(Y);
+                    var YN = AY.multiply(AT);
+                    var AIS = A.multiply(IS);
+                    var AYUS = AY.multiply(US);
+                    var UN = electricity.MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
+                    console.log("UN");
+                    electricity.MatrixMath.traceMatrix(UN);
+                };
+                return AdmittanceMethod;
+            }(calculaters.MethodBase));
+            calculaters.AdmittanceMethod = AdmittanceMethod;
+        })(calculaters = electricity.calculaters || (electricity.calculaters = {}));
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
@@ -610,6 +697,70 @@ var hanyeah;
             return ElectricityWorld;
         }(electricity.HObject));
         electricity.ElectricityWorld = ElectricityWorld;
+    })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
+})(hanyeah || (hanyeah = {}));
+/**
+ * Created by hanyeah on 2019/8/13.
+ */
+var hanyeah;
+(function (hanyeah) {
+    var electricity;
+    (function (electricity) {
+        var examples;
+        (function (examples) {
+            var DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
+            var Example01 = /** @class */ (function () {
+                function Example01(ctx) {
+                    var elecWorld = new electricity.ElectricityWorld();
+                    var arr = [];
+                    for (var i = 0; i < 4; i++) {
+                        var ele = new DTwoTerminalElement();
+                        elecWorld.addElement(ele);
+                        arr.push(ele);
+                        ele.R = 2;
+                    }
+                    arr[0].terminal0.connect(arr[1].terminal0);
+                    arr[0].terminal1.connect(arr[1].terminal1);
+                    arr[0].terminal0.connect(arr[2].terminal1);
+                    arr[0].terminal1.connect(arr[3].terminal0);
+                    arr[3].terminal1.connect(arr[2].terminal0);
+                    arr[3].SU = 6;
+                    arr[3].R = 0;
+                    // console.log(arr);
+                    test1();
+                    // test2();
+                    // setInterval(test1, 2000);
+                    traceUI();
+                    function traceUI() {
+                        for (var i = 0; i < arr.length; i++) {
+                            console.log(i + ":\t" + arr[i].U.toPrecision(2) + ",\t" + arr[i].I.toPrecision(2));
+                        }
+                    }
+                    function test2() {
+                        console.time("用时");
+                        for (var i = 0; i < 100000; i++) {
+                            elecWorld.calculate();
+                        }
+                        elecWorld.calculate();
+                        console.timeEnd("用时");
+                    }
+                    function test1() {
+                        console.time("用时");
+                        elecWorld.calculate();
+                        console.timeEnd("用时");
+                    }
+                    function test0() {
+                        var loop = function () {
+                            elecWorld.calculate();
+                            requestAnimationFrame(loop);
+                        };
+                        requestAnimationFrame(loop);
+                    }
+                }
+                return Example01;
+            }());
+            examples.Example01 = Example01;
+        })(examples = electricity.examples || (electricity.examples = {}));
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));
 /**
@@ -1168,45 +1319,78 @@ var hanyeah;
 (function (hanyeah) {
     var electricity;
     (function (electricity) {
-        var examples;
-        (function (examples) {
-            var DTwoTerminalElement = hanyeah.electricity.elecData.DTwoTerminalElement;
-            var Example01 = /** @class */ (function () {
-                function Example01(ctx) {
-                    var elecWorld = new electricity.ElectricityWorld();
-                    var arr = [];
-                    for (var i = 0; i < 4; i++) {
-                        var ele = new DTwoTerminalElement();
-                        elecWorld.addElement(ele);
-                        arr.push(ele);
-                        ele.R = 2;
+        var Edge = hanyeah.electricity.graph.Edge;
+        var Vertex = hanyeah.electricity.graph.Vertex;
+        var ListMethod = hanyeah.electricity.calculaters.ListMethod;
+        var ElectricityCalculater = /** @class */ (function () {
+            function ElectricityCalculater() {
+            }
+            ElectricityCalculater.prototype.calculate = function (elements) {
+                var len = elements.length;
+                var ele;
+                var terminal0;
+                var terminal1;
+                // -------------初始化index-------------
+                for (var i = 0; i < len; i++) {
+                    ele = elements[i];
+                    ele.terminal0.index = -1;
+                    ele.terminal1.index = -1;
+                }
+                // ------------生成顶点Map---------
+                var vertexs = [];
+                var n = 0;
+                for (var i = 0; i < len; i++) {
+                    ele = elements[i];
+                    terminal0 = ele.terminal0.root;
+                    terminal1 = ele.terminal1.root;
+                    if (terminal0.index === -1) {
+                        vertexs[n] = new Vertex(n);
+                        terminal0.index = n;
+                        n++;
                     }
-                    arr[0].terminal0.connect(arr[1].terminal0);
-                    arr[0].terminal1.connect(arr[1].terminal1);
-                    arr[0].terminal0.connect(arr[2].terminal0);
-                    arr[0].terminal1.connect(arr[3].terminal0);
-                    arr[3].terminal1.connect(arr[2].terminal1);
-                    arr[3].SU = 5;
-                    // arr[0].R = 0;
-                    // console.log(arr);
-                    test1();
-                    // setInterval(test1, 2000);
-                    function test1() {
-                        console.time("用时");
-                        elecWorld.calculate();
-                        console.timeEnd("用时");
-                    }
-                    function test0() {
-                        var loop = function () {
-                            elecWorld.calculate();
-                            requestAnimationFrame(loop);
-                        };
-                        requestAnimationFrame(loop);
+                    if (terminal1.index === -1) {
+                        vertexs[n] = new Vertex(n);
+                        terminal1.index = n;
+                        n++;
                     }
                 }
-                return Example01;
-            }());
-            examples.Example01 = Example01;
-        })(examples = electricity.examples || (electricity.examples = {}));
+                // ------------生成边Map------------
+                var edges = [];
+                n = 0;
+                var edge;
+                for (var i = 0; i < len; i++) {
+                    ele = elements[i];
+                    if (ele.isBreak) {
+                        continue;
+                    }
+                    terminal0 = ele.terminal0.root;
+                    terminal1 = ele.terminal1.root;
+                    if (terminal0 !== terminal1) {
+                        edge = new Edge(n);
+                        edge.vertex0 = vertexs[terminal0.index];
+                        edge.vertex1 = vertexs[terminal1.index];
+                        edges[n] = edge;
+                        edge.SU = ele.SU;
+                        edge.SI = ele.SI;
+                        edge.R = ele.R;
+                        ele.index = n;
+                        n++;
+                        if (edge.vertex0.root !== edge.vertex1.root) {
+                            edge.vertex0.root.root = edge.vertex1.root;
+                        }
+                    }
+                }
+                // console.log(vertexs);
+                // console.log(edges);
+                // const method: MethodBase = new ImpedanceMethod();
+                // method.solve(vertexs, edges);
+                // const method: MethodBase = new AdmittanceMethod();
+                // method.solve(vertexs, edges);
+                var method = new ListMethod();
+                method.solve(vertexs, edges);
+            };
+            return ElectricityCalculater;
+        }());
+        electricity.ElectricityCalculater = ElectricityCalculater;
     })(electricity = hanyeah.electricity || (hanyeah.electricity = {}));
 })(hanyeah || (hanyeah = {}));

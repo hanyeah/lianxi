@@ -1,3 +1,15 @@
+## 功能
+
+实现了直流电路的计算。
+
+支持电阻、电压源、电流源；不支持电感、电容。
+
+一条支路只能是电阻、电压源、电流源中的一种。
+
+可以参考examples下面的例子。
+
+## 运行项目
+
 为了避免写大量的///\<reference path="xxxx/xxxx.ts"/>，使用typescript-plus编译。
 
 安装typescript-plus。
@@ -20,4 +32,4 @@ File->Settings->Languages & FrameWorks->TypeScript
 
 ### 编译命令：
 
-`tsc-plus --reorderFiles --w`。
+`tsc-plus --reorderFiles`。

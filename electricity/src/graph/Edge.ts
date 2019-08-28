@@ -10,19 +10,7 @@ namespace hanyeah.electricity.graph {
     public vertex1: Vertex;
     public SU: number = 0;
     public SI: number = 0;
-    public Y: number = 0;
-    public Z: number = 0;
     public R: number = 0;
-    public G: number = 0;
-    public C: number = 0;
-    public L: number = 0;
-    public m: number[] = [];
-    public n: number[] = [];
-    public u: number[] = [];
-    public g: number[] = [];
-    public r: number[] = [];
-    public b: number[] = [];
-    public type = EdgeType.L;
 
     constructor(index: number) {
       super();

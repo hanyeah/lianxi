@@ -101,7 +101,7 @@ namespace hanyeah.electricity.calculaters {
         A.setElement(edge.vertex1.index2, i, -1);
         US.setElement(i, 0, edge.SU);
         IS.setElement(i, 0, edge.SI);
-        Z.setElement(i, i, edge.Z);
+        Z.setElement(i, i, edge.R);
       }
       //
       const BZ: MatrixMath = BF.multiply(Z);

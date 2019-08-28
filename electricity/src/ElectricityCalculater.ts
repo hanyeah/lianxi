@@ -11,6 +11,7 @@ namespace hanyeah.electricity {
   import MethodBase = hanyeah.electricity.calculaters.MethodBase;
   import ImpedanceMethod = hanyeah.electricity.calculaters.ImpedanceMethod;
   import AdmittanceMethod = hanyeah.electricity.calculaters.AdmittanceMethod;
+  import ListMethod = hanyeah.electricity.calculaters.ListMethod;
 
   export class ElectricityCalculater {
     constructor() {
@@ -65,8 +66,6 @@ namespace hanyeah.electricity {
           edge.SU = ele.SU;
           edge.SI = ele.SI;
           edge.R = ele.R;
-          edge.Y = ele.getY(0);
-          edge.Z = ele.getZ(0);
           ele.index = n;
           n++;
           if (edge.vertex0.root !== edge.vertex1.root) {
@@ -77,11 +76,13 @@ namespace hanyeah.electricity {
       // console.log(vertexs);
       // console.log(edges);
 
-      const method: MethodBase = new ImpedanceMethod();
-      method.solve(vertexs, edges);
+      // const method: MethodBase = new ImpedanceMethod();
+      // method.solve(vertexs, edges);
 
       // const method: MethodBase = new AdmittanceMethod();
       // method.solve(vertexs, edges);
+      const method: MethodBase = new ListMethod();
+      method.solve(vertexs, edges);
     }
   }
 }
