@@ -513,6 +513,13 @@ var hanyeah;
                     var IB = electricity.MatrixMath.GaussSolution(BZA, BUBZI);
                     console.log("IB");
                     electricity.MatrixMath.traceMatrix(IB);
+                    // 给边和节点设置计算好的电流电压。
+                    for (var i = 0; i < en; i++) {
+                        edge = edges[i];
+                        edge.I = IB.getElement(i, 0);
+                        edge.U = edge.R * edge.I;
+                    }
+                    // 不知道结点电压
                 };
                 return ImpedanceMethod;
             }(calculaters.MethodBase));
@@ -670,6 +677,17 @@ var hanyeah;
                     var UN = electricity.MatrixMath.GaussSolution(YN, AIS.clone().sub(AYUS));
                     console.log("UN");
                     electricity.MatrixMath.traceMatrix(UN);
+                    // 给边和节点设置计算好的电流电压。
+                    var vertex;
+                    for (var i = 0; i <= rows; i++) {
+                        vertex = vertexs[i];
+                        vertex.U = UN.getElement(vertex.index2, 0);
+                    }
+                    for (var i = 0; i < cols; i++) {
+                        edge = edges[i];
+                        edge.U = edge.vertex0.U - edge.vertex1.U;
+                        edge.I = edge.U * (edge.R === 0 ? 1e6 : 1 / edge.R);
+                    }
                 };
                 return AdmittanceMethod;
             }(calculaters.MethodBase));
