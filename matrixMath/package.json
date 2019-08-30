@@ -1,0 +1,13 @@
+{
+  "name": "MatrixMath",
+  "main": "MatrixMath.js",
+  "version": "0.0.0",
+  "description": "hanyeah's matrix math",
+  "typings": "index.d.ts",
+  "author": "hanyeah <hanlidong@yeah.net> (http://hanyeah.com)",
+  "scripts":{
+    "start": "npm run build && npm run server",
+    "build": "tsc-plus --reorderFiles",
+    "server": "cd ./lib && live-server"
+  }
+}
