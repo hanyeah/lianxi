@@ -8,11 +8,19 @@ function Main(canvas) {
     this.ticker.add(this.update, this);
 
     
-    this.tube = new Tube(new PIXI.Point(100, 100), new PIXI.Point(500, 100), 1);
+    this.tube = new Tube(new PIXI.Point(300, 400), new PIXI.Point(300, 100), 6e-3);
     this.colorArr = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff, 0x000000];
     this.n = 1;
+
+    this.bottle = new Bottle(50 ,80);
+    this.bottle.addWater(1000);
+    this.bottle.x = 300;
+    this.bottle.y = 410;
+
     this.gra = new PIXI.Graphics();
     this.stage.addChild(this.gra);
+
+
     window.main = this;
     this.ticker.start();
     this.ticker.maxFPS = 10;
@@ -29,12 +37,22 @@ function Main(canvas) {
     });
 }
 
-Main.prototype.update = function() {
-    if(this.dir === 1) {
+Main.prototype.update = function(dt) {
+    var h = this.tube.p0.y - (this.bottle.y - this.bottle.wH);
+    if(h > 0 && h < this.bottle.h) {
+        var dp = this.bottle.getP(h);
+        var rho = 1.0e3;
+        var v = Math.sqrt(dp * 2 / rho);
+        var dh = this.tube.v2h(v);
+        console.log(dp, dh);
+        this.add(dh * 16 / 1000);
+        this.bottle.removeWater(v);
+    }
+    /*if(this.dir === 1) {
         this.add();
     } else if(this.dir === -1) {
         this.reverseAdd();
-    }
+    }*/
 
     var p0 = this.tube.p0.clone();
     var dir = getDir(this.tube.p0, this.tube.p1);
@@ -43,17 +61,20 @@ Main.prototype.update = function() {
     var gra = this.gra;
     gra.clear();
 
-    gra.lineStyle(5, 0x000000);
-    gra.moveTo(this.tube.p0.x, this.tube.p0.y + 50);
-    gra.lineTo(this.tube.p1.x, this.tube.p1.y + 50);
-
     this.tube.forEach((column) => {
         p1 = pointAt(p0, dir, column.length);
-        gra.lineStyle(5, this.colorArr[column.data.id % this.colorArr.length]);
+        gra.lineStyle(m2px(this.tube.d), this.colorArr[column.data.id % this.colorArr.length]);
         gra.moveTo(p0.x, p0.y);
         gra.lineTo(p1.x, p1.y);
         p0 = p1;
     });
+ 
+    gra.lineStyle(1, 0x000000);
+    gra.drawRect(this.bottle.x - this.bottle.d / 2, this.bottle.y - this.bottle.h, this.bottle.d, this.bottle.h);
+    gra.lineStyle(0, 0x000000, 0.0);
+    gra.beginFill(0xff0000, 0.5);
+    gra.drawRect(this.bottle.x - this.bottle.d / 2, this.bottle.y - this.bottle.wH, this.bottle.d, this.bottle.wH);
+    gra.endFill();
 }
 
 Main.prototype.add = function(v) {
@@ -73,29 +94,49 @@ function pointAt(p0, dir, d) {
     return new PIXI.Point(p0.x + dir.x * d, p0.y + dir.y * d);
 }
 
+function distance(p0, p1) {
+    return length(p0.x - p1.x, p0.y - p1.y);
+}
+
+function length(x, y) {
+    return Math.sqrt(x * x + y * y);
+}
+
+function m2px(m) {
+    return m * 1000;
+}
+
+function px2m(px) {
+    return px / 1000;
+}
+
+/**
+ * 管子
+ * @param {Point} p0 端点
+ * @param {Point} p1 端点
+ * @param {Point} d  直径
+ */
 function Tube(p0, p1, d){
     this.d = d;
     this.p0 = p0;
     this.p1 = p1;
     //
-    this.r = this.d / 2;
-    this.s = Math.PI * this.r* this.r;
     this.length = distance(this.p0, this.p1);
     //
     this.column0 = new Column(this.length, {id: 0});
     this.column1 = this.column0;
 }
 
-Tube.prototype.v2l = function(v) {
-    return v / this.s;
+Tube.prototype.v2h = function(v) {
+    return v / this.d;
 }
 
-Tube.prototype.l2v = function(l) {
-    return l * this.s;
+Tube.prototype.h2v = function(h) {
+    return h * this.d;
 }
 
-Tube.prototype.add = function(l, data) {
-    var column = new Column(l, data);
+Tube.prototype.add = function(h, data) {
+    var column = new Column(h, data);
     column.next = this.column0;
     this.column0.prev = column;
     this.column0 = column;
@@ -104,8 +145,8 @@ Tube.prototype.add = function(l, data) {
     this.cutOff();
 }
 
-Tube.prototype.reverseAdd = function(l, data) {
-    var column = new Column(l, data);
+Tube.prototype.reverseAdd = function(h, data) {
+    var column = new Column(h, data);
     column.prev = this.column1;
     this.column1.next = column;
     this.column1 = column;
@@ -186,6 +227,9 @@ Tube.prototype.columnNum = function() {
     return n;
 }
 
+/**
+ * 一段液柱。
+ */
 function Column(length, data){
     this.next = this;
     this.prev = this;
@@ -201,12 +245,42 @@ Column.prototype.destroy = function() {
     this.data = null;
 }
 
-
-function distance(p0, p1) {
-    return length(p0.x - p1.x, p0.y - p1.y);
+function Bottle(d, h) {
+    this.d = d;
+    this.h = h;
+    //
+    this.v = this.d * this.h;
+    //
+    this.wV = 0;
+    this.wH = 0;
+    this.p0 = 0;
 }
 
-function length(x, y) {
-    return Math.sqrt(x * x + y * y);
+Bottle.prototype.v2h = function(v) {
+    return v / this.d;
 }
 
+Bottle.prototype.h2v = function(h) {
+    return h * this.d;
+}
+
+Bottle.prototype.addWater = function(v) {
+    this.wV += v;
+    if(this.wV > this.v) {
+        this.wV = this.v;
+    }
+    if(this.wV < 0) {
+        this.wV = 0;
+    }
+    this.wH = this.v2h(this.wV);
+}
+
+Bottle.prototype.removeWater = function(v) {
+    this.addWater(-v);
+}
+
+Bottle.prototype.getP = function(h) {
+    var rho = 1.0e3;
+    var g = 10.0;
+    return this.p0 + rho * g * Math.min(this.wH, h);
+}
