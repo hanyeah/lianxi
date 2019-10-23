@@ -1,0 +1,16 @@
+{
+  "name": "Tube",
+  "main": "./dist/Main.js",
+  "version": "0.0.0",
+  "description": "",
+  "typings": "./dist/Main.d.ts",
+  "author": "hanyeah <hanlidong@yeah.net> (http://hanyeah.com)",
+  "scripts": {
+    "start": "npm run build && npm run server",
+    "build": "tsc-plus --reorderFiles",
+    "server": "cd ./dist && live-server"
+  },
+  "dependencies": {
+
+  }
+}
