@@ -16,6 +16,7 @@ function Main(canvas) {
     this.bottle.addWater(1000);
     this.bottle.x = 300;
     this.bottle.y = 410;
+    this.bottle.p0 = 100000;
 
     this.gra = new PIXI.Graphics();
     this.stage.addChild(this.gra);
@@ -40,13 +41,19 @@ function Main(canvas) {
 Main.prototype.update = function(dt) {
     var h = this.tube.p0.y - (this.bottle.y - this.bottle.wH);
     if(h > 0 && h < this.bottle.h) {
-        var dp = this.bottle.getP(h);
+        var dp = this.bottle.getP(h) - this.tube.getP();
         var rho = 1.0e3;
-        var v = Math.sqrt(dp * 2 / rho);
-        var dh = this.tube.v2h(v);
-        console.log(dp, dh);
-        this.add(dh * 16 / 1000);
-        this.bottle.removeWater(v);
+        if(dp > 0) {
+            var v = Math.sqrt(dp / rho);
+            var dh = this.tube.v2h(v);
+            this.add(dh * 16 / 1000, 1.0e3, 1);
+            this.bottle.removeWater(v);
+        } else if(dp < 0) {
+            var v = Math.sqrt(-dp / rho);
+            var dh = this.tube.v2h(v);
+            this.reverseAdd(dh * 16 / 1000, 0, 0);
+            this.bottle.addWater(v);
+        }
     }
     /*if(this.dir === 1) {
         this.add();
@@ -77,12 +84,12 @@ Main.prototype.update = function(dt) {
     gra.endFill();
 }
 
-Main.prototype.add = function(v) {
-    this.tube.add(v || Math.random() * 10 + 1, {id: this.n++});
+Main.prototype.add = function(v, rho = 1.0e3, n) {
+    this.tube.add(v || Math.random() * 10 + 1, {id: n, rho: rho});
 }
 
-Main.prototype.reverseAdd = function(v) {
-    this.tube.reverseAdd(v || Math.random() * 10 + 1, {id: this.n++});
+Main.prototype.reverseAdd = function(v, rho = 1.0e3, n) {
+    this.tube.reverseAdd(v || Math.random() * 10 + 1, {id: n, rho: rho});
 }
 
 function getDir(p0, p1) {
@@ -123,7 +130,7 @@ function Tube(p0, p1, d){
     //
     this.length = distance(this.p0, this.p1);
     //
-    this.column0 = new Column(this.length, {id: 0});
+    this.column0 = new Column(this.length, {id: 0, rho: 0});
     this.column1 = this.column0;
 }
 
@@ -227,6 +234,16 @@ Tube.prototype.columnNum = function() {
     return n;
 }
 
+Tube.prototype.getP = function() {
+    var column = this.column0;
+    var p = column.getP();
+    while(column !== this.column1) {
+        column = column.next;
+        p += column.getP();
+    }
+    return p;
+}
+
 /**
  * 一段液柱。
  */
@@ -243,6 +260,11 @@ Column.prototype.destroy = function() {
     this.next = null;
     this.prev = null;
     this.data = null;
+}
+
+Column.prototype.getP = function() {
+    var g = 10;
+    return this.data.rho * g * this.length;
 }
 
 function Bottle(d, h) {
