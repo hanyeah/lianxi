@@ -4,12 +4,12 @@
 namespace hanyeah.tube{
   export class Column{
     public length: number;
-    public data: LiquidData;
+    public data: DChemicals;
     public next: Column;
     public prev: Column;
     public prevLength: number;
     public nextLength: number;
-    constructor(length: number, data: LiquidData) {
+    constructor(length: number, data: DChemicals) {
       this.length = length;
       this.data = data;
       this.next = this;

@@ -4,8 +4,9 @@
 namespace hanyeah.tube{
   export class Bottle extends PIXI.Container{
     public d: number = 80;
-    public h: number = 120;
-    public v: number = this.d * this.h;
+    public s: number = DUtils.getS(this.d / 2);
+    public h: number = 100;
+    public v: number = this.s * this.h;
     public wV: number = 0;
     public wH: number = 0;
     public p0: number = 0;
@@ -32,11 +33,11 @@ namespace hanyeah.tube{
     }
 
     public v2h(v: number): number{
-      return v / this.d;
+      return v / this.s;
     }
 
     public h2v(h: number): number {
-      return h * this.d;
+      return h * this.s;
     }
 
     public addWater(v) {
@@ -57,6 +58,8 @@ namespace hanyeah.tube{
     public getP(g: number, h: number): number{
       return this.p0 + 1.0e3 * g * Math.min(this.wH, h);
     }
+
+
 
   }
 }
