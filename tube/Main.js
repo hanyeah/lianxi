@@ -46,12 +46,12 @@ Main.prototype.update = function(dt) {
         if(dp > 0) {
             var v = Math.sqrt(dp / rho);
             var dh = this.tube.v2h(v);
-            this.add(dh * 16 / 1000, 1.0e3, 1);
+            this.add(dh * 1 / 1000, 1.0e3, 1);
             this.bottle.removeWater(v);
         } else if(dp < 0) {
             var v = Math.sqrt(-dp / rho);
             var dh = this.tube.v2h(v);
-            this.reverseAdd(dh * 16 / 1000, 0, 0);
+            this.reverseAdd(dh * 1 / 1000, 0, 0);
             this.bottle.addWater(v);
         }
     }
