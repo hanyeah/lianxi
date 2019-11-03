@@ -1,0 +1,89 @@
+<script type="text/javascript">
+	var arr = [
+		["Ca", "(", "O", "H", ")", 2],
+		["(", "N", "H", 4, ")", 2, "S", "O", 4],
+		["Al", 2, "(", "S", "O",4,")",3],
+		["Ca", "(", "H", 2, "P","O",4,")",2]
+	];
+
+	for(var i = 0; i < arr.length; i++) {
+		var a = arr[i];
+		var index = 0;
+		var b = [];
+		while(index < a.length){
+			var o = a[index];
+			index++;
+			b.push(o);
+			if(isElement(o)) {
+				if(isString(a[index])){
+					b.push(1);
+				}
+			}
+		}
+		console.log(b);
+		var e = {children:[], parent: null, num: 1};
+		var index = 0;
+		while(index < b.length) {
+			var o = b[index];
+			if(o === "(") {
+				var ch = {children:[], parent: null, num: 1};
+				e.children.push(ch);
+				ch.parent = e;
+				e = ch;
+			} else if(o === ")"){
+				index++;
+				e.num = b[index];
+				e = e.parent;
+			} else {
+				var oo = {name: o, num: 1};
+				index++;
+				oo.num = b[index];
+				e.children.push(oo);
+			}
+			index++;
+		}
+		console.log(e);
+		var r = [];
+		zhankai(r, e);
+		console.log(r);
+		var m = toMap(r);
+		console.log(m);
+		console.log("-----------------------");
+	}
+
+	function zhankai(r, e) {
+		for(var i = 0; i < e.children.length; i++) {
+			e.children[i].num *= e.num;
+		}
+		for(var i = 0; i < e.children.length; i++) {
+			var o = e.children[i];
+			if(o.children) {
+				zhankai(r, o);
+			} else {
+				r.push(o);
+			}
+		}
+	}
+
+	function toMap(a){
+		var m = {};
+		for(var i = 0; i < a.length; i++){
+			var o = a[i];
+			if(m[o.name]){
+				m[o.name] += o.num;
+			} else {
+				m[o.name] = o.num;
+			}
+		}
+		return m;
+	}
+	
+
+	function isElement(s) {
+		return isString(s) && s !== '(';
+	}
+
+	function isString(s){
+		return Boolean(s.charAt);
+	}
+</script>
