@@ -1,0 +1,299 @@
+<script type="text/javascript" src = "MatrixMath.js"></script>
+<script type="text/javascript">
+	// var a = "Ca(OH)2";
+	// var b = "H2SO4";
+	// var c = "H2O";
+	// var d = "CaSO4";
+	
+	var arr = ["Ca(OH)2", "H2SO4", "H2O", "CaSO4", "(NH4)2SO4", "Al2(SO4)3", "Ca(HPO4)2"];
+	var equations = [
+		["CH4","O2","CO2","H2O"],
+		["Al","H2SO4","Al2(SO4)3","H2"]
+	];
+
+	equations.forEach(function(equation){
+		banlance(equation);
+	});
+
+	function banlance(equation){
+		var os = [];
+		for(var i = 0; i < equation.length; i++){
+			var m = fenjie(equation[i]);
+			os.push(m);
+		}
+		console.log(os);
+		solute(os);
+		console.log("------------------");
+	}
+
+	function fenjie(s) {
+		var a = cut(s);
+		// console.log(a);
+		var b = fillNumber(a);
+		// console.log(b);
+		var e = toTree(b);
+		// console.log(e);
+		var r = [];
+		zhankai(r, e);
+		// console.log(r);
+		var m = toMap(r);
+		// console.log(m);
+		return m;
+	}
+
+	/*for(var i = 0; i < arr.length; i++) {
+		var s = arr[i];
+		var a = cut(s);
+		console.log(a);
+		var b = fillNumber(a);
+		console.log(b);
+		var e = toTree(b);
+		console.log(e);
+		var r = [];
+		zhankai(r, e);
+		console.log(r);
+		var m = toMap(r);
+		console.log(m);
+		console.log("--------------------");
+	}*/
+
+	function fillNumber(a){
+		var index = 0;
+		var b = [];
+		while(index < a.length){
+			var o = a[index];
+			index++;
+			b.push(o);
+			if(isElement(o)) {
+				if(!a[index] || isString(a[index])){
+					b.push(1);
+				}
+			}
+		}
+		return b;
+	}
+
+	function toTree(b) {
+		var e = {children:[], parent: null, num: 1};
+		var index = 0;
+		while(index < b.length) {
+			var o = b[index];
+			if(o === "(") {
+				var ch = {children:[], parent: null, num: 1};
+				e.children.push(ch);
+				ch.parent = e;
+				e = ch;
+			} else if(o === ")"){
+				index++;
+				e.num = b[index];
+				e = e.parent;
+			} else {
+				var oo = {name: o, num: 1};
+				index++;
+				oo.num = b[index];
+				e.children.push(oo);
+			}
+			index++;
+		}
+		return e;
+	}
+
+	function zhankai(r, e) {
+		for(var i = 0; i < e.children.length; i++) {
+			e.children[i].num *= e.num;
+		}
+		for(var i = 0; i < e.children.length; i++) {
+			var o = e.children[i];
+			if(o.children) {
+				zhankai(r, o);
+			} else {
+				r.push(o);
+			}
+		}
+	}
+
+	function toMap(a){
+		var m = {};
+		for(var i = 0; i < a.length; i++){
+			var o = a[i];
+			if(m[o.name]){
+				m[o.name] += o.num;
+			} else {
+				m[o.name] = o.num;
+			}
+		}
+		return m;
+	}
+	
+
+	function isElement(s) {
+		return isString(s) && s !== '(';
+	}
+
+	function isString(s){
+		return (s && Boolean(s.charAt)) || s === "";
+	}
+
+	function cut(s){
+		var a = [];
+		var index = 0;
+		var tasks = [getElement, getNumer, getBrackets];
+		while(index < s.length) {
+			for(var i = 0 ; i < tasks.length; i++) {
+				var func = tasks[i];
+				var obj = func(s, index);
+				if(obj.index !== index) {
+					index = obj.index;
+					a.push(obj.value);
+				}
+			}
+		}
+		return a;
+	}
+
+	function getBrackets(s, index){
+		var c = s.charAt(index);
+		if(isBrackets(c)) {
+			index++;
+		} else {
+			c = "";
+		}
+		return {
+			value: c,
+			index: index
+		}
+	}
+
+	function getNumer(s, index) {
+		var result = [];
+		var c = s.charAt(index);
+		if(isNumber(c)) {
+			result.push(c);
+			while(true) {
+				index++;
+				c = s.charAt(index);
+				if(isNumber(c)) {
+					result.push(c);
+				} else {
+					break;
+				}
+			}
+		}
+		var num = parseInt(result.join(""));
+		if(isNaN(num) || num === 0) {
+			num = 1;
+		}
+		return {
+			value: num,
+			index: index
+		}
+	}
+
+	function getElement(s, index) {
+		var result = [];
+		var c = s.charAt(index);
+		if(isUpperCase(c)) {
+			result.push(c);
+			while(true) {
+				index++;
+				c = s.charAt(index);
+				if(isLowerCase(c)) {
+					result.push(c);
+				} else {
+					break;
+				}
+			}
+		}
+		return {
+			value: result.join(""),
+			index: index
+		};
+	}
+
+	function isLowerCase(c){
+		var code = c.charCodeAt(0);
+		return code >= 97 && code <= 122;
+	}
+
+	function isUpperCase(c) {
+		var code = c.charCodeAt(0);
+		return code >= 65 && code <= 90;
+	}
+
+	function isNumber(c) {
+		var code = c.charCodeAt(0);
+		return code >= 47 && code <= 57;
+	}
+
+	function isBrackets(c) {
+		return c === "(" || c === ")";
+	}
+	
+	var os = [
+		{"Ca": 1, "O": 2, "H": 2},
+		{"H": 2, "S": 1, "O": 4},
+		{"Ca": 1, "S": 1, "O": 4},
+		{"H": 2, "O": 1}
+	];
+	
+	function getEles(os) {
+		var eles = [];
+		var map = {};
+		for(var i = 0; i < os.length; i++) {
+			var o = os[i];
+			for(var key in o) {
+				if(o.hasOwnProperty(key)){
+					if(!map[key]){
+						map[key] = true;
+						eles.push(key);
+					}
+				}
+			}
+		}
+		return eles;
+	}
+	// solute(eles, os);
+
+	function solute(os) {
+		var eles = getEles(os);
+		var rows = eles.length;
+		var cols = os.length;
+		var m = new MatrixMath(rows - 1, cols - 1);
+		var y = new MatrixMath(rows - 1, 1);
+		for(var i = 0; i < rows; i++) {
+			for(var j = 0; j < cols; j++) {
+				var value = (os[j][eles[i]]||0);
+				if(j === cols - 1) {
+					y.setElement(i, 0, value);
+				} else {
+					m.setElement(i, j, value);
+				}
+			}
+		}
+		console.log("m=");
+		m.traceMatrix();
+		console.log("y=");
+		y.traceMatrix();
+		var x = MatrixMath.GaussSolution(m, y);
+		console.log("x=");
+		x.traceMatrix();
+
+		toInt(x._m.concat(1));
+	}
+
+	function toInt(x){
+		var ds = [];
+		for(var i = 0; i < x.length; i++){
+			if(isDouble(x[i])){
+				ds.push(x[i]);
+			}
+		}
+		console.log(ds);
+	}
+
+	function isDouble(n){
+		n = Math.abs(n) + 1e-6;
+		return Math.floor(n * 1e5) !=  Math.floor(n) * 1e5;
+	}
+	
+</script>
