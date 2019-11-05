@@ -278,22 +278,182 @@
 		console.log("x=");
 		x.traceMatrix();
 
-		toInt(x._m.concat(1));
+		var e = toInt(x._m.concat(-1));
+		console.log(e);
 	}
 
 	function toInt(x){
+		x = x.concat();
 		var ds = [];
+		var b = [];
+		var c = [];
 		for(var i = 0; i < x.length; i++){
 			if(isDouble(x[i])){
 				ds.push(x[i]);
+				var o = toFraction(Math.abs(x[i]));
+				b.push(o.a);
+				c.push(o.b);
+			} else {
+				b.push(Math.abs(x[i]));
+				c.push(1);
 			}
 		}
 		console.log(ds);
+		if(ds.length === 0){
+			return x;
+		}
+
+		console.log(b, c);
+		var d = paixuQuchong(c);
+		console.log(d);
+		var g = lcms(d);
+		var e = [];
+		for(var i = 0; i< b.length; i++){
+			e[i] = b[i] * g / c[i] * (x[i] > 0 ? 1: -1);
+		}
+		console.log(e);
+		return e;
+	}
+
+	function paixuQuchong(a){
+		a = a.concat();
+		a.sort(function(m,n){return m - n;});
+		var b = [];
+		for(var i = 0; i < a.length; i++){
+			if(a[i] !== 1 && a[i] !== a[i-1]){
+				b.push(a[i]);
+			}
+		}
+		return b;
+	}
+
+	function toFraction(d){
+		var numerators = [0, 1];
+		var denominators = [1, 0];
+		var d2 = d;
+		var calcD, prevCalcD;
+		// var maxNumerator = getMaxNumerator(d);
+		for (var i = 2; i < 1000; i++)  {
+			var L2 = Math.floor(d2);
+			var numerator = L2 * numerators[i-1] + numerators[i-2];
+			var denominator = L2 * denominators[i-1] + denominators[i-2];
+			// if(numerator > maxNumerator){
+			// 	break;
+			// }
+			calcD = numerator / denominator;
+			if (calcD == prevCalcD) {
+				break;
+			}
+			numerators[i] = numerator;
+			denominators[i] = denominator;
+			if (calcD == d) {
+				break;
+			}
+			prevCalcD = calcD;
+			d2 = 1 / (d2-L2);
+		}
+
+		// console.log(numerators, denominators);
+		// console.log("%s / %s = %s", numerators[numerators.length-1], denominators[denominators.length-1], numerators[numerators.length-1] / denominators[denominators.length-1]);
+		return {
+			a: numerators[numerators.length - 1],
+			b: denominators[denominators.length - 1]
+		};
+	}
+
+	function getMaxNumerator(f){
+		var f2 = null;
+		var ixe = f.toString().indexOf("E");
+		if (ixe == -1) ixe = f.toString().indexOf("e");
+		if (ixe == -1) f2 = f.toString();
+		else f2 = f.toString().substring(0, ixe);
+
+		var digits = null;
+		var ix = f2.toString().indexOf(".");
+		if (ix==-1) digits = f2;
+		else if (ix==0) digits = f2.substring(1, f2.length);
+		else if (ix < f2.length) digits = f2.substring(0, ix) + f2.substring(ix + 1, f2.length);
+
+		var L = digits;
+
+		var numDigits = L.toString().length;
+		var L2 = f;
+		var numIntDigits = L2.toString().length;
+		if (L2 == 0) numIntDigits = 0;
+		var numDigitsPastDecimal = numDigits - numIntDigits;
+
+		for (var i=numDigitsPastDecimal; i>0 && L%2==0; i--) L/=2;
+		for (var i=numDigitsPastDecimal; i>0 && L%5==0; i--) L/=5;
+
+		return L;
 	}
 
 	function isDouble(n){
 		n = Math.abs(n) + 1e-6;
 		return Math.floor(n * 1e5) !=  Math.floor(n) * 1e5;
+	}
+	// https://blog.csdn.net/u011815404/article/details/81284222
+	function gcd(a, b){
+		if(b === 0){
+			return a;
+		} 
+		return gcd(b, a % b);
+	}
+
+	function lcm(a, b){
+		return a / gcd(a, b) * b;
+	}
+
+	function gcds(arr){
+		if(arr.length === 1){
+			return arr[0];
+		}
+		if(arr.length === 2){
+			return gcd(arr[0], arr[1]);
+		}
+		var a = arr.concat();
+		var n = a.length;
+		var m = 0, i = 0;
+		while(n > 1){
+			m = 0
+			for(i = 0; i < n - 1; i += 2){
+				a[m] = gcd(a[i], a[i + 1]);
+				m++;
+			}
+			if (i == n - 1) {
+				a[m] = a[i];
+				m++;
+			}
+			// n = Math.floor((n + 1) / 2);
+			n = m;
+		}
+		return a[0];
+	}
+
+	function lcms(arr){
+		if(arr.length === 1){
+			return arr[0];
+		}
+		if(arr.length === 2){
+			return lcm(arr[0], arr[1]);
+		}
+		var a = arr.concat();
+		var n = a.length;
+		var m = 0, i = 0;
+		while(n > 1){
+			m = 0
+			for(i = 0; i < n - 1; i += 2){
+				a[m] = lcm(a[i], a[i + 1]);
+				m++;
+			}
+			if (i == n - 1) {
+				a[m] = a[i];
+				m++;
+			}
+			// n = Math.floor((n + 1) / 2);
+			n = m;
+		}
+		return a[0];
 	}
 	
 </script>
