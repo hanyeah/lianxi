@@ -29,13 +29,26 @@
 		var scw = [];
 		for(var i = 0; i < e.length; i++){
 			if(e[i] > 0){
-				fyw.push([e[i], equation[i]].join(""));
+				fyw.push({name: equation[i], num: e[i]});
 			} else {
-				scw.push([-e[i], equation[i]].join(""));
+				scw.push({name: equation[i], num: -e[i]});
 			}
 		}
-		console.log((fyw.join("+") + "=" + scw.join("+")).replace(/1/g, ""));
+		var s = toStringEquation(fyw, scw);
+		console.log(s);
 		console.log("------------------");
+	}
+
+	function toStringEquation(fyw, scw){
+		return (toStringFywScw(fyw) + "=" + toStringFywScw(scw)).replace(/1/g, "");
+	}
+
+	function toStringFywScw(a){
+		var r = [];
+		for(var i = 0; i < a.length; i++){
+			r.push(a[i].num + "" + a[i].name);
+		}
+		return r.join("+");
 	}
 
 	function fenjie(s) {
