@@ -22,7 +22,19 @@
 			os.push(m);
 		}
 		console.log(os);
-		solute(os);
+		var e = solute(os);
+		console.log(e);
+
+		var fyw = [];
+		var scw = [];
+		for(var i = 0; i < e.length; i++){
+			if(e[i] > 0){
+				fyw.push([e[i], equation[i]].join(""));
+			} else {
+				scw.push([-e[i], equation[i]].join(""));
+			}
+		}
+		console.log((fyw.join("+") + "=" + scw.join("+")).replace(/1/g, ""));
 		console.log("------------------");
 	}
 
@@ -255,11 +267,17 @@
 	// solute(eles, os);
 
 	function solute(os) {
-		var eles = getEles(os);
+		var eles = getEles(os);console.log(eles);
 		var rows = eles.length;
 		var cols = os.length;
-		var m = new MatrixMath(rows - 1, cols - 1);
-		var y = new MatrixMath(rows - 1, 1);
+		if(rows === cols){
+			rows = rows - 1;
+		}
+		if(rows !== cols - 1){
+			console.log("行数列错误：", rows, cols);
+		}
+		var m = new MatrixMath(rows, cols - 1);
+		var y = new MatrixMath(rows, 1);
 		for(var i = 0; i < rows; i++) {
 			for(var j = 0; j < cols; j++) {
 				var value = (os[j][eles[i]]||0);
@@ -270,16 +288,18 @@
 				}
 			}
 		}
+		
+		var x = MatrixMath.GaussSolution(m, y);
 		console.log("m=");
 		m.traceMatrix();
 		console.log("y=");
 		y.traceMatrix();
-		var x = MatrixMath.GaussSolution(m, y);
 		console.log("x=");
 		x.traceMatrix();
 
 		var e = toInt(x._m.concat(-1));
-		console.log(e);
+		//console.log(e);
+		return e;
 	}
 
 	function toInt(x){
@@ -298,20 +318,20 @@
 				c.push(1);
 			}
 		}
-		console.log(ds);
+		//console.log(ds);
 		if(ds.length === 0){
 			return x;
 		}
 
-		console.log(b, c);
+		//console.log(b, c);
 		var d = paixuQuchong(c);
-		console.log(d);
+		//console.log(d);
 		var g = lcms(d);
 		var e = [];
 		for(var i = 0; i< b.length; i++){
 			e[i] = b[i] * g / c[i] * (x[i] > 0 ? 1: -1);
 		}
-		console.log(e);
+		//console.log(e);
 		return e;
 	}
 
