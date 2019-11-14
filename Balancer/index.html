@@ -1,19 +1,47 @@
+<h1>自动配平</h1>
+输入反应物和生成物：<input id = "input" placeholder ="CH4,O2,CO2,H2O" style="width:100%;"/>
+<button onclick="calc()">计算</button>
+<div id = "out"></div>
 <script type="text/javascript" src = "MatrixMath.js"></script>
 <script type="text/javascript">
-	// var a = "Ca(OH)2";
-	// var b = "H2SO4";
-	// var c = "H2O";
-	// var d = "CaSO4";
 	
-	var arr = ["Ca(OH)2", "H2SO4", "H2O", "CaSO4", "(NH4)2SO4", "Al2(SO4)3", "Ca(HPO4)2"];
-	var equations = [
-		["CH4","O2","CO2","H2O"],
-		["Al","H2SO4","Al2(SO4)3","H2"]
-	];
+	var eles = ["H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb"," Lu","Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg","Tl","Pb","Bi","Po","At","Rn","Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr"];
 
-	equations.forEach(function(equation){
-		banlance(equation);
-	});
+	var out = document.getElementById("out");
+	var input = document.getElementById("input");
+	function calc(){
+		var s = input.value;
+		s = s.replace(/\s/g, "").replace(/，/g, ",");
+		if(s.length === 0){
+			s = input.placeholder;
+		}
+		console.log(s);
+		var equation = s.split(",");
+		out.innerHTML = "";
+		if(equation.length){
+			try{
+				var o = banlance(equation);
+				out.innerHTML = toStringEquation(o.fyw, o.scw);
+			} catch(e){
+				out.innerHTML = "发生错误";
+			}
+		}
+	}
+	
+	function test0(){
+		var equations = [
+			["CH4","O2","CO2","H2O"],
+			["Al","H2SO4","Al2(SO4)3","H2"]
+		];
+
+		equations.forEach(function(equation){
+			var o = banlance(equation);
+			var s = toStringEquation(o.fyw, o.scw);
+			console.log(s);
+			console.log("------------------");
+		});
+	}
+	
 
 	function banlance(equation){
 		var os = [];
@@ -21,9 +49,9 @@
 			var m = fenjie(equation[i]);
 			os.push(m);
 		}
-		console.log(os);
+		//console.log(os);
 		var e = solute(os);
-		console.log(e);
+		//console.log(e);
 
 		var fyw = [];
 		var scw = [];
@@ -34,9 +62,10 @@
 				scw.push({name: equation[i], num: -e[i]});
 			}
 		}
-		var s = toStringEquation(fyw, scw);
-		console.log(s);
-		console.log("------------------");
+		return {
+			fyw: fyw,
+			scw: scw
+		};
 	}
 
 	function toStringEquation(fyw, scw){
@@ -303,12 +332,12 @@
 		}
 		
 		var x = MatrixMath.GaussSolution(m, y);
-		console.log("m=");
-		m.traceMatrix();
-		console.log("y=");
-		y.traceMatrix();
-		console.log("x=");
-		x.traceMatrix();
+		// console.log("m=");
+		// m.traceMatrix();
+		// console.log("y=");
+		// y.traceMatrix();
+		// console.log("x=");
+		// x.traceMatrix();
 
 		var e = toInt(x._m.concat(-1));
 		//console.log(e);
@@ -365,14 +394,10 @@
 		var denominators = [1, 0];
 		var d2 = d;
 		var calcD, prevCalcD;
-		// var maxNumerator = getMaxNumerator(d);
 		for (var i = 2; i < 1000; i++)  {
 			var L2 = Math.floor(d2);
 			var numerator = L2 * numerators[i-1] + numerators[i-2];
 			var denominator = L2 * denominators[i-1] + denominators[i-2];
-			// if(numerator > maxNumerator){
-			// 	break;
-			// }
 			calcD = numerator / denominator;
 			if (calcD == prevCalcD) {
 				break;
@@ -384,41 +409,15 @@
 			}
 			prevCalcD = calcD;
 			d2 = 1 / (d2-L2);
+			if(d2 > 1e6){
+				break;
+			}
 		}
 
-		// console.log(numerators, denominators);
-		// console.log("%s / %s = %s", numerators[numerators.length-1], denominators[denominators.length-1], numerators[numerators.length-1] / denominators[denominators.length-1]);
 		return {
 			a: numerators[numerators.length - 1],
 			b: denominators[denominators.length - 1]
 		};
-	}
-
-	function getMaxNumerator(f){
-		var f2 = null;
-		var ixe = f.toString().indexOf("E");
-		if (ixe == -1) ixe = f.toString().indexOf("e");
-		if (ixe == -1) f2 = f.toString();
-		else f2 = f.toString().substring(0, ixe);
-
-		var digits = null;
-		var ix = f2.toString().indexOf(".");
-		if (ix==-1) digits = f2;
-		else if (ix==0) digits = f2.substring(1, f2.length);
-		else if (ix < f2.length) digits = f2.substring(0, ix) + f2.substring(ix + 1, f2.length);
-
-		var L = digits;
-
-		var numDigits = L.toString().length;
-		var L2 = f;
-		var numIntDigits = L2.toString().length;
-		if (L2 == 0) numIntDigits = 0;
-		var numDigitsPastDecimal = numDigits - numIntDigits;
-
-		for (var i=numDigitsPastDecimal; i>0 && L%2==0; i--) L/=2;
-		for (var i=numDigitsPastDecimal; i>0 && L%5==0; i--) L/=5;
-
-		return L;
 	}
 
 	function isDouble(n){
