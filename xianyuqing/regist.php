@@ -12,17 +12,20 @@ if ($conn->connect_error) {
 } 
 echo "数据库连接成功";
 
-$domain=$_POST['user_nickname'];
- 
-echo "post:".$domain;
-// $sql = "if not exists(select user_nickname from user where user_nickname='"++"')";
-// $result = $conn->query($sql);
-// if ($result->num_rows > 0) {
-//     // 输出数据
-//     echo "结果:".($result->num_rows);
-// } else {
-//     echo "0 结果";
-// }
+$userName=$_POST['name'];
+$userEmail=$_POST['email'];
+$userPassword=$_POST['password'];
+
+$selectSql = "select user_nickname from user where user_nickname='{$userName}'";
+$insertSql = "insert into user (user_nickname,user_email,user_password,user_addtime,user_lasttime) value ('{$userName}', '{$userEmail}', '{$userPassword}')"
+$sql = "if not exists({$selectSql}) insert";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+    // 输出数据
+    echo "结果:".($result->num_rows);
+} else {
+    echo "0 结果";
+}
 
 $conn->close();
 ?>

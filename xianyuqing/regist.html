@@ -62,19 +62,19 @@ function validateSignup(){
       <table>
       <tr>
           <td>用户名</td>
-          <td><input class="inputForm" type="text" name="up_user" value="" required="" onkeyup="this.value=this.value.replace(/[^\w\u4E00-\u9FA5]/g, '')"></td>
+          <td><input class="inputForm" type="text" name="up_user" value="" required="" onkeyup="hanyeah.userNameInput(this)"></td>
       </tr>
       <tr>
           <td>邮箱</td>
-          <td><input class="inputForm" type="email" name="up_email" value="" required=""></td>
+          <td><input class="inputForm" type="email" name="up_email" value="" required="" onkeyup="hanyeah.emailInput(this)"></td>
       </tr>
       <tr>
           <td>密码</td>
-          <td><input class="inputForm" type="password" name="up_password" value="" required=""></td>
+          <td><input class="inputForm" type="password" name="up_password" value="" required="" onkeyup="hanyeah.passWordInput(this)"></td>
       </tr>
       <tr>
           <td>确认密码</td>
-          <td><input class="inputForm" type="password" name="up_password_" value="" required=""></td>
+          <td><input class="inputForm" type="password" name="up_password_" value="" required="" onkeyup="hanyeah.passWordInput(this)"></td>
       </tr>
       <tr><td id = "tip" colspan="2" style="color:red;font-size: 8px;"></td></tr>
       </table>
