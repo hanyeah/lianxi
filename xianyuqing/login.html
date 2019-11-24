@@ -12,23 +12,46 @@
         margin-top: 20px;
       }
     </style>
-    <script src = "forms.js"></script>
+    <script src = "hanyeah.js"></script>
     <script>
-      function
+      function showTip(s){
+        var tip = document.getElementById("tip");
+        tip.innerHTML = s;
+      }
+
+      function post(o){
+        hanyeah.post("http://xianyuqing.com/login.php", o, function(responseText){
+          console.log(responseText);
+        },true);
+        console.log("提交：", o);
+      }
+
+      function validateSignin(){      
+        var form = document.forms["formLogin"];
+        var s;
+        var o = {
+            name: form.up_user.value,
+            password: form.up_password.value
+          }
+          post(o);
+        return false;
+      }
     </script>
 </head>
 <body>
   <div class = "con">
-      <form class="formLogin" name="formLogin" action="/signin" onsubmit="return validateSignin()" method="post">
+      <form class="formLogin" name="formLogin" action="" onsubmit="return validateSignin()" method="post">
         <table>
+          <table>
             <tr>
                 <td>用户名</td>
-                <td><input class="inputForm" type="text" name="user" value="" size="20" required="" autofocus="autofocus"></td>
+                <td><input class="inputForm" type="text" name="up_user" value="" required="" onkeyup="hanyeah.userNameInput(this)"></td>
             </tr>
             <tr>
                 <td>密码</td>
-                <td><input class="inputForm" type="password" name="password" value="" size="20" required=""></td>
+                <td><input class="inputForm" type="password" name="up_password" value="" required="" onkeyup="hanyeah.passWordInput(this)"></td>
             </tr>
+            <tr><td id = "tip" colspan="2" style="color:red;font-size: 8px;"></td></tr>
         </table>
         <input type="submit" class="formButton" value="登录">
     </form>

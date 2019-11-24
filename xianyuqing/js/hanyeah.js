@@ -94,7 +94,7 @@ hanyeah.checkEmail = function(email){
   if(!re2.test(email)){
       return "邮箱格式不正确";
   }
-  if(userName.length > 50){
+  if(email.length > 50){
     return "邮箱不能多于50个字符";
   }
   return null;
@@ -107,8 +107,8 @@ hanyeah.checkPassWord = function(password, password_){
   if(password.length < 6){
     return "密码至少要6个字符";
   }
-  if(userName.length > 8){
-    return "邮箱不能多于8个字符";
+  if(password.length > 20){
+    return "邮箱不能多于20个字符";
   }
   return null;
 }

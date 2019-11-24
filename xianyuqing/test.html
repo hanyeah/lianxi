@@ -1,0 +1,24 @@
+<meta charset="utf-8">
+<script src = "hanyeah.js"></script>
+<script>
+  function testVip(o){
+    hanyeah.post("http://xianyuqing.com/vip.php", o, function(responseText){
+      console.log(responseText);
+    },true);
+    console.log("vip提交：", o);
+  }
+
+  function testBuy(o){
+    hanyeah.post("http://xianyuqing.com/buy.php", o, function(responseText){
+      console.log(responseText);
+    },true);
+    console.log("buy提交：", o);
+  }
+
+  function getVip(o){
+    hanyeah.post("http://xianyuqing.com/getVip.php", o, function(responseText){
+      console.log(responseText);
+    },true);
+    console.log("getVip：", o);
+  }
+</script>
