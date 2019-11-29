@@ -1,0 +1,25 @@
+[
+	spriteSheet: "a.json",
+	eqs: [
+		{
+			name: "电阻",
+			icon: "a.png",
+			conf: "电阻.json"
+		},
+		{
+			name: "电源",
+			icon: "b.png",
+			conf: "电源.json"
+		},
+		{
+			name: "单刀单掷开关",
+			icon: "c.png",
+			conf: "单刀单掷开关.json"
+		},
+		{
+			name: "滑动变阻器",
+			icon: "c.png",
+			conf: "滑动变阻器.json"
+		}
+	]
+]

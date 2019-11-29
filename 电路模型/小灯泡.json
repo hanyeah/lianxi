@@ -1,0 +1,25 @@
+{
+	name: "小灯泡",
+	model: "Edge",
+	R: 1,
+	bg: "a.png",
+	anchor: {
+		x: 50,
+	 	y: 50
+	},
+	light:{
+		bg: "",
+		anchor: {x: 50, y: 50},
+		alpha: "10 * sqrt(I)"
+	},
+	p0: {
+		x: 0,
+		y: 0,
+		r: 10
+	},
+	p1: {
+		x: 100,
+		y: 0,
+		r: 10
+	}
+}

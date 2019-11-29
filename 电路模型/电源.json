@@ -1,0 +1,21 @@
+{
+	name: "电源",
+	model: "SeriesConn",
+	E: 1.5,
+	R: 1e-6,
+	bg: "b.png",
+	anchor: {
+		x: 50,
+	 	y: 0
+	},
+	p0: {
+		x: 0,
+		y: 0,
+		r: 10
+	},
+	p1: {
+		x: 100,
+		y: 0,
+		r: 10
+	}
+}

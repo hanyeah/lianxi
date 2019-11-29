@@ -1,0 +1,40 @@
+{
+	name: "滑动变阻器",
+	model: "SeriesConn",
+	R: 20,
+	per: 0.5,
+	bg: "a.png",
+	anchor: {
+		x: 50,
+	 	y: 0
+	},
+	thumb: {
+		bg:"b.png",
+		anchor:{x: 10, y: 10}
+	},
+	slide: {
+		x: 0,
+		y: -10,
+		len: 100
+	},
+	p0: {
+		x: 0,
+		y: 0,
+		r: 10
+	},
+	p1: {
+		x: 100,
+		y: 0,
+		r: 10
+	},
+	p2: {
+		x: 0,
+		y: -20,
+		r: 10
+	},
+	p3: {
+		x: 100,
+		y: -20,
+		r: 10
+	}
+}

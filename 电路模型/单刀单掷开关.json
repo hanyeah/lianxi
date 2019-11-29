@@ -1,0 +1,28 @@
+{
+	name:"单刀单掷开关",
+	model: "Edge",
+	bg: "c.png",
+	anchor: {x: 50, y: 0},
+	knife: {
+		bg: "knife.png",
+		anchor: {0, 0},
+		rot0: 0,
+		rot1: -30,
+		hitArea: {
+			x: 100,
+			y: 0,
+			r: 10
+		}
+	},
+	isBreak: true,
+	p0: {
+		x: 0,
+		y: 0,
+		r: 10
+	},
+	p1: {
+		x: 100,
+		y: 0,
+		r: 10
+	}
+}
