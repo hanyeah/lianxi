@@ -1,20 +1,44 @@
 {
 	name: "电阻",
-	model: "Edge",
-	R: 1,
-	bg: "a.png",
-	anchor: {
-		x: 50,
-	 	y: 0
+	data:{
+		vertexs:[],
+		edges:[
+			{
+				type: "edge",
+				name: "edge0",
+				R: 1
+			}
+		]
 	},
-	p0: {
-		x: 0,
-		y: 0,
-		r: 10
-	},
-	p1: {
-		x: 100,
-		y: 0,
-		r: 10
-	}
+	skin:[
+		{
+			name: "bg",
+			type: "sprite",
+			texture: "a.png",
+			anchor:{
+				x: 50,
+				y: 0
+			}
+		}
+	],
+	terminals: [
+		{
+			view: "",
+			type: "box",
+			x: 0,
+			y: 0,
+			w: 10,
+			h: 10,
+			data: "edge0.vertex0"
+		},
+		{
+			view: "",
+			type: "box",
+			x: 100,
+			y: 0,
+			w: 10,
+			h: 10,
+			data: "edge0.vertex1"
+		}
+	]
 }

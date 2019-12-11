@@ -20,6 +20,11 @@
 			name: "滑动变阻器",
 			icon: "c.png",
 			conf: "滑动变阻器.json"
+		},
+		{
+			name: "小灯泡",
+			icon: "c.png",
+			conf: "小灯泡.json"
 		}
 	]
 ]

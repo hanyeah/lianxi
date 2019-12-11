@@ -1,21 +1,49 @@
 {
 	name: "电源",
-	model: "SeriesConn",
-	E: 1.5,
-	R: 1e-6,
-	bg: "b.png",
-	anchor: {
-		x: 50,
-	 	y: 0
+	data:{
+		vertexs:[],
+		edges:[
+			{
+				type: "SeriesConn",
+				name: "conn",
+				edge0: {
+					SU: 1.5
+				},
+				edge1:{
+					R: 1e-10
+				}
+			}
+		]
 	},
-	p0: {
-		x: 0,
-		y: 0,
-		r: 10
-	},
-	p1: {
-		x: 100,
-		y: 0,
-		r: 10
-	}
+	skin:[
+		{
+			name: "bg",
+			type: "sprite",
+			texture: "a.png",
+			anchor:{
+				x: 50,
+				y: 0
+			}
+		}
+	],
+	terminals: [
+		{
+			view: "",
+			type: "box",
+			x: 0,
+			y: 0,
+			w: 10,
+			h: 10,
+			data: "conn.vertex0"
+		},
+		{
+			view: "",
+			type: "box",
+			x: 100,
+			y: 0,
+			w: 10,
+			h: 10,
+			data: "conn.vertex2"
+		}
+	]
 }
