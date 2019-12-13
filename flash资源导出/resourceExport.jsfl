@@ -27,9 +27,13 @@ if(!flaDocument){
 	// 解析文档
 	jiexiDoc();
 	// 化简
-	// forEach(data.instances, huajian);
+	forEach(data.instances, huajian);
+	for(var key in data.libs){
+		huajian(data.libs[key]);
+	}
 	// 保存
-	// save();
+	save();
+	// trace(JSON.stringify(data, null, 2));
 }
 
 //解析文档
@@ -40,39 +44,101 @@ function jiexiDoc(){
 				data.instances.push({
 					libName: instance.libraryItem.name
 				});
-				parseLibSprite(instance.libraryItem);
+				data.libs[instance.libraryItem.name] = parseLibItem(instance.libraryItem);
 			}
 	});
 }
 
 function parseLibSprite(libraryItem){
-	if(data.libs[libraryItem.name]){
-		return;
-	}
+	//trace("sprite");
 	instances = bianliTimeline(libraryItem.timeline, isSupport, 1)[0];
+	if(!isContainer(instances)){
+		var instance = instances[0];
+		var o = parseBitmap(instance.libraryItem);
+		if(instance.x != 0 || instance.y != 0){
+			o.anchor = {
+				x: toFixed(-instance.x / instance.width, 4),
+				y: toFixed(-instance.y / instance.height, 4)
+			};
+		}
+		return o;
+	}
 	var o = {
 		type: "Container",
 		children: []
 	};
-	data.libs[libraryItem.name] = o;
 	forEach(instances, function(instance){
 			if(isSupport(instance)){
 				o.children.push(parseBaseParam(instance, {}));
-				parseLibItem(instance.libraryItem);
+				var oo = parseLibItem(instance.libraryItem);
+				if(oo){
+					data.libs[instance.libraryItem.name] = oo;
+				}
 			}
 	});
+	return o;
+}
+
+function parseLibBitmap(libraryItem){
+	//trace("bitmap" + libraryItem.name);
+	var o = {
+		type: "Bitmap",
+		texture: libraryItem.name
+	};
+	sheet.addBitmap(libraryItem);
+	return o;
+}
+
+function parseLibMovieClip(libraryItem){
+	//trace("movie clip");
+	var frames = bianliTimeline(libraryItem.timeline, isSupport, 0);
+	if(isAnimatedSprite(frames)){
+		var o = {
+			type: "AnimatedSprite",
+			textureArray: []
+		};
+		forEach(frames, function(frame){
+			var element = frame[0];
+			o.textureArray.push(element.libraryItem.name);
+			sheet.addBitmap(element.libraryItem);
+		});
+		return o;
+	}
+	return null;
 }
 
 function parseLibItem(libraryItem){
 	if(data.libs[libraryItem.name]){
-		return;
+		return null;
 	}
-	trace("libraryItem.symbolType: " + libraryItem.symbolType);
+	var o;
+	if(!libraryItem.symbolType){
+		o = parseLibBitmap(libraryItem);
+	} else {
+		if(isOneFrame(libraryItem)){
+		    o = parseLibSprite(libraryItem);
+		} else {
+			o = parseLibMovieClip(libraryItem);
+		}
+	}
+	return o;
 }
 //
-//function isContainer(instances){
-//	return !(instances.length == 1 && isBitmap(instances[0]) && isOri(parseBaseParam(instances[0], {})));
-//}
+function isContainer(instances){
+	return !(instances.length == 1 && isBitmap(instances[0]) && isOri(parseBaseParam(instances[0], {})));
+}
+
+function isAnimatedSprite(arr){
+	for(var i = 0; i < arr.length; i++){
+		if(arr[i].length > 1){
+			return false;
+		}
+		if(!isBitmap(arr[i][0])){
+			return false;
+		}
+	}
+	return true;
+}
 
 function canIgnore(co){
 	if(co.type == "MovieClip"){
@@ -108,10 +174,10 @@ function save(){
 	trace("导出" + confFile);
 	var jsonData = sheet.exportSpriteSheet(path + name, {format:"png", bitDepth:32, backgroundColor:"#00000000"});
 	//
-	// jsonData = jsonFrameAddFileName(jsonData);
+	jsonData = jsonFrameAddFileName(jsonData);
 	//
-	FLfile.write(jsonFile, jsonData);
 	var jsonFile = path + name + ".json";
+	FLfile.write(jsonFile, jsonData);
 	trace("导出" + jsonFile);
 }
 
@@ -191,7 +257,7 @@ function bianliTimeline(timeline, filterEle, maxFrame){
 			if(frame){
 				var elements = frame.elements;
 				for(var k = 0; k < elements.length; k++){
-					if(filterEle(elements[k])){
+					if(!filterEle || filterEle(elements[k])){
 						a.push(elements[k]);
 					}
 				}
@@ -214,6 +280,10 @@ function forEach(arr, callBack){
 	for(var i = 0; i < arr.length; i++){
 		callBack(arr[i]);
 	}
+}
+
+function isOneFrame(libraryItem){
+	return libraryItem.timeline.frameCount == 1;
 }
 
 function isSprite(element){

@@ -1,0 +1,55 @@
+{
+  "frames": {
+    "test/位图 1": {
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 144,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 144,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 34
+      }
+    },
+    "test/位图 2": {
+      "frame": {
+        "x": 148,
+        "y": 2,
+        "w": 22,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 22
+      }
+    }
+  },
+  "meta": {
+    "app": "Adobe Flash CS6",
+    "version": "12.0.0.481",
+    "image": "test.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 256,
+      "h": 256
+    },
+    "scale": "1"
+  }
+}

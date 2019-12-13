@@ -1,0 +1,41 @@
+{
+  "instances": [
+    {
+      "libName": "元件 1"
+    }
+  ],
+  "libs": {
+    "位图 1": {
+      "type": "Bitmap",
+      "texture": "位图 1"
+    },
+    "terminal": {
+      "type": "Bitmap",
+      "texture": "位图 2",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "元件 1": {
+      "type": "Container",
+      "children": [
+        {
+          "libName": "位图 1",
+          "x": -72,
+          "y": -17
+        },
+        {
+          "libName": "terminal",
+          "x": -55,
+          "y": "0.45"
+        },
+        {
+          "libName": "terminal",
+          "x": 52,
+          "y": "0.45"
+        }
+      ]
+    }
+  }
+}
