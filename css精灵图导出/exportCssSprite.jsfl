@@ -8,6 +8,8 @@ var flaDocument = fl.getDocumentDOM();
 var path;
 var name;
 
+fl.spriteSheetExporter = fl.spriteSheetExporter || new SpriteSheetExporter();
+
 if(!flaDocument){
 	trace("没有打开的文档");
 } else {
@@ -49,11 +51,11 @@ function forEach(arr, callBack){
 function getCssData(jsonData){
 	var o = JSON.parse(jsonData);
 	var a = [];
-	a.push("."+name+"_sprite{background-image:url(/"+ name+".png); background-repeat:no-repeat}");
+	a.push("."+name+"_sprite{background-image:url(./"+ name+".png); background-repeat:no-repeat}");
 	for(var key in o.frames){
 		var oo = o.frames[key];
 		var frame = oo.frame;
-		a.push("."+key+" {width:"+frame.w+"px;height:"+frame.h+"px;background-position:"+frame.x+"px "+frame.y+"px;}");
+		a.push("."+key+" {width:"+frame.w+"px;height:"+frame.h+"px;background-position:"+(-frame.x)+"px "+(-frame.y)+"px;}");
 	}
 	return a.join("\n");
 }
