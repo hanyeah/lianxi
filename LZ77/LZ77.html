@@ -1,0 +1,43 @@
+<script type="text/javascript">
+	function compress(s){
+		var a = [];
+		var m = 32 * 1024;
+		var i = 0;
+		var n = m;
+		while(i < s.length){
+			var r = match(s, i, m);
+			if(r[1] > 3){
+				a.push("`", r[0],",", r[1]);
+				i += r[1];
+			} else {
+				a.push(s.charAt(i));
+				i++;
+			}
+		}
+		return a.join("");
+	}
+
+	function match(s, i, m){
+		var n = i - m;
+		if(n < 0){
+			n = 0;
+		}
+		var p = 0;
+		var q = 0;
+		for(var j = n; j < i; j++){
+			var k = i;
+			while(k < s.length){
+				if(s.charAt(j + k - i) === s.charAt(k)){
+					k++;
+				} else {
+					break;
+				}
+			}
+			if(k - i > q){
+				q = k - i;
+				p = j;
+			}
+		}
+		return [p, q];
+	}
+</script>

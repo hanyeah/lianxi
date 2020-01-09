@@ -49,7 +49,7 @@
 			ib.uploadFromVector(indexData, 0, 6);
 			
 			
-			var vec: Vector.<Number> = Vector.<Number>([0.0, 1.0, 0.5, 1.0]);
+			var vec: Vector.<Number> = Vector.<Number>([0.0, 0.0, 0.0, 1.0]);
 			trace(vec);
 			
 			context3D.enableErrorChecking = true;
@@ -57,11 +57,14 @@
 			
 			//A simple vertex program in AGAL
 			const VERTEX_SHADER:String =["mov op, va0",
-				"mov v0, va1"].join("\n"); 
+				"mov v0, va1",
+				"mov v1, va0"].join("\n"); 
 			//A simple fragment (or pixel) program in AGAL        
 			const FRAGMENT_SHADER:String = [
 			"mov ft0 v0",
+			"mov ft0 fc0",
 			"mov ft0.x fc0.z",
+			"mov ft0.x v1.x",
 			"mov oc ft0",
 			].join("\n");  
 			var vertexAssembly:AGALMiniAssembler = new AGALMiniAssembler();

@@ -15,8 +15,7 @@
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="." />
-    <class path="D:\练习\class" />
+    <class path="E:\class" />
   </classpaths>
   <!-- Build options -->
   <build>
