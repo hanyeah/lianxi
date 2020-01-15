@@ -1,0 +1,221 @@
+<script type="text/javascript">
+	var elements = {"H":"1.01","He":"4","Li":"6.94","Be":"9.01","B":"10.8","C":"12","N":"14","O":"16","F":"19","Ne":"20.2","Na":"23","Mg":"24.3","Al":"27","Si":"28.1","P":"31","S":"32.1","Cl":"35.5","Ar":"39.9","K":"39.1","Ca":"40.1","Sc":"45","Ti":"47.9","V":"50.9","Cr":"52","Mn":"54.9","Fe":"55.8","Co":"58.9","Ni":"58.7","Cu":"63.5","Zn":"65.4","Ga":"69.7","Ge":"72.64","As":"74.9","Se":"79","Br":"79.9","Kr":"83.8","Rb":"85.5","Sr":"87.6","Y":"88.9","Zr":"91.2","Nb":"92.9","Mo":"95.9","Tc":"98","Ru":"101","Rh":"103","Pd":"106","Ag":"108","Cd":"112","In":"115","Sn":"119","Sb":"122","Te":"128","I":"127","Xe":"131","Cs":"133","Ba":"137","La":"139","Ce":"140","Pr":"141","Nd":"144","Pm":"145","Sm":"150","Eu":"152","Gd":"157","Tb":"159","Dy":"163","Ho":"165","Er":"167","Tm":"169","Yb":"173","Lu":"175","Hf":"178","Ta":"181","W":"184","Re":"186","Os":"190","Ir":"192","Pt":"195","Au":"197","Hg":"201","Tl":"204","Pb":"207","Bi":"209","Po":"210","At":"210","Rn":"220","Fr":"223","Ra":"226","Ac":"227","Pa":"231","Th":"232","Np":"237","U":"238","Am":"243","Pu":"244","Cm":"247","Bk":"247","Cf":"251","Es":"252","Fm":"257","Md":"258","No":"259","Lr":"262","Rf":"261","Db":"262","Sg":"266","Bh":"264","Hs":"277","Mt":"268","Ds":"271","Rg":"272"}
+	var formulas = ["H2O","C7H7O4N","Ag","Ag2O","Ag2S","Ag2SO4","AgBr","AgCl","AgF","AgI","AgNO3","Al","Al2O3","Al2S3","Al2(SO4)3","AlBr3","AlCl3","Al(NO3)3","Al(OH)3","Ar","BaCl2","BaCO3","Ba(NO3)2","BaO","Ba(OH)2","BaSO4","Br2","Ca","CaC2","CaCl2","CaCO3","Ca(NO3)2","CaO","Ca(OH)2","CaSO3","CaSO4","CCl4","Cl2","CO","CO2","Cu","Cu1","Cu2","Cu2S","CuCl2","CuCO3","Cu(NO3)2","CuO","Cu(OH)2","CuSO4·5H2O","CuSO4","F2","Fe","Fe1","Fe2","Fe2O3","Fe2(SO4)3","Fe3O4","FeCl2","FeCl3","Fe(NO3)2","Fe(NO3)3","FeO","Fe(OH)2","Fe(OH)3","FeSO4","H2","H2O2","H2S","SO3","H2SO3","H2SO4","H3PO4","HCl","He","HF","Hg","HgO","I2","K","K2MnO4","K2O","K2SO4","KBr","KCl","KClO3","KI","KMnO4","KNO3","KOH","K3[Fe(CN)6]","Li","LiOH","Li2O","Mg","Mg3N2","MgCl2","Mg(NO3)2","MgO","Mg(OH)2","MgSO4","MnCl2","Mn(NO3)2","Mn(OH)2","MgCO3","MnO2","N2","N2O","Na","Na2CO3","Na2O","Na2O2","Na2SO3","Na2SO4","NaAlO2","NaCl","NaHCO3","NaHSO3","NaHSO4","NaNO3","NaOH","Ne","NH3","(NH4)2SO4","NH4Cl","NH4NO3","NO","NO2","O2","O3","P","P4","P2O5","Pb","PbCl2","PbO2","PbSO4","Pt","S","Si","SO2","Zn","ZnCl2","Zn(NO3)2","ZnS","ZnSO4","C12H22O11","CH3COOH","C20H14O4","Na2SiO3","C17H35COONa","C20H19N3","SiO2","Cu2(OH)2CO3","H2CO3","NH3H2O","HCO3","Ca(HCO3)2","H2PO4","HPO4","HSO3","HNO3","C","CH3COONa","NaH2PO4","Na2HPO4","Na2S","HS","NaHS","AgOH","H2SiO3","Na3PO4","CH3COONH4","NH4HCO3","(NH4)2CO3","CH4","C2H2","C6H6","HClO","HAlO2","Na2S2O3","H2C2O4","MnSO4","K2Cr2O7","K2CrO4","H2CrO4","Fe(SCN)3","KSCN","C2H5ONa","C2H5OH","N2O4","OTHERS","KI(OTHERS)9","NaClO","(C6H10O5)n","Ba(OH)2·8H2O","H3BO3","(CH3COO)2Mg","NaI","NaBr","C8H18","AmBpO2p·nH2O","NO2(C)0","C20H19N3·H2SO3","(C17H35COO)2Ca","C20H19N3(C)0","Ag2CO3","C7H8O5NCl","NaBrO3","NaBrO","K2S","Ag(NH3)2OH","Na2CrO4","Na2Cr2O7","NaH2BO3","H2O2C20H14O4","HBrO","HBr","OHC(CHOH)4CH2OH","CH2OH(CHOH)3COCH2OH","CH3CHO","鸡蛋清","C6H12O7","Cu2O","CH3COOCH2CH3","PE","Mn","Ba(HCO3)2","Ca(ClO)2","CuS","KHCO3","K2CO3","CaSiO3","(NH4)2SO3","C20H20N3ClO","CH2=CH2","碎瓷片","石蜡油","CH2BrCH2Br","C7H8","C6H5COOH","CH3Cl","CH2Cl2","CHCl3","NaB(OH)4","AlI3","K2O","K2O2","KO2","CH2ONa(CHONa)4CHO","CH3OH","CHBr=CHBr","CHBr2CHBr2","杂质","C6H5Br","CaS","C3H7OH","Cr2(SO4)3","Fe(CH3COO)2","HI","C17H35COOH","CH3CH2OCH2CH3","H3PO4","C25H52","C5H11O5COONH4","(CH3COO)2Cu","C70H71O41N10Cl","Pb(NO3)2","C14H14N3SO3Na","C15H15N3O2","PbI2","Ca(CH3COO)2","CH2O","C6H5OH","C6H5NO2","C6H5ONa","CH3CHO","C6H4(NO2)2","C6H5SO3H","CH3CH2Br","H3[Fe(C6H5O)6]","C6H3Br3O","CH3COOK","C5H11O5COONa","Ag(NH3)2Cl","FeS"];
+
+
+
+formulas = ["H","Ag","Al","Ba","Ca","Cu","Fe","Fe","K","Mg","Mn","Na","NH4","Zn","Ag(NH3)2","Cr","Pb","OH","HS","HSO3","SO4","H2PO4","Na","CH3COO","HCO3","CO3","HPO4","PO4","SO3","NO3","Cl","S","SiO3","ClO","AlO2","C2O4","CrO4","C2H5O","H2BO3","BrO","Br","I","C17H35COO","Fe(C6H5O)6","S","SO4","Br","Cl","I","NO3","OH","CO3","S","SO4","Br","Cl","NO3","OH","I","Cl","CO3","NO3","OH","SO4","HCO3","Cl","CO3","NO3","OH","SO3","SO4","HCO3","ClO","SiO3","S","CH3COO","S","Cl","CO3","NO3","OH","SO4","CH3COO","SO4","Cl","NO3","OH","SCN","Cl","NO3","OH","SO4","CH3COO","S","MnO4","SO4","Br","Cl","ClO3","I","MnO4","NO3","OH","Cr2O7","CrO4","SCN","S","HCO3","CO3","CH3COO","Cl","NO3","OH","SO4","CO3","CH3COO","Cl","NO3","OH","SO4","CO3","SO3","SO4","AlO2","Cl","HCO3","HSO3","NO3","OH","SiO3","C17H35COO","CH3COO","H2PO4","HPO4","S","HS","PO4","S2O3","C2H5O","ClO","I","Br","BrO","CrO4","Cr2O7","H2BO3","B(OH)4","C6H5O","SO4","Cl","NO3","OH","CH3COO","HCO3","CO3","SO3","Cl","NO3","S","SO4","OH","Cl","SO4","I"];
+	var result = [];
+	for(var i = 0; i < formulas.length; i++){
+		var formula = formulas[i];
+		formula = formula.replace(/\[/g, "(").replace(/\]/g, ")").replace(/·/g, "");
+		var o = fenjie(formula);
+		var m = mass(o);
+		result.push(m);
+
+		// console.log(formula);
+		// console.log(o);
+	}
+	console.log(result.join("\n"));
+
+	function fenjie(s) {
+		var a = cut(s);
+		// console.log("a",a);
+		var b = fillNumber(a);
+		// console.log(b);
+		var e = toTree(b);
+		// console.log(e);
+		var r = [];
+		zhankai(r, e);
+		// console.log(r);
+		var m = toMap(r);
+		// console.log(m);
+		return m;
+	}
+
+	function mass(o) {
+		var m = 0;
+		for(var key in o) {
+			var c = key;
+			var n = o[key];
+			m += (elements[c] || 0) * (n || 0);
+		}
+		return m;
+	}
+
+	function toTree(b) {
+		var e = {children:[], parent: null, num: 1};
+		var index = 0;
+		while(index < b.length) {
+			var o = b[index];
+			if(o === "(") {
+				var ch = {children:[], parent: null, num: 1};
+				e.children.push(ch);
+				ch.parent = e;
+				e = ch;
+			} else if(o === ")"){
+				index++;
+				e.num = b[index];
+				e = e.parent;
+			} else {
+				var oo = {name: o, num: 1};
+				index++;
+				oo.num = b[index];
+				e.children.push(oo);
+			}
+			index++;
+		}
+		return e;
+	}
+
+	function zhankai(r, e) {
+		for(var i = 0; i < e.children.length; i++) {
+			e.children[i].num *= e.num;
+		}
+		for(var i = 0; i < e.children.length; i++) {
+			var o = e.children[i];
+			if(o.children) {
+				zhankai(r, o);
+			} else {
+				r.push(o);
+			}
+		}
+	}
+
+	function toMap(a){
+		var m = {};
+		for(var i = 0; i < a.length; i++){
+			var o = a[i];
+			if(m[o.name]){
+				m[o.name] += o.num;
+			} else {
+				m[o.name] = o.num;
+			}
+		}
+		return m;
+	}
+
+	function cut(s){
+		var a = [];
+		var index = 0;
+		var tasks = [getElement, getNumer, getBrackets];
+		while(index < s.length) {
+			var lastIndex = index;
+			for(var i = 0 ; i < tasks.length; i++) {
+				var func = tasks[i];
+				var obj = func(s, index);
+				if(obj.index !== index) {
+					index = obj.index;
+					a.push(obj.value);
+				}
+			}
+			if(lastIndex == index) {
+				console.log("非法字符：" + s.charAt(index));
+				index++;
+			}
+		}
+		return a;
+	}
+
+	function fillNumber(a){
+		var index = 0;
+		var b = [];
+		while(index < a.length){
+			var o = a[index];
+			index++;
+			b.push(o);
+			if(isElement(o)) {
+				if(!a[index] || isString(a[index])){
+					b.push(1);
+				}
+			}
+		}
+		return b;
+	}
+
+	function getBrackets(s, index){
+		var c = s.charAt(index);
+		if(isBrackets(c)) {
+			index++;
+		} else {
+			c = "";
+		}
+		return {
+			value: c,
+			index: index
+		}
+	}
+
+	function getNumer(s, index) {
+		var result = [];
+		var c = s.charAt(index);
+		if(isNumber(c)) {
+			result.push(c);
+			while(true) {
+				index++;
+				c = s.charAt(index);
+				if(isNumber(c)) {
+					result.push(c);
+				} else {
+					break;
+				}
+			}
+		}
+		var num = parseInt(result.join(""));
+		if(isNaN(num) || num === 0) {
+			num = 1;
+		}
+		return {
+			value: num,
+			index: index
+		}
+	}
+
+	function getElement(s, index) {
+		var result = [];
+		var c = s.charAt(index);
+		if(isUpperCase(c)) {
+			result.push(c);
+			while(true) {
+				index++;
+				c = s.charAt(index);
+				if(isLowerCase(c)) {
+					result.push(c);
+				} else {
+					break;
+				}
+			}
+		}
+		return {
+			value: result.join(""),
+			index: index
+		};
+	}
+
+	function isElement(s) {
+		return isString(s) && s !== '(';
+	}
+
+	function isString(s){
+		return (s && Boolean(s.charAt)) || s === "";
+	}
+
+	function isLowerCase(c){
+		var code = c.charCodeAt(0);
+		return code >= 97 && code <= 122;
+	}
+
+	function isUpperCase(c) {
+		var code = c.charCodeAt(0);
+		return code >= 65 && code <= 90;
+	}
+
+	function isNumber(c) {
+		var code = c.charCodeAt(0);
+		return code >= 47 && code <= 57;
+	}
+
+	function isBrackets(c) {
+		return c === "(" || c === ")";
+	}
+</script>
