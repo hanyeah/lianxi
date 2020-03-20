@@ -1,0 +1,14 @@
+{
+  "name": "new-optical",
+  "main": "./web/Main.js",
+  "version": "0.0.1",
+  "description": "hanyeah's optical",
+  "typings": "./lib/Main.d.ts",
+  "author": "hanyeah <hanlidong@yeah.net> (http://hanyeah.com)",
+  "scripts": {
+    "start": "npm run build && npm run server",
+    "build": "tsc-plus --reorderFiles",
+    "server": "cd ./web && live-server"
+  },
+  "dependencies": {}
+}
