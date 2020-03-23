@@ -176,8 +176,20 @@ var hanyeah;
         Calculater.prototype.firstLine = function (light, segments, angData, quad) {
             this.leftLine(light, segments, angData, quad);
         };
+        Calculater.prototype.getP0 = function (light, angData) {
+            if (angData.p1.owner === light) {
+                return angData.p1;
+            }
+            if (angData.angle === light.p0.angData.angle) {
+                return light.p0;
+            }
+            if (angData.angle === light.p1.angData.angle) {
+                return light.p1;
+            }
+            return hanyeah.LineUtil.intersectRayLine(angData.p0, angData.p1, light.p0, light.p1);
+        };
         Calculater.prototype.leftLine = function (light, segments, angData, quad) {
-            var p0 = hanyeah.LineUtil.intersectRayLine(angData.p0, angData.p1, light.p0, light.p1);
+            var p0 = this.getP0(light, angData);
             var d0 = hanyeah.PointUtils.distance(angData.p0, p0);
             var intersects = this.getIntersects(angData.p0, angData.p1, segments, light);
             var minIntersect = this.getMinIntersect(intersects, d0, true, false);
@@ -186,7 +198,7 @@ var hanyeah;
             quad.p1 = new hanyeah.QuadPoint(p1.x, p1.y, minIntersect.seg);
         };
         Calculater.prototype.rightLine = function (light, segments, angData, quad) {
-            var p0 = hanyeah.LineUtil.intersectRayLine(angData.p0, angData.p1, light.p0, light.p1);
+            var p0 = this.getP0(light, angData);
             var d0 = hanyeah.PointUtils.distance(angData.p0, p0);
             var intersects = this.getIntersects(angData.p0, angData.p1, segments, light);
             var minIntersect = this.getMinIntersect(intersects, d0, false, true);

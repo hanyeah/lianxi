@@ -109,8 +109,21 @@ namespace hanyeah {
       this.leftLine(light, segments, angData, quad);
     }
 
+    getP0(light: LightData, angData: AngleData): IPoint {
+      if (angData.p1.owner === light) {
+        return angData.p1;
+      }
+      if (angData.angle === light.p0.angData.angle) {
+        return light.p0;
+      }
+      if (angData.angle === light.p1.angData.angle) {
+        return light.p1;
+      }
+      return LineUtil.intersectRayLine(angData.p0, angData.p1, light.p0, light.p1);
+    }
+
     leftLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): void {
-      const p0: IPoint = LineUtil.intersectRayLine(angData.p0, angData.p1, light.p0, light.p1);
+      const p0: IPoint = this.getP0(light, angData);
       const d0: number = PointUtils.distance(angData.p0, p0);
       const intersects: IntersectResult[] = this.getIntersects(angData.p0, angData.p1, segments, light);
       const minIntersect: IntersectResult = this.getMinIntersect(intersects, d0, true, false);
@@ -120,7 +133,7 @@ namespace hanyeah {
     }
 
     rightLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): void {
-      const p0: IPoint = LineUtil.intersectRayLine(angData.p0, angData.p1, light.p0, light.p1);
+      const p0: IPoint = this.getP0(light, angData);
       const d0: number = PointUtils.distance(angData.p0, p0);
       const intersects: IntersectResult[] = this.getIntersects(angData.p0, angData.p1, segments, light);
       const minIntersect: IntersectResult = this.getMinIntersect(intersects, d0, false, true);

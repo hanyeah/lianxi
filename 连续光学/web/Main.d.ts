@@ -42,6 +42,7 @@ declare namespace hanyeah {
         lastLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): void;
         middleLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): Quad;
         firstLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): void;
+        getP0(light: LightData, angData: AngleData): IPoint;
         leftLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): void;
         rightLine(light: LightData, segments: Segment[], angData: AngleData, quad: Quad): void;
         getMinIntersect(intersects: IntersectResult[], minD: number, ignoreRight: boolean, ignoreLeft: boolean): IntersectResult;
