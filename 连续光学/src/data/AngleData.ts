@@ -10,8 +10,6 @@ namespace hanyeah {
       this.p1 = p1;
       this.angle = Utils.formatAngle(PointUtils.getAngle2(p0, p1), ang0);
       this.d = PointUtils.distance(p0, p1);
-      p0.angData = this;
-      p1.angData = this;
     }
   } 
 }

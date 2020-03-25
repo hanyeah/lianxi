@@ -25,13 +25,6 @@ namespace hanyeah {
       this.gra.lineStyle(5, 0xffff00, 0.8);
       this.gra.moveTo(this.p0.x, this.p0.y);
       this.gra.lineTo(this.p1.x, this.p1.y);
-      //
-      if(this.data.p0.angData) {
-        this.p0.tf.text = "" + Math.round(this.data.p0.angData.angle * 100)/100;
-      }
-      if(this.data.p1.angData) {
-        this.p1.tf.text = "" + Math.round(this.data.p1.angData.angle * 100)/100;
-      }
     }
   }
 }

@@ -1,32 +1,20 @@
 namespace hanyeah {
   export class Segment {
     public world: World;
-    public p0: HPoint = new HPoint(0, 0, this);
-    public p1: HPoint = new HPoint(0, 0, this);
+    public p0: HPoint = new HPoint(-10, 0);
+    public p1: HPoint = new HPoint(10, 0);
     public type: SegmentType;
     constructor(world: World, type: SegmentType) {
-      this.p0.brother = this.p1;
-      this.p1.brother = this.p0;
-      this.world = world;
-      this.world.addSegment(this);
       this.type = type;
+      this.world = world;
+      world.addSegment(this);
     }
 
     public destroy(): void {
-      
+      this.world.removeSegment(this);
+      this.world = null;
     }
 
-  }
-
-  export enum SegmentType {
-    mirror,
-    wall,
-    light
-  }
-
-  export interface ISegment {
-    p0: HPoint;
-    p1: HPoint;
   }
 
 }

@@ -29,17 +29,16 @@ namespace hanyeah {
       this.eqs.forEach((eq: Equipment) => {
         eq.update(dt);
       });
-      const quads: Quad[] = this.world.calculate();
+      const quads: QuadData[] = this.world.calculate();
       this.gra.clear();
       this.gra.lineStyle(1, 0xffffff, 0.8);
       for (let i: number = 0; i < quads.length; i++) {
         this.gra.beginFill(0xff00ff, 0.5);
-        const quad: Quad = quads[i];
+        const quad: QuadData = quads[i];
         this.gra.moveTo(quad.p0.x, quad.p0.y);
         this.gra.lineTo(quad.p1.x, quad.p1.y);
         this.gra.lineTo(quad.p2.x, quad.p2.y);
         this.gra.lineTo(quad.p3.x, quad.p3.y);
-        this.gra.closePath();
         this.gra.endFill();
       }
     }

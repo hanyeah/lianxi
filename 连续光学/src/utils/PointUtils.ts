@@ -91,7 +91,7 @@ namespace hanyeah {
      * 两个点是否相等
      */
     public static isEqual(p0: IPoint, p1: IPoint): boolean {
-      return p0.x === p1.x && p0.y === p1.y;
+      return Math.abs(p0.x - p1.x) < 1e-8 && Math.abs(p0.y - p1.y) < 1e-8;
     }
 
   }
