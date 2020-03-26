@@ -185,10 +185,13 @@ namespace hanyeah {
           const vec1: HPoint = new HPoint(quad.p1.x - quad.p0.x, quad.p1.y - quad.p0.y);
           const d0: number = PointUtils.dot(vec1, normal);
           const sp: HPoint = new HPoint(p0.x + d0 * normal.x * 2, p0.y + d0 * normal.y * 2);
-          const light: LineLight = new LineLight(null, sp, 
+          // const light: LineLight = new LineLight(null, sp, 
+          //   new HPoint(quad.p1.x, quad.p1.y), 
+          //   new HPoint(quad.p2.x, quad.p2.y));
+
+          const light: ConvergeLineLight = new ConvergeLineLight(null, sp, 
             new HPoint(quad.p1.x, quad.p1.y), 
-            new HPoint(quad.p2.x, quad.p2.y), 
-            LightType.diverge);
+            new HPoint(quad.p2.x, quad.p2.y));
           light.seg = quad.p2.seg;
           lights.push(light);
         }

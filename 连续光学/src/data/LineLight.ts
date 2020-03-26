@@ -7,12 +7,10 @@ namespace hanyeah {
     public p1: HPoint;
     public angle0: number = 0;
     public angle1: number = 0;
-    public type: LightType = LightType.diverge;
-    constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint, type: LightType) {
+    constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint) {
       super(world, sp);
       this.p0 = p0;
       this.p1 = p1;
-      this.type = type;
       this.angle0 = Math.atan2(p0.y - sp.y, p0.x - sp.x);
       this.angle1 = Math.atan2(p1.y - sp.y, p1.x - sp.x);
     }
@@ -32,7 +30,7 @@ namespace hanyeah {
       if(this.isLegalAng(ang)) {
         const c1: number = PointUtils.cross2(this.p0, this.sp, this.p0, this.p1);
         const c2: number = PointUtils.cross2(this.p0, p, this.p0, this.p1);
-        if ((this.type === LightType.diverge && c1 * c2 <= 0) || (this.type === LightType.converge && c1 * c2 >= 0)) {
+        if (c1 * c2 <= 0) {
           const sp: IPoint = LineUtil.intersectRaySegment(this.sp, p, this.p0, this.p1);
           if(sp) {
             return new RayData(new HPoint(sp.x, sp.y), p, ang, this);

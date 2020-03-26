@@ -1,4 +1,13 @@
 declare namespace hanyeah {
+    import Container = PIXI.Container;
+    class Equipment extends Container {
+        main: Scene;
+        constructor(main: Scene);
+        removed(): void;
+        update(dt: number): void;
+    }
+}
+declare namespace hanyeah {
     class LightData {
         world: World;
         sp: HPoint;
@@ -20,11 +29,12 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
-    import Container = PIXI.Container;
-    class Equipment extends Container {
-        main: Scene;
+    class Mirror extends Equipment {
+        p0: DragAbleCircle;
+        p1: DragAbleCircle;
+        data: Segment;
+        private gra;
         constructor(main: Scene);
-        removed(): void;
         update(dt: number): void;
     }
 }
@@ -39,35 +49,24 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
-    class CalculateLights {
-        quads: QuadData[];
-        constructor(lights: LightData[], segments: Segment[]);
-        calculateLight(light: LightData, segments: Segment[]): QuadData[];
-        simpleQuad(quads: QuadData[]): QuadData[];
-        inSameSeg(quad0: QuadData, quad1: QuadData): boolean;
-        mergeQuad(quad0: QuadData, quad1: QuadData): void;
-        getLeftLine(ray: RayData, segments: Segment[], quad: QuadData): void;
-        getRightLine(ray: RayData, segments: Segment[], quad: QuadData): void;
-        getMinIntersect(intersects: IntersectResult[], ignoreRight: boolean, ignoreLeft: boolean): IntersectResult;
-        getIntersects(ray: RayData, segments: Segment[]): IntersectResult[];
+    class ConvergeLineLight extends LightData {
+        p0: HPoint;
+        p1: HPoint;
+        angle0: number;
+        angle1: number;
+        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint);
+        destroy(): void;
         /**
-         * 是否是线段的右端点
+         * 获取光源到指定点的光线。
          */
-        isRightPoint(ray: RayData, p: IPoint, seg: Segment): boolean;
-        isRight(p: IPoint, p0: IPoint, p1: IPoint): boolean;
+        protected getRay(p: HPoint): RayData;
         /**
-         * 是否是线段的左端点
+         *
          */
-        isLeftPoint(ray: RayData, p: IPoint, seg: Segment): boolean;
-        isLeft(p: IPoint, p0: IPoint, p1: IPoint): boolean;
-    }
-    class Calculater {
-        lightArr: LineLight[];
-        constructor();
-        calculate(world: World): QuadData[];
-        getLights(quads: QuadData[]): LightData[];
-        private getReflectVec;
-        getVec(p0: IPoint, p1: IPoint): HPoint;
+        protected getBoundary(): RayData[];
+        protected compareFn(a: RayData, b: RayData): number;
+        private formatAngle;
+        private getP1;
     }
 }
 declare namespace hanyeah {
@@ -108,8 +107,7 @@ declare namespace hanyeah {
         p1: HPoint;
         angle0: number;
         angle1: number;
-        type: LightType;
-        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint, type: LightType);
+        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint);
         destroy(): void;
         /**
          * 获取光源到指定点的光线。
@@ -203,7 +201,7 @@ declare namespace hanyeah {
     const enum SegmentType {
         mirror = 0,
         wall = 1,
-        light = 2
+        lens = 2
     }
 }
 declare namespace hanyeah {
@@ -391,6 +389,11 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
+    class Lens extends Mirror {
+        constructor(scene: Scene);
+    }
+}
+declare namespace hanyeah {
     class Light extends Equipment {
         p0: DragAbleCircle;
         p1: DragAbleCircle;
@@ -402,13 +405,35 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
-    class Mirror extends Equipment {
-        p0: DragAbleCircle;
-        p1: DragAbleCircle;
-        data: Segment;
-        private gra;
-        constructor(main: Scene);
-        update(dt: number): void;
+    class CalculateLights {
+        quads: QuadData[];
+        constructor(lights: LightData[], segments: Segment[]);
+        calculateLight(light: LightData, segments: Segment[]): QuadData[];
+        simpleQuad(quads: QuadData[]): QuadData[];
+        inSameSeg(quad0: QuadData, quad1: QuadData): boolean;
+        mergeQuad(quad0: QuadData, quad1: QuadData): void;
+        getLeftLine(ray: RayData, segments: Segment[], quad: QuadData): void;
+        getRightLine(ray: RayData, segments: Segment[], quad: QuadData): void;
+        getMinIntersect(intersects: IntersectResult[], ignoreRight: boolean, ignoreLeft: boolean): IntersectResult;
+        getIntersects(ray: RayData, segments: Segment[]): IntersectResult[];
+        /**
+         * 是否是线段的右端点
+         */
+        isRightPoint(ray: RayData, p: IPoint, seg: Segment): boolean;
+        isRight(p: IPoint, p0: IPoint, p1: IPoint): boolean;
+        /**
+         * 是否是线段的左端点
+         */
+        isLeftPoint(ray: RayData, p: IPoint, seg: Segment): boolean;
+        isLeft(p: IPoint, p0: IPoint, p1: IPoint): boolean;
+    }
+    class Calculater {
+        lightArr: LineLight[];
+        constructor();
+        calculate(world: World): QuadData[];
+        getLights(quads: QuadData[]): LightData[];
+        private getReflectVec;
+        getVec(p0: IPoint, p1: IPoint): HPoint;
     }
 }
 declare namespace hanyeah {

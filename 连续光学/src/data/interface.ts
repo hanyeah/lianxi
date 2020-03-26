@@ -9,7 +9,7 @@ namespace hanyeah {
   export const enum SegmentType {
     mirror,
     wall,
-    light
+    lens
   }
   
 }
