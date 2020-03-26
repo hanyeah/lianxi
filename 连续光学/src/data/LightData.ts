@@ -2,6 +2,7 @@ namespace hanyeah {
   export class LightData {
     public world: World;
     public sp: HPoint;
+    public seg: Segment;
     constructor(world: World, sp: HPoint) {
       this.sp = sp || new HPoint();
       this.world = world;

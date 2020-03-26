@@ -21,9 +21,7 @@ namespace hanyeah {
     protected getRay(p: HPoint): RayData {
       const ang: number = Math.atan2(p.y - this.sp.y, p.x - this.sp.x);
       if(this.isLegalAng(ang)) {
-        const dir: HPoint = new HPoint(p.x - this.sp.x, p.y - this.sp.y);
-        PointUtils.normalize(dir);
-        return new RayData(this.sp.clone(), p, Math.atan2(dir.y, dir.x), this);
+        return new RayData(this.sp.clone(), p, ang, this);
       }
       return null;
     }

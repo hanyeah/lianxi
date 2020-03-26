@@ -114,23 +114,19 @@ var hanyeah;
 })(hanyeah || (hanyeah = {}));
 var hanyeah;
 (function (hanyeah) {
-    var Calculater = /** @class */ (function () {
-        function Calculater() {
-            //
-        }
-        Calculater.prototype.calculate = function (world) {
-            var result = [];
-            var lights = world.getAllLights();
-            var segments = world.getAllSegments();
+    var CalculateLights = /** @class */ (function () {
+        function CalculateLights(lights, segments) {
+            var _a;
+            this.quads = [];
             for (var i = 0; i < lights.length; i++) {
-                result.push.apply(result, this.calculateLight(lights[i], segments));
+                (_a = this.quads).push.apply(_a, this.calculateLight(lights[i], segments));
             }
-            return result;
-        };
-        Calculater.prototype.calculateLight = function (light, segments) {
+        }
+        CalculateLights.prototype.calculateLight = function (light, segments) {
             var rays = light.getRays(segments);
             var result = [];
             var quad = new hanyeah.QuadData();
+            quad.sp = new hanyeah.QuadPoint(light.sp.x, light.sp.y);
             result.push(quad);
             var rayData;
             for (var i = 0; i < rays.length; i++) {
@@ -144,14 +140,14 @@ var hanyeah;
                 else {
                     this.getRightLine(rays[i], segments, quad);
                     quad = new hanyeah.QuadData();
+                    quad.sp = new hanyeah.QuadPoint(light.sp.x, light.sp.y);
                     result.push(quad);
                     this.getLeftLine(rays[i], segments, quad);
                 }
             }
             return this.simpleQuad(result);
-            // return result;
         };
-        Calculater.prototype.simpleQuad = function (quads) {
+        CalculateLights.prototype.simpleQuad = function (quads) {
             var result = [];
             var quad;
             for (var i = 0; i < quads.length; i++) {
@@ -165,33 +161,33 @@ var hanyeah;
             }
             return result;
         };
-        Calculater.prototype.inSameSeg = function (quad0, quad1) {
+        CalculateLights.prototype.inSameSeg = function (quad0, quad1) {
             return quad0 && quad1 && quad0.p2.seg === quad1.p2.seg;
         };
-        Calculater.prototype.mergeQuad = function (quad0, quad1) {
+        CalculateLights.prototype.mergeQuad = function (quad0, quad1) {
             quad0.p2 = quad1.p2;
             quad0.p3 = quad1.p3;
         };
-        Calculater.prototype.getLeftLine = function (ray, segments, quad) {
+        CalculateLights.prototype.getLeftLine = function (ray, segments, quad) {
             var intersects = this.getIntersects(ray, segments);
             var minIntersect = this.getMinIntersect(intersects, true, false);
             var p1 = minIntersect.p;
             quad.p0 = new hanyeah.QuadPoint(ray.p0.x, ray.p0.y, null);
             quad.p1 = new hanyeah.QuadPoint(p1.x, p1.y, minIntersect.seg);
         };
-        Calculater.prototype.getRightLine = function (ray, segments, quad) {
+        CalculateLights.prototype.getRightLine = function (ray, segments, quad) {
             var intersects = this.getIntersects(ray, segments);
             var minIntersect = this.getMinIntersect(intersects, false, true);
             var p1 = minIntersect.p;
             quad.p2 = new hanyeah.QuadPoint(p1.x, p1.y, minIntersect.seg);
             quad.p3 = new hanyeah.QuadPoint(ray.p0.x, ray.p0.y, null);
         };
-        Calculater.prototype.getMinIntersect = function (intersects, ignoreRight, ignoreLeft) {
+        CalculateLights.prototype.getMinIntersect = function (intersects, ignoreRight, ignoreLeft) {
             var intersect;
             var minInter;
             for (var i = 0; i < intersects.length; i++) {
                 intersect = intersects[i];
-                if (!minInter || intersect.d < minInter.d) {
+                if (intersect.d > 0 && (!minInter || intersect.d < minInter.d)) {
                     if (ignoreRight && this.isRightPoint(intersect.ray, intersect.p, intersect.seg)) {
                         //
                     }
@@ -215,41 +211,101 @@ var hanyeah;
             }
             return minInter;
         };
-        Calculater.prototype.getIntersects = function (ray, segments) {
+        CalculateLights.prototype.getIntersects = function (ray, segments) {
             var seg;
             var p;
             var result = [];
             for (var i = 0; i < segments.length; i++) {
                 seg = segments[i];
-                p = hanyeah.LineUtil.intersectRaySegment(ray.p0, ray.p1, seg.p0, seg.p1);
+                if (seg === ray.light.seg) {
+                    continue;
+                }
+                if (hanyeah.PointUtils.isEqual(ray.p1, seg.p0) || hanyeah.PointUtils.isEqual(ray.p1, seg.p1)) {
+                    p = ray.p1;
+                }
+                else {
+                    p = hanyeah.LineUtil.intersectRaySegment(ray.p0, ray.p1, seg.p0, seg.p1);
+                }
                 if (p) {
                     var d = hanyeah.PointUtils.distance(ray.p0, p);
                     result.push(new hanyeah.IntersectResult(p, seg, d, ray));
                 }
+            }
+            if (result.length === 0) {
+                debugger;
+                this.getIntersects(ray, segments);
             }
             return result;
         };
         /**
          * 是否是线段的右端点
          */
-        Calculater.prototype.isRightPoint = function (ray, p, seg) {
+        CalculateLights.prototype.isRightPoint = function (ray, p, seg) {
             return (hanyeah.PointUtils.isEqual(p, seg.p0) && this.isRight(ray.p0, seg.p0, seg.p1))
                 || (hanyeah.PointUtils.isEqual(p, seg.p1) && this.isRight(ray.p0, seg.p1, seg.p0));
         };
-        Calculater.prototype.isRight = function (p, p0, p1) {
+        CalculateLights.prototype.isRight = function (p, p0, p1) {
             var c = hanyeah.PointUtils.cross2(p0, p, p0, p1);
             return c < 0;
         };
         /**
          * 是否是线段的左端点
          */
-        Calculater.prototype.isLeftPoint = function (ray, p, seg) {
+        CalculateLights.prototype.isLeftPoint = function (ray, p, seg) {
             return (hanyeah.PointUtils.isEqual(p, seg.p0) && this.isLeft(ray.p0, seg.p0, seg.p1))
                 || (hanyeah.PointUtils.isEqual(p, seg.p1) && this.isLeft(ray.p0, seg.p1, seg.p0));
         };
-        Calculater.prototype.isLeft = function (p, p0, p1) {
+        CalculateLights.prototype.isLeft = function (p, p0, p1) {
             var c = hanyeah.PointUtils.cross2(p0, p, p0, p1);
             return c > 0;
+        };
+        return CalculateLights;
+    }());
+    hanyeah.CalculateLights = CalculateLights;
+    var Calculater = /** @class */ (function () {
+        function Calculater() {
+            this.lightArr = [];
+            //
+        }
+        Calculater.prototype.calculate = function (world) {
+            var result = [];
+            var lights = world.getAllLights();
+            var segments = world.getAllSegments();
+            for (var i = 0; i < 2; i++) {
+                var quads = new CalculateLights(lights, segments).quads;
+                lights = this.getLights(quads);
+                if (i === 0) {
+                    this.lightArr = lights;
+                }
+                result.push.apply(result, quads);
+            }
+            return result;
+        };
+        Calculater.prototype.getLights = function (quads) {
+            var lights = [];
+            for (var i = 0; i < quads.length; i++) {
+                var quad = quads[i];
+                if (quad.p2.seg.type === 0 /* mirror */) {
+                    var p0 = quad.sp;
+                    var vec = this.getVec(quad.p1, quad.p2);
+                    var normal = new hanyeah.HPoint(-vec.y, vec.x);
+                    var vec1 = new hanyeah.HPoint(quad.p1.x - quad.p0.x, quad.p1.y - quad.p0.y);
+                    var d0 = hanyeah.PointUtils.dot(vec1, normal);
+                    var sp = new hanyeah.HPoint(p0.x + d0 * normal.x * 2, p0.y + d0 * normal.y * 2);
+                    var light = new hanyeah.LineLight(null, sp, new hanyeah.HPoint(quad.p1.x, quad.p1.y), new hanyeah.HPoint(quad.p2.x, quad.p2.y), 1 /* diverge */);
+                    light.seg = quad.p2.seg;
+                    lights.push(light);
+                }
+            }
+            return lights;
+        };
+        Calculater.prototype.getReflectVec = function (p0, normal) {
+            return new hanyeah.HPoint(p0.x + normal.x * 2, p0.y + normal.y * 2);
+        };
+        Calculater.prototype.getVec = function (p0, p1) {
+            var vec = new hanyeah.HPoint(p1.x - p0.x, p1.y - p0.y);
+            hanyeah.PointUtils.normalize(vec);
+            return vec;
         };
         return Calculater;
     }());
@@ -322,14 +378,73 @@ var hanyeah;
         __extends(LineLight, _super);
         function LineLight(world, sp, p0, p1, type) {
             var _this = _super.call(this, world, sp) || this;
+            _this.angle0 = 0;
+            _this.angle1 = 0;
             _this.type = 1 /* diverge */;
             _this.p0 = p0;
             _this.p1 = p1;
             _this.type = type;
+            _this.angle0 = Math.atan2(p0.y - sp.y, p0.x - sp.x);
+            _this.angle1 = Math.atan2(p1.y - sp.y, p1.x - sp.x);
             return _this;
         }
         LineLight.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
+        };
+        /**
+         * 获取光源到指定点的光线。
+         */
+        LineLight.prototype.getRay = function (p) {
+            if (hanyeah.PointUtils.isEqual(p, this.p0) || hanyeah.PointUtils.isEqual(p, this.p1)) {
+                return null;
+            }
+            var ang = Math.atan2(p.y - this.sp.y, p.x - this.sp.x);
+            if (this.isLegalAng(ang)) {
+                var c1 = hanyeah.PointUtils.cross2(this.p0, this.sp, this.p0, this.p1);
+                var c2 = hanyeah.PointUtils.cross2(this.p0, p, this.p0, this.p1);
+                if ((this.type === 1 /* diverge */ && c1 * c2 <= 0) || (this.type === 0 /* converge */ && c1 * c2 >= 0)) {
+                    var sp = hanyeah.LineUtil.intersectRaySegment(this.sp, p, this.p0, this.p1);
+                    if (sp) {
+                        return new hanyeah.RayData(new hanyeah.HPoint(sp.x, sp.y), p, ang, this);
+                    }
+                }
+            }
+            return null;
+        };
+        /**
+         *
+         */
+        LineLight.prototype.getBoundary = function () {
+            return [
+                new hanyeah.RayData(this.p0.clone(), this.getP1(this.p0), this.getAngle(this.p0), this),
+                new hanyeah.RayData(this.p1.clone(), this.getP1(this.p1), this.getAngle(this.p1), this)
+            ];
+        };
+        LineLight.prototype.isLegalAng = function (ang) {
+            if (this.angle1 > this.angle0) {
+                return ang >= this.angle0 && ang <= this.angle1;
+            }
+            return ang <= this.angle1 || ang >= this.angle0;
+        };
+        LineLight.prototype.compareFn = function (a, b) {
+            if (this.angle1 >= this.angle0) {
+                return -(a.angle - b.angle);
+            }
+            return -(this.formatAngle(a.angle) - this.formatAngle(b.angle));
+        };
+        LineLight.prototype.formatAngle = function (ang) {
+            if (ang <= this.angle1) {
+                ang += 2 * Math.PI;
+            }
+            return ang;
+        };
+        LineLight.prototype.getAngle = function (p) {
+            return Math.atan2(p.y - this.sp.y, p.x - this.sp.x);
+        };
+        LineLight.prototype.getP1 = function (p) {
+            var vec = { x: p.x - this.sp.x, y: p.y - this.sp.y };
+            hanyeah.PointUtils.normalize(vec);
+            return new hanyeah.HPoint(p.x + vec.x, p.y + vec.y);
         };
         return LineLight;
     }(hanyeah.LightData));
@@ -362,9 +477,7 @@ var hanyeah;
         PointLight.prototype.getRay = function (p) {
             var ang = Math.atan2(p.y - this.sp.y, p.x - this.sp.x);
             if (this.isLegalAng(ang)) {
-                var dir = new hanyeah.HPoint(p.x - this.sp.x, p.y - this.sp.y);
-                hanyeah.PointUtils.normalize(dir);
-                return new hanyeah.RayData(this.sp.clone(), p, Math.atan2(dir.y, dir.x), this);
+                return new hanyeah.RayData(this.sp.clone(), p, ang, this);
             }
             return null;
         };
@@ -403,6 +516,7 @@ var hanyeah;
 (function (hanyeah) {
     var QuadData = /** @class */ (function () {
         function QuadData() {
+            this.sp = new QuadPoint();
             this.p0 = new QuadPoint();
             this.p1 = new QuadPoint();
             this.p2 = new QuadPoint();
@@ -443,9 +557,9 @@ var hanyeah;
 (function (hanyeah) {
     var World = /** @class */ (function () {
         function World() {
+            this.calculater = new hanyeah.Calculater();
             this.lightDataArr = [];
             this.sagmentDataArr = [];
-            this.calculater = new hanyeah.Calculater();
         }
         World.prototype.addLight = function (data) {
             this.lightDataArr.push(data);
@@ -967,6 +1081,7 @@ var hanyeah;
             return eq;
         };
         Scene.prototype.update = function (dt) {
+            var _this = this;
             this.eqs.forEach(function (eq) {
                 eq.update(dt);
             });
@@ -982,6 +1097,11 @@ var hanyeah;
                 this.gra.lineTo(quad.p3.x, quad.p3.y);
                 this.gra.endFill();
             }
+            this.world.calculater.lightArr.forEach(function (light) {
+                _this.gra.beginFill(0x00ff00, 0.5);
+                _this.gra.drawCircle(light.sp.x, light.sp.y, 10);
+                _this.gra.endFill();
+            });
         };
         return Scene;
     }(Container));

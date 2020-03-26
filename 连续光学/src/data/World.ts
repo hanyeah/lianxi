@@ -1,8 +1,8 @@
 namespace hanyeah {
   export class World {
+    public calculater: Calculater = new Calculater();
     private lightDataArr: LightData[] = [];
     private sagmentDataArr: Segment[] = [];
-    private calculater: Calculater = new Calculater();
     constructor() {
 
     }

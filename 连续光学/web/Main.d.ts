@@ -2,6 +2,7 @@ declare namespace hanyeah {
     class LightData {
         world: World;
         sp: HPoint;
+        seg: Segment;
         constructor(world: World, sp: HPoint);
         destroy(): void;
         getRays(segments: Segment[]): RayData[];
@@ -38,9 +39,9 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
-    class Calculater {
-        constructor();
-        calculate(world: World): QuadData[];
+    class CalculateLights {
+        quads: QuadData[];
+        constructor(lights: LightData[], segments: Segment[]);
         calculateLight(light: LightData, segments: Segment[]): QuadData[];
         simpleQuad(quads: QuadData[]): QuadData[];
         inSameSeg(quad0: QuadData, quad1: QuadData): boolean;
@@ -59,6 +60,14 @@ declare namespace hanyeah {
          */
         isLeftPoint(ray: RayData, p: IPoint, seg: Segment): boolean;
         isLeft(p: IPoint, p0: IPoint, p1: IPoint): boolean;
+    }
+    class Calculater {
+        lightArr: LineLight[];
+        constructor();
+        calculate(world: World): QuadData[];
+        getLights(quads: QuadData[]): LightData[];
+        private getReflectVec;
+        getVec(p0: IPoint, p1: IPoint): HPoint;
     }
 }
 declare namespace hanyeah {
@@ -97,9 +106,24 @@ declare namespace hanyeah {
     class LineLight extends LightData {
         p0: HPoint;
         p1: HPoint;
+        angle0: number;
+        angle1: number;
         type: LightType;
         constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint, type: LightType);
         destroy(): void;
+        /**
+         * 获取光源到指定点的光线。
+         */
+        protected getRay(p: HPoint): RayData;
+        /**
+         *
+         */
+        protected getBoundary(): RayData[];
+        protected isLegalAng(ang: number): boolean;
+        protected compareFn(a: RayData, b: RayData): number;
+        private formatAngle;
+        private getAngle;
+        private getP1;
     }
 }
 declare namespace hanyeah {
@@ -124,6 +148,7 @@ declare namespace hanyeah {
 }
 declare namespace hanyeah {
     class QuadData {
+        sp: QuadPoint;
         p0: QuadPoint;
         p1: QuadPoint;
         p2: QuadPoint;
@@ -155,9 +180,9 @@ declare namespace hanyeah {
 }
 declare namespace hanyeah {
     class World {
+        calculater: Calculater;
         private lightDataArr;
         private sagmentDataArr;
-        private calculater;
         constructor();
         addLight(data: LightData): void;
         removeLight(data: LightData): void;

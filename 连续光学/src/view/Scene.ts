@@ -41,6 +41,12 @@ namespace hanyeah {
         this.gra.lineTo(quad.p3.x, quad.p3.y);
         this.gra.endFill();
       }
+      
+      this.world.calculater.lightArr.forEach((light: LineLight) => {
+        this.gra.beginFill(0x00ff00, 0.5);
+        this.gra.drawCircle(light.sp.x, light.sp.y, 10);
+        this.gra.endFill();
+      });
     }
   }
 }

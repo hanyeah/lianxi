@@ -1,5 +1,6 @@
 namespace hanyeah {
   export class QuadData{
+    public sp: QuadPoint = new QuadPoint();
     public p0: QuadPoint = new QuadPoint();
     public p1: QuadPoint = new QuadPoint();
     public p2: QuadPoint = new QuadPoint();
