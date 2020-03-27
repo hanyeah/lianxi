@@ -1,13 +1,4 @@
 declare namespace hanyeah {
-    import Container = PIXI.Container;
-    class Equipment extends Container {
-        main: Scene;
-        constructor(main: Scene);
-        removed(): void;
-        update(dt: number): void;
-    }
-}
-declare namespace hanyeah {
     class LightData {
         world: World;
         sp: HPoint;
@@ -29,6 +20,40 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
+    import Container = PIXI.Container;
+    class Equipment extends Container {
+        main: Scene;
+        constructor(main: Scene);
+        removed(): void;
+        update(dt: number): void;
+    }
+}
+declare namespace hanyeah {
+    /**
+     * 线光源
+     */
+    class LineLight extends LightData {
+        p0: HPoint;
+        p1: HPoint;
+        angle0: number;
+        angle1: number;
+        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint);
+        destroy(): void;
+        /**
+         * 获取光源到指定点的光线。
+         */
+        protected getRay(p: HPoint): RayData;
+        /**
+         *
+         */
+        protected getBoundary(): RayData[];
+        protected isLegalAng(ang: number): boolean;
+        protected compareFn(a: RayData, b: RayData): number;
+        protected formatAngle(ang: number): number;
+        protected getP1(p: IPoint): HPoint;
+    }
+}
+declare namespace hanyeah {
     class Mirror extends Equipment {
         p0: DragAbleCircle;
         p1: DragAbleCircle;
@@ -44,29 +69,9 @@ declare namespace hanyeah {
         p0: HPoint;
         p1: HPoint;
         type: SegmentType;
+        f: number;
         constructor(world: World, type: SegmentType);
         destroy(): void;
-    }
-}
-declare namespace hanyeah {
-    class ConvergeLineLight extends LightData {
-        p0: HPoint;
-        p1: HPoint;
-        angle0: number;
-        angle1: number;
-        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint);
-        destroy(): void;
-        /**
-         * 获取光源到指定点的光线。
-         */
-        protected getRay(p: HPoint): RayData;
-        /**
-         *
-         */
-        protected getBoundary(): RayData[];
-        protected compareFn(a: RayData, b: RayData): number;
-        private formatAngle;
-        private getP1;
     }
 }
 declare namespace hanyeah {
@@ -99,29 +104,12 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
-    /**
-     * 线光源
-     */
-    class LineLight extends LightData {
+    class AngleData {
         p0: HPoint;
         p1: HPoint;
-        angle0: number;
-        angle1: number;
-        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint);
-        destroy(): void;
-        /**
-         * 获取光源到指定点的光线。
-         */
-        protected getRay(p: HPoint): RayData;
-        /**
-         *
-         */
-        protected getBoundary(): RayData[];
-        protected isLegalAng(ang: number): boolean;
-        protected compareFn(a: RayData, b: RayData): number;
-        private formatAngle;
-        private getAngle;
-        private getP1;
+        angle: number;
+        d: number;
+        constructor(p0: HPoint, p1: HPoint, ang0: number);
     }
 }
 declare namespace hanyeah {
@@ -167,6 +155,7 @@ declare namespace hanyeah {
         dir: HPoint;
         angle: number;
         light: LightData;
+        f0: number;
         constructor(p0: HPoint, p1: HPoint, angle: number, light: LightData);
     }
 }
@@ -380,31 +369,6 @@ declare namespace hanyeah {
     }
 }
 declare namespace hanyeah {
-    class AngleData {
-        p0: HPoint;
-        p1: HPoint;
-        angle: number;
-        d: number;
-        constructor(p0: HPoint, p1: HPoint, ang0: number);
-    }
-}
-declare namespace hanyeah {
-    class Lens extends Mirror {
-        constructor(scene: Scene);
-    }
-}
-declare namespace hanyeah {
-    class Light extends Equipment {
-        p0: DragAbleCircle;
-        p1: DragAbleCircle;
-        p2: DragAbleCircle;
-        data: PointLight;
-        private gra;
-        constructor(main: Scene);
-        update(dt: number): void;
-    }
-}
-declare namespace hanyeah {
     class CalculateLights {
         quads: QuadData[];
         constructor(lights: LightData[], segments: Segment[]);
@@ -432,8 +396,47 @@ declare namespace hanyeah {
         constructor();
         calculate(world: World): QuadData[];
         getLights(quads: QuadData[]): LightData[];
+        private zheshe;
+        private reflect;
         private getReflectVec;
         getVec(p0: IPoint, p1: IPoint): HPoint;
+    }
+}
+declare namespace hanyeah {
+    class Lens extends Mirror {
+        constructor(scene: Scene, f?: number);
+    }
+}
+declare namespace hanyeah {
+    class Light extends Equipment {
+        p0: DragAbleCircle;
+        p1: DragAbleCircle;
+        p2: DragAbleCircle;
+        data: PointLight;
+        private gra;
+        constructor(main: Scene);
+        update(dt: number): void;
+    }
+}
+declare namespace hanyeah {
+    class ConvergeLineLight extends LineLight {
+        p0: HPoint;
+        p1: HPoint;
+        angle0: number;
+        angle1: number;
+        constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint);
+        destroy(): void;
+        /**
+         * 获取光源到指定点的光线。
+         */
+        protected getRay(p: HPoint): RayData;
+        /**
+         *
+         */
+        protected getBoundary(): RayData[];
+        protected compareFn(a: RayData, b: RayData): number;
+        protected formatAngle(ang: number): number;
+        protected getP1(p: IPoint): HPoint;
     }
 }
 declare namespace hanyeah {

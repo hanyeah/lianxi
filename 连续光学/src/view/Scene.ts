@@ -10,9 +10,10 @@ namespace hanyeah {
       this.gra = new Graphics();
       this.addChild(this.gra);
       this.addEq(new Light(this), 400, 100);
-      this.addEq(new Mirror(this), 300, 300);
-      this.addEq(new Mirror(this), 500, 300);
-      // this.addEq(new Lens(this), 400, 400);
+      // this.addEq(new Mirror(this), 300, 300);
+      // this.addEq(new Mirror(this), 500, 300);
+      this.addEq(new Lens(this, 100), 400, 400);
+      this.addEq(new Lens(this, -100), 400, 500);
       this.addEq(new Wall(this, {x: 0, y: 0}, {x: 0, y: 600}), 0, 0);
       this.addEq(new Wall(this, {x: 800, y: 0}, {x: 800, y:600}), 0, 0);
       this.addEq(new Wall(this, {x: 0, y: 0}, {x: 800, y: 0}), 0, 0);

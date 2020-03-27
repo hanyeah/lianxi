@@ -162,7 +162,7 @@ namespace hanyeah {
       let lights: LightData[] = world.getAllLights();
       const segments: Segment[] = world.getAllSegments();
 
-      for(let i: number = 0; i < 2; i++) {
+      for(let i: number = 0; i < 3; i++) {
         const quads: QuadData[] =  new CalculateLights(lights, segments).quads;
         lights = this.getLights(quads);
         if (i === 0) {
@@ -178,25 +178,66 @@ namespace hanyeah {
       const lights: LightData[] = [];
       for (let i: number = 0; i < quads.length; i++) {
         const quad: QuadData = quads[i];
-        if (quad.p2.seg.type === SegmentType.mirror) {
-          const p0: IPoint = quad.sp;
-          const vec: HPoint = this.getVec(quad.p1, quad.p2);
-          const normal: HPoint = new HPoint(-vec.y, vec.x);
-          const vec1: HPoint = new HPoint(quad.p1.x - quad.p0.x, quad.p1.y - quad.p0.y);
-          const d0: number = PointUtils.dot(vec1, normal);
-          const sp: HPoint = new HPoint(p0.x + d0 * normal.x * 2, p0.y + d0 * normal.y * 2);
-          // const light: LineLight = new LineLight(null, sp, 
-          //   new HPoint(quad.p1.x, quad.p1.y), 
-          //   new HPoint(quad.p2.x, quad.p2.y));
-
-          const light: ConvergeLineLight = new ConvergeLineLight(null, sp, 
-            new HPoint(quad.p1.x, quad.p1.y), 
-            new HPoint(quad.p2.x, quad.p2.y));
-          light.seg = quad.p2.seg;
-          lights.push(light);
+        switch(quad.p2.seg.type) {
+          case SegmentType.mirror:
+            lights.push(this.reflect(quad));
+            break;
+          case SegmentType.lens:
+            lights.push(this.zheshe(quad));
+            break;
         }
       }
       return lights;
+    }
+
+    private zheshe(quad: QuadData): LightData {
+      const f: number = quad.p2.seg.f;
+      const p0: IPoint = quad.sp; // 物点
+      const op: IPoint = PointUtils.getMiddleP(quad.p1, quad.p2); // 透镜中心
+      const vec: HPoint = new HPoint(p0.x - op.x, p0.y - op.y);
+      const u: number = PointUtils.length0(vec);
+      // 1/u + 1/v = 1/f
+      // =>1/v = 1/f-1/u
+      // =>1/v = (u-f)/(fu)
+      // =>v = (fu)/(u-f)
+      // const v: number = u === f ? 1e10: (f * u) / (u - f);
+      // const sc: number = v / u;
+      const c1: number = PointUtils.cross2(quad.p1, quad.p2, quad.p1, quad.p0);
+      const c2: number = PointUtils.cross2(quad.p1, quad.p2, quad.p1, p0);
+      const c: number = c1 * c2 > 0 ? 1 : -1;
+
+      const sc: number = c * (u === f ? 1e10: f / (u - f));
+      const pv: HPoint = new HPoint(op.x - vec.x * sc, op.y - vec.y * sc);
+
+      const cv: number = PointUtils.cross2(quad.p1, quad.p2, quad.p1, pv);
+      let light: LightData;
+      if (c1 * cv < 0) {
+        // 汇聚
+        light = new ConvergeLineLight(null, pv, 
+          new HPoint(quad.p1.x, quad.p1.y), 
+          new HPoint(quad.p2.x, quad.p2.y));
+      } else {
+        // 发散
+        light = new LineLight(null, pv, 
+          new HPoint(quad.p1.x, quad.p1.y), 
+          new HPoint(quad.p2.x, quad.p2.y));
+      }
+      light.seg = quad.p2.seg;
+      return light;
+    }
+
+    private reflect(quad: QuadData): LightData {
+      const p0: IPoint = quad.sp;
+      const vec: HPoint = this.getVec(quad.p1, quad.p2);
+      const normal: HPoint = new HPoint(-vec.y, vec.x);
+      const vec1: HPoint = new HPoint(quad.p1.x - quad.p0.x, quad.p1.y - quad.p0.y);
+      const d0: number = PointUtils.dot(vec1, normal);
+      const sp: HPoint = new HPoint(p0.x + d0 * normal.x * 2, p0.y + d0 * normal.y * 2);
+      const light: LineLight = new LineLight(null, sp, 
+        new HPoint(quad.p1.x, quad.p1.y), 
+        new HPoint(quad.p2.x, quad.p2.y));
+      light.seg = quad.p2.seg;
+      return light;
     }
 
     private getReflectVec(p0: IPoint, normal: HPoint): HPoint {

@@ -11,8 +11,17 @@ namespace hanyeah {
       super(world, sp);
       this.p0 = p0;
       this.p1 = p1;
-      this.angle0 = Math.atan2(p0.y - sp.y, p0.x - sp.x);
-      this.angle1 = Math.atan2(p1.y - sp.y, p1.x - sp.x);
+      this.angle0 = PointUtils.getAngle2(sp, p0);
+      this.angle1 = PointUtils.getAngle2(sp, p1);
+      if (this.angle1 < this.angle0) {
+        if (this.angle0 - this.angle1 < Math.PI) {
+          let temp: number = this.angle0;
+          this.angle0 = this.angle1;
+          this.angle1 = temp;
+          this.p0 = p1;
+          this.p1 = p0;
+        }
+      }
     }
 
     public destroy(): void {
@@ -26,15 +35,12 @@ namespace hanyeah {
       if (PointUtils.isEqual(p, this.p0) || PointUtils.isEqual(p, this.p1)) {
         return null;
       }
-      const ang: number = Math.atan2(p.y - this.sp.y, p.x - this.sp.x);
-      if(this.isLegalAng(ang)) {
-        const c1: number = PointUtils.cross2(this.p0, this.sp, this.p0, this.p1);
-        const c2: number = PointUtils.cross2(this.p0, p, this.p0, this.p1);
-        if (c1 * c2 <= 0) {
-          const sp: IPoint = LineUtil.intersectRaySegment(this.sp, p, this.p0, this.p1);
-          if(sp) {
-            return new RayData(new HPoint(sp.x, sp.y), p, ang, this);
-          }
+      const c1: number = PointUtils.cross2(this.p0, this.sp, this.p0, this.p1);
+      const c2: number = PointUtils.cross2(this.p0, p, this.p0, this.p1);
+      if (c1 * c2 <= 0) {
+        const sp: IPoint = LineUtil.intersectLineSegment(this.sp, p, this.p0, this.p1);
+        if (sp) {
+          return new RayData(new HPoint(sp.x, sp.y), p, PointUtils.getAngle2(sp, p), this);
         }
       }
       return null;
@@ -45,8 +51,8 @@ namespace hanyeah {
      */
     protected getBoundary(): RayData[] {
       return [
-        new RayData(this.p0.clone(), this.getP1(this.p0), this.getAngle(this.p0), this),
-        new RayData(this.p1.clone(), this.getP1(this.p1), this.getAngle(this.p1), this)
+        new RayData(this.p0.clone(), this.getP1(this.p0), PointUtils.getAngle2(this.sp, this.p0), this),
+        new RayData(this.p1.clone(), this.getP1(this.p1), PointUtils.getAngle2(this.sp, this.p1), this)
       ];
     }
 
@@ -64,18 +70,14 @@ namespace hanyeah {
       return -(this.formatAngle(a.angle) - this.formatAngle(b.angle));
     }
 
-    private formatAngle(ang: number): number {
+    protected formatAngle(ang: number): number {
       if (ang <= this.angle1) {
         ang += 2 * Math.PI;
       }
       return ang;
     }
 
-    private getAngle(p: IPoint): number {
-      return Math.atan2(p.y - this.sp.y, p.x - this.sp.x);
-    }
-
-    private getP1(p: IPoint): HPoint {
+    protected getP1(p: IPoint): HPoint {
       const vec: IPoint = {x: p.x - this.sp.x, y: p.y - this.sp.y};
       PointUtils.normalize(vec);
       return new HPoint(p.x + vec.x, p.y + vec.y);

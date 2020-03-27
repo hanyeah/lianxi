@@ -1,15 +1,11 @@
 namespace hanyeah {
-  export class ConvergeLineLight extends LightData {
+  export class ConvergeLineLight extends LineLight {
     public p0: HPoint;
     public p1: HPoint;
     public angle0: number = 0;
     public angle1: number = 0;
     constructor(world: World, sp: HPoint, p0: HPoint, p1: HPoint) {
-      super(world, sp);
-      this.p0 = p0;
-      this.p1 = p1;
-      this.angle0 = PointUtils.getAngle2(p0, sp);
-      this.angle1 = PointUtils.getAngle2(p1, sp);
+      super(world, sp, p0, p1);
     }
 
     public destroy(): void {
@@ -20,6 +16,17 @@ namespace hanyeah {
      * 获取光源到指定点的光线。
      */
     protected getRay(p: HPoint): RayData {
+      if (PointUtils.isEqual(p, this.p0) || PointUtils.isEqual(p, this.p1)) {
+        return null;
+      }
+      const c1: number = PointUtils.cross2(this.p0, this.sp, this.p0, this.p1);
+      const c2: number = PointUtils.cross2(this.p0, p, this.p0, this.p1);
+      if (c1 * c2 >= 0) {
+        const sp: IPoint = LineUtil.intersectLineSegment(this.sp, p, this.p0, this.p1);
+        if (sp) {
+          return new RayData(new HPoint(sp.x, sp.y), p, PointUtils.getAngle2(sp, p), this);
+        }
+      }
       return null;
     }
     
@@ -40,14 +47,14 @@ namespace hanyeah {
       return -(this.formatAngle(a.angle) - this.formatAngle(b.angle));
     }
 
-    private formatAngle(ang: number): number {
+    protected formatAngle(ang: number): number {
       if (ang <= this.angle1) {
         ang += 2 * Math.PI;
       }
       return ang;
     }
 
-    private getP1(p: IPoint): HPoint {
+    protected getP1(p: IPoint): HPoint {
       const vec: IPoint = {x: this.sp.x - p.x, y: this.sp.y - p.y};
       PointUtils.normalize(vec);
       return new HPoint(p.x + vec.x, p.y + vec.y);
