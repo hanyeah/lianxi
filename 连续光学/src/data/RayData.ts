@@ -5,7 +5,6 @@ namespace hanyeah {
     public dir: HPoint;
     public angle: number;
     public light: LightData;
-    public f0: number = -1;
     constructor(p0: HPoint, p1: HPoint, angle: number, light: LightData) {
       this.p0 = p0;
       this.p1 = p1;
