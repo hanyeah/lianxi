@@ -4,8 +4,9 @@ namespace hanyeah.circuit {
     public edge: IEdge;
     public prev: IVertex = this;
     public next: IVertex = this;
+    public index: number = -1;
     private world: IWorld;
-    
+
     constructor(world: IWorld, edge: IEdge){
       this.world = world;
       this.edge = edge;

@@ -20,4 +20,3 @@ namespace hanyeah.circuit {
   }
 }
 
-new hanyeah.circuit.Main();

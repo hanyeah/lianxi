@@ -24,6 +24,7 @@ namespace hanyeah.circuit {
     edge: IEdge;
     prev: IVertex;
     next: IVertex;
+    index: number;
     destroy(): void;
     connect(vertex: IVertex): void;
     disConnect(): void;
