@@ -40,21 +40,23 @@ if(!flaDocument){
 function jiexiDoc(){
 	var elements = bianliTimeline(flaDocument.getTimeline(), isMovieClip, 1)[0];
 	forEach(elements, function(instance){
-			if(isSprite(instance)){
-				data.instances.push({
-					libName: instance.libraryItem.name
-				});
+			if(isSupport(instance)){
+				//data.instances.push({
+				//	libName: instance.libraryItem.name,
+				//	instanceName: instance.name
+				//});
+				data.instances.push(instance.libraryItem.name);
 				data.libs[instance.libraryItem.name] = parseLibItem(instance.libraryItem);
 			}
 	});
 }
 
 function parseLibSprite(libraryItem){
-	//trace("sprite");
+	trace("sprite");
 	instances = bianliTimeline(libraryItem.timeline, isSupport, 1)[0];
 	if(!isContainer(instances)){
 		var instance = instances[0];
-		var o = parseBitmap(instance.libraryItem);
+		var o = parseLibBitmap(instance.libraryItem);
 		if(instance.x != 0 || instance.y != 0){
 			o.anchor = {
 				x: toFixed(-instance.x / instance.width, 4),
@@ -80,7 +82,7 @@ function parseLibSprite(libraryItem){
 }
 
 function parseLibBitmap(libraryItem){
-	//trace("bitmap" + libraryItem.name);
+	trace("bitmap" + libraryItem.name);
 	var o = {
 		type: "Bitmap",
 		texture: libraryItem.name
@@ -90,7 +92,7 @@ function parseLibBitmap(libraryItem){
 }
 
 function parseLibMovieClip(libraryItem){
-	//trace("movie clip");
+	trace("AnimatedSprite");
 	var frames = bianliTimeline(libraryItem.timeline, isSupport, 0);
 	if(isAnimatedSprite(frames)){
 		var o = {
@@ -174,7 +176,7 @@ function save(){
 	trace("导出" + confFile);
 	var jsonData = sheet.exportSpriteSheet(path + name, {format:"png", bitDepth:32, backgroundColor:"#00000000"});
 	//
-	jsonData = jsonFrameAddFileName(jsonData);
+	// jsonData = jsonFrameAddFileName(jsonData);
 	//
 	var jsonFile = path + name + ".json";
 	FLfile.write(jsonFile, jsonData);
